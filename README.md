@@ -1,2 +1,2 @@
 # arane
-Help download mangas to read offline
+Download mangas to read offline
