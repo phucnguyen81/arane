@@ -1,0 +1,210 @@
+delimiters "$", "$"
+
+story(story) ::= <<
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>$story.name$</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript">
+$javascript()$
+</script>
+</head>
+<body onload="javascript:onBodyLoad()">
+    $chapterListing(story.chapters)$
+    $story.chapters:chapterDiv();separator="\n"$
+    $chapterListing(story.chapters)$
+</body>
+</html>
+>>
+
+javascript() ::= <<
+    function onBodyLoad() {
+        window.onkeydown = onKeyDown;
+        selectInitialChapter();
+    }
+
+    function selectInitialChapter() {
+        var chapterId = getCookie("chapter");
+        if (!document.getElementById(chapterId)) chapterId = firstChapterId();
+        selectChapter(chapterId);
+    }
+
+    function selectChapter(chapterId) {
+        updateSelectChapter(chapterId);
+        unloadAllChapters();
+        loadChapter(chapterId);
+        jumpToTop();
+        setCookie("chapter", chapterId, 30);
+    }
+
+    function firstChapterId() {
+        var firstChapter = document.getElementsByClassName("chapter")[0];
+        return firstChapter.id;
+    }
+
+    function updateSelectChapter(chapterId) {
+        var selectChapters = document.getElementsByClassName("selectChapter");
+        for (var i = 0; i < selectChapters.length; i++) {
+            selectChapters[i].value = chapterId;
+        }
+    }
+
+    function unloadAllChapters() {
+        var chapters = document.getElementsByClassName("chapter");
+        for (var i = 0; i < chapters.length; i++) {
+            chapters[i].style.display = 'none';
+            var images = chapters[i].getElementsByTagName("img");
+            for (var j = 0; j < images.length; j++) {
+                images[j].removeAttribute("src");
+            }
+        }
+    }
+
+    function loadChapter(chapterId) {
+        var chapter = document.getElementById(chapterId);
+        chapter.style.display = '';
+        var images = chapter.getElementsByTagName("img");
+        for (var i = 0; i < images.length; i++) {
+            images[i].setAttribute("src", images[i].getAttribute("alt"));
+        }
+    }
+
+    function jumpToTop() {
+        window.scrollTo(0, 0);
+    }
+
+    function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        var expires = "expires="+d.toUTCString();
+        document.cookie = cname + "=" + cvalue + "; " + expires;
+    }
+
+    function getCookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1);
+            if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+        }
+        return "";
+    }
+
+    function onKeyDown(e) {
+        if (e.keyCode == 'S'.charCodeAt(0)) {
+            scrollDown();
+        }
+        else if (e.keyCode == 'W'.charCodeAt(0)) {
+            scrollUp();
+        }       
+    }
+
+    function scrollDown() {
+        var winTop = window.pageYOffset;
+        var winHeight = window.innerHeight;
+        var winBottom = winTop + winHeight;
+
+        var images = document.getElementsByTagName('img');
+        for (var i=0; i<images.length; i++) {
+            var image = images[i];
+            var imgTop = image.offsetTop;
+            var imgHeight = image.clientHeight;
+            var imgBottom = imgTop + imgHeight;
+            var bottomDistance = imgBottom - winBottom
+
+            //if bottom of current image is in view, scroll past current image
+            if (winTop < imgBottom && imgBottom < winBottom) {
+                window.scrollTo(0, imgBottom);
+                return;
+            }
+            //if image bottom is close enough to window bottom, scroll to see the bottom
+            else if (0 < bottomDistance && bottomDistance < winHeight) {
+                window.scrollBy(0, bottomDistance);
+                return;
+            }
+        }
+
+        //default is to scroll view height
+        window.scrollBy(0, winHeight);
+    }
+
+    function scrollUp() {
+        var winTop = window.pageYOffset;
+        var winHeight = window.innerHeight;
+        var winBottom = winTop + winHeight;
+
+        var images = document.getElementsByTagName('img');
+        for (var i=0; i<images.length; i++) {
+            var image = images[i];
+            var imgTop = image.offsetTop;
+            var imgHeight = image.clientHeight;
+            var imgBottom = imgTop + imgHeight;
+            var topDistance = winTop - imgTop;
+
+            //if we see the top of current image, make it the bottom
+            if (winTop < imgTop && imgTop < winBottom) {
+                window.scrollBy(0, -(winBottom-imgTop));
+                return;
+            }
+            //if image top is close to window top, scroll to it
+            else if (0 < topDistance && topDistance < winHeight) {
+                window.scrollBy(0, -topDistance);
+                return;
+            }
+        }
+
+        //default is to scroll view height
+        window.scrollBy(0, -winHeight);
+    }
+
+    function selectNextChapter() {
+        var chapters = document.getElementsByClassName("chapter");  
+        var currentChapter = document.getElementsByClassName('selectChapter')[0].value;
+        for (var i=0; i<chapters.length; i++) {
+            if (chapters[i].id == currentChapter) {
+                if (i+1 <chapters.length) {
+                    selectChapter(chapters[i+1].id);
+                    return;
+                }
+            }
+        }
+    }   
+    
+    function selectPreviousChapter() {
+        var chapters = document.getElementsByClassName("chapter");
+        var currentChapter = document.getElementsByClassName('selectChapter')[0].value;
+        for (var i=0; i<chapters.length; i++) {
+            if (chapters[i].id == currentChapter) {
+                if (i-1 >= 0) {
+                    selectChapter(chapters[i-1].id);
+                    return;
+                }
+            }
+        }
+    }    
+>>
+
+chapterListing(chapters) ::= <<
+<div align="center">
+    <p>S to scroll down, W to scroll up</p>
+$if(rest(chapters))$
+    <button type="button" onclick="selectPreviousChapter()">Previous</button>
+    <select class="selectChapter" onchange="javascript:selectChapter(this.value)">
+        $chapters:chapterOption();separator="\n"$
+    </select>
+    <button type="button" onclick="selectNextChapter()">Next</button>
+$endif$
+</div>
+>>
+
+chapterOption(chapter) ::= <<
+<option value="$chapter.dir$">$chapter.dir$</option>
+>>
+
+chapterDiv(chapter) ::= <<
+<div id="$chapter.dir$" class="chapter" align="center" style="display:none">
+    $chapter.imageUris:{image|<p><img alt="$image$" title="$image$"/></p>};separator="\n"$
+</div>
+>>
