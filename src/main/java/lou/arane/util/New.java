@@ -18,6 +18,8 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.ws.Holder;
@@ -78,6 +80,10 @@ public class New {
 
     public static <T> LinkedList<T> linkedList() {
         return new LinkedList<T>();
+    }
+
+    public static <T> Collector<T, ?, List<T>> listCollector() {
+        return Collectors.toList();
     }
 
     public static <T> HashSet<T> set() {

@@ -167,6 +167,16 @@ public final class Util {
         }
     }
 
+    /** Copy a file to a target file.
+     * @see Files#copy(Path, Path, CopyOption...) */
+    public static void copy(Path source, Path target, CopyOption... options) {
+        try {
+            Files.copy(source, target, options);
+        } catch (IOException e) {
+            throw new Unchecked(e);
+        }
+    }    
+
     /** Write/Overwrite a file with default settings */
     public static void write(Path path, String content) {
         write(path, content, defaultCharset());
@@ -257,4 +267,5 @@ public final class Util {
     	}
     	return range;
     }
+
 }

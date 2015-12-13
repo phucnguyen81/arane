@@ -1,17 +1,12 @@
 package lou.arane.util.script;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import lou.arane.util.Check;
-import lou.arane.util.Unchecked;
 import lou.arane.util.Util;
 
 /**
@@ -79,11 +74,13 @@ public class CopyFiles {
     /** Run the process of matching, grouping and copying files to target
      * directory */
     public void run() {
-        for (Path sourcePath : listRegularFiles(sourceDir)) {
-            String targetName = targetFileName(sourcePath);
-            Path targetPath = targetPath(targetName);
-            copyFile(sourcePath, targetPath);
-        }
+        Util.list(sourceDir)
+            .filter(Util::isRegularFile)
+            .forEach(sourcePath -> {
+                String targetName = targetFileName(sourcePath);
+                Path targetPath = targetPath(targetName);
+                copyFile(sourcePath, targetPath);
+            });
     }
 
     /**
@@ -111,29 +108,11 @@ public class CopyFiles {
         return targetDir.resolve(targetPath);
     }
 
-    /** Collect regular filenames directly under a directory */
-    private static List<Path> listRegularFiles(Path dir) {
-        try {
-            return Files.list(dir)
-                .filter(p -> Files.isRegularFile(p))
-                .collect(Collectors.toList());
-        }
-        catch (IOException e) {
-            throw new Unchecked("Failed to list files under folder " + dir, e);
-        }
-    }
-
     /** Copy a file to a directory; the target file-name is preserved */
     private static void copyFile(Path source, Path target) {
-        if (Files.exists(target)) return;
-        try {
-            Files.createDirectories(target.getParent());
-            Files.copy(source, target);
-        }
-        catch (IOException e) {
-            throw new Unchecked("Failed to copy source "
-                + source + " to target " + target, e);
-        }
+        if (Util.exists(target)) return;
+        Util.createDirectories(target.getParent());
+        Util.copy(source, target);
     }
 
 }

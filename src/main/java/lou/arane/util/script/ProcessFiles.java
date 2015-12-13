@@ -1,6 +1,5 @@
 package lou.arane.util.script;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
@@ -20,7 +19,7 @@ public class ProcessFiles {
     public static void main(String[] args) {
         Path dir = Paths.get("C:/Ban Long");
         Util.list(dir)
-            .filter(p -> Files.isDirectory(p))
+            .filter(p -> Util.isDirectory(p))
             .forEach(p -> renameDirectory(p));
     }
 
@@ -35,7 +34,9 @@ public class ProcessFiles {
         }
     }
 
-    static boolean filterDuplicatePath(Path p) {
+    /** whether a file padded with 0 already exists;
+     * e.g. '1.jpg' is a duplicate of '01.jpg' */
+    static boolean isDuplicatePath(Path p) {
         String fileName = p.getFileName().toString();
         return Util.exists(p.resolveSibling("0" + fileName))
             || Util.exists(p.resolveSibling("00" + fileName));
