@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import lou.arane.util.Check;
-import lou.arane.util.RuntimeError;
+import lou.arane.util.Unchecked;
 import lou.arane.util.Util;
 
 /**
@@ -119,7 +119,7 @@ public class CopyFiles {
                 .collect(Collectors.toList());
         }
         catch (IOException e) {
-            throw new RuntimeError("Failed to list files under folder " + dir, e);
+            throw new Unchecked("Failed to list files under folder " + dir, e);
         }
     }
 
@@ -131,7 +131,7 @@ public class CopyFiles {
             Files.copy(source, target);
         }
         catch (IOException e) {
-            throw new RuntimeError("Failed to copy source "
+            throw new Unchecked("Failed to copy source "
                 + source + " to target " + target, e);
         }
     }

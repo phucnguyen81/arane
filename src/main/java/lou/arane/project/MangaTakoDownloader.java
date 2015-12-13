@@ -55,7 +55,7 @@ public class MangaTakoDownloader extends BaseDownloader {
      * @param baseDir = e.g. mangas/mangatako/Terra ForMars
      */
     public MangaTakoDownloader(String seriesName, Path baseDir) {
-        Check.notNull(seriesName, "Null uri");
+        Check.notNull(seriesName, "Null name");
         this.mangaUri = new Uri(BASE_URI + "?series=" + seriesName);
         this.baseDir = Check.notNull(baseDir, "Null base dir");
         chapterList = baseDir.resolve("chapters.html");

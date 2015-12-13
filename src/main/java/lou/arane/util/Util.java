@@ -24,7 +24,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
 /**
- * Utility methods
+ * Facade over the standard library
  *
  * @author LOU
  */
@@ -81,11 +81,11 @@ public final class Util {
     public static Path userHomeDir() {
         String userHome = System.getProperty("user.home");
         if (userHome == null) {
-            throw new RuntimeError("user.home system property is un-specified");
+            throw new Unchecked("user.home system property is not available");
         }
         Path userHomeDir = Paths.get(userHome);
-        if (!Files.exists(userHomeDir)) {
-            throw new RuntimeError("User home directory does not exist at " + userHomeDir);
+        if (!exists(userHomeDir)) {
+            throw new Unchecked("User home directory does not exist at " + userHomeDir);
         }
         return userHomeDir;
     }
@@ -95,20 +95,28 @@ public final class Util {
             return Files.createDirectories(dir, attrs);
         }
         catch (IOException e) {
-            throw new RuntimeError(e);
+            throw new Unchecked(e);
+        }
+    }
+
+    public static void delete(Path path) {
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new Unchecked(e);
         }
     }
 
     /**
-     * Delete a file, a symbolic link or an empty directory if it exists; return
-     * whether the file is deleted.
+     * Delete a file, a symbolic link or an empty directory if it exists; 
+     * return whether the file is deleted.
      */
     public static boolean deleteIfExists(Path path) {
         try {
             return Files.deleteIfExists(path);
         }
         catch (IOException e) {
-            throw new RuntimeError(e);
+            throw new Unchecked(e);
         }
     }
 
@@ -117,69 +125,68 @@ public final class Util {
         return Files.exists(path, options);
     }
 
+    public static boolean isRegularFile(Path path, LinkOption... options) {
+        return Files.isRegularFile(path, options);
+    }
+
+    public static boolean isDirectory(Path path, LinkOption... options) {
+        return Files.isDirectory(path, options);
+    }
+
+    public static Path renameDirectory(Path dir, String newName) {
+        return move(dir, dir.resolveSibling(newName));
+    }
+
     /** @see Files#move(Path, Path, CopyOption...) */
     public static Path move(Path source, Path target, CopyOption... options) {
         try {
             return Files.move(source, target, options);
         }
         catch (IOException e) {
-            throw new RuntimeError(e);
+            throw new Unchecked(e);
         }
     }
 
-    /**
-     * Given a directory, return a lazily populated stream of its direct files
-     * and sub-directories. This is a version of {@link Files#list(Path)} that
-     * uses unchecked exception.
-     */
-    public static Stream<Path> list(Path dir) {
+    /** Get direct files and sub-dirs */
+    public static Stream<Path> list(Path path) {
         try {
-            return Files.list(dir);
+            return Files.list(path);
         }
         catch (IOException e) {
-            throw new RuntimeError(e);
+            throw new Unchecked(e);
         }
     }
 
-    /**
-     * A version of {@link Files#walk(Path, FileVisitOption...)} that uses
-     * unchecked exceptions
-     */
+    /** Get all files and dirs under a start path */
     public static Stream<Path> walk(Path start, FileVisitOption... options) {
         try {
             return Files.walk(start, options);
         }
         catch (IOException e) {
-            throw new RuntimeError(e);
+            throw new Unchecked(e);
         }
     }
 
-    /**
-     * Write/Overwrite a file with default settings
-     */
+    /** Write/Overwrite a file with default settings */
     public static void write(Path path, String content) {
         write(path, content, defaultCharset());
     }
 
-    /**
-     * Write/Overwrite a file with default settings
-     */
+    /** Write/Overwrite a file with default settings */
     public static void write(Path path, String content, Charset charset) {
         write(path, content.getBytes(charset));
     }
 
-    /**
-     * Write to a file with default behaviors: create all parent directories if
+    /** Write to a file with default behaviors: create all parent directories if
      * they do not exist, create the file if it does not exist, or initially
-     * truncating an existing file to a size of 0.
-     */
+     * truncating an existing file to a size of 0. */
     public static void write(Path path, byte[] bytes) {
         try {
             Files.createDirectories(path.getParent());
             Files.write(path, bytes);
         }
         catch (IOException e) {
-            throw new RuntimeError(e);
+            throw new Unchecked(e);
         }
     }
 

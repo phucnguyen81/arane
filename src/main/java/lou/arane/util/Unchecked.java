@@ -8,17 +8,17 @@ package lou.arane.util;
  * @author LOU
  */
 @SuppressWarnings("serial")
-public class RuntimeError extends RuntimeException {
+public class Unchecked extends RuntimeException {
 
-    public RuntimeError(String message) {
+    public Unchecked(String message) {
         super(message);
     }
 
-    public RuntimeError(String message, Exception cause) {
+    public Unchecked(String message, Exception cause) {
         super(message, cause);
     }
 
-    public RuntimeError(Exception cause) {
+    public Unchecked(Exception cause) {
         super(cause);
     }
 
