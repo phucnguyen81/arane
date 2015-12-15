@@ -12,18 +12,26 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
 
-/**
- * Capture uris normally accepted by browser.
- * <p>
- * TODO the alternate uris make this not immutable. Find a clean way to separate
- * handling of alternate uris.
+/** Uri data as it is used by this project
  *
  * @author pnguyen58
  */
 public class Uri implements Comparable<Uri> {
 
+    private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
+
     public static Uri of(String uri) {
         return new Uri(uri);
+    }
+
+    /** Create uri from a uri string. 
+     * If the uri scheme is not present, it defaults to http. */
+    public static Uri http(String uriString) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriString);
+        if (builder.build().getScheme() == null) {
+            builder.scheme("http");
+        }
+        return new Uri(builder);
     }
 
     public static boolean isValidUri(String uri) {
@@ -34,8 +42,29 @@ public class Uri implements Comparable<Uri> {
             return false;
         }
     }
-    
-    private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
+
+    public static String decode(String source) {
+        try {
+            return source == null ? null : UriUtils.decode(source, DEFAULT_ENCODING);
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new Unchecked("Should not happen", e);
+        }
+    }
+
+    public static String encode(String uriStr) {
+        UriComponents uri = UriComponentsBuilder.fromUriString(uriStr).build();
+        return encode(uri).toUriString();
+    }
+
+    private static UriComponents encode(UriComponents uri) {
+        try {
+            return uri.encode(DEFAULT_ENCODING);
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new Unchecked("Should not happen!", e);
+        }
+    }
 
     /* alternate uris meant to locate the same resource as this uri */
     private final LinkedList<Uri> alternatives = New.linkedList();
@@ -64,18 +93,6 @@ public class Uri implements Comparable<Uri> {
     @Override
     public boolean equals(Object other) {
         return compareTo(((Uri) other)) == 0;
-    }
-
-    /**
-     * Create uri from a uri string. If the uri scheme is not present, it
-     * defaults to http.
-     */
-    public static Uri http(String uriString) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriString);
-        if (builder.build().getScheme() == null) {
-            builder.scheme("http");
-        }
-        return new Uri(builder);
     }
 
     /** Base method to create uri */
@@ -116,9 +133,8 @@ public class Uri implements Comparable<Uri> {
     public String getFileExtension() {
         if (getFileName() == null) return null;
         String filename = getFileName().toString();
-        int extensionIndex = filename.lastIndexOf('.');
-        if (extensionIndex < 0) return "";
-        return filename.substring(extensionIndex + 1);
+        String ext = Util.getFileExtension(filename);
+        return ext == null ? "" : ext;
     }
 
     public Path getFileName() {
@@ -129,9 +145,11 @@ public class Uri implements Comparable<Uri> {
     public Path getFilePath() {
         Path path = null;
         String uriPath = uri.getPath();
-        if (uriPath != null) for (Path p : Paths.get(decode(uriPath))) {
-            if (path == null) path = p;
-            else path = path.resolve(p);
+        if (uriPath != null) {
+            for (Path p : Paths.get(decode(uriPath))) {
+                if (path == null) path = p;
+                else path = path.resolve(p);
+            }
         }
         return path;
     }
@@ -140,32 +158,10 @@ public class Uri implements Comparable<Uri> {
         return decode(uri.getQuery());
     }
 
+    /** Get value of the first query parm */
     public String getQueryParm(String key) {
         MultiValueMap<String, String> params = uri.getQueryParams();
         String val = params.getFirst(key);
         return decode(val);
-    }
-
-    public static String decode(String source) {
-        try {
-            return source == null ? null : UriUtils.decode(source, DEFAULT_ENCODING);
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("Should not happen", e);
-        }
-    }
-
-    public static String encode(String uriStr) {
-        UriComponents uri = UriComponentsBuilder.fromUriString(uriStr).build();
-        return encode(uri).toUriString();
-    }
-
-    private static UriComponents encode(UriComponents uri) {
-        try {
-            return uri.encode(DEFAULT_ENCODING);
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("Should not happen!", e);
-        }
     }
 }

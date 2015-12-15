@@ -71,11 +71,16 @@ public final class Util {
         return str;
     }
 
-    /**
-     * Common way to get a base directory for downloading a manga.
-     * <p>
-     * TODO this seems to belong to {@link BaseDownloader} or a TestBase
-     */
+    /** Assume a string is a path, get its file extension (without the dot) */
+    public static String getFileExtension(String str) {
+        if (str == null) return null;
+        int extensionIdx = str.lastIndexOf('.');
+        if (extensionIdx >= 0)
+            return str.substring(0, extensionIdx + 1);
+        return null;
+    }
+
+    /** Common way to get a base directory for downloading a manga. */
     public static Path mangaDir(String first, String... more) {
         Path mangasDir = userHomeDir().resolve("mangas");
         Path baseDir = mangasDir.resolve(Paths.get(first, more));
@@ -211,10 +216,8 @@ public final class Util {
         return Joiner.on(separator).join(parts);
     }
 
-    /**
-     * Given a string, pad numeric sequences shorter than a minimum length found
-     * in that string.
-     */
+    /** Given a string, pad numeric sequences shorter 
+     * than a minimum length found in that string. */
     public static String padNumericSequences(String str, int minLength) {
         // pattern to look for numeric sequences shorter than a minimum length
         Pattern notPadded = Pattern.compile("(\\A|\\D)(\\d{1," + (minLength - 1) + "})(\\z|\\D)");
@@ -230,9 +233,7 @@ public final class Util {
         return str;
     }
 
-    /**
-     * Get a padded string of length at least minLength
-     */
+    /** Get a padded string of length at least minLength */
     public static String padStart(String string, int minLength, char padChar) {
         return Strings.padStart(string, minLength, padChar);
     }
@@ -288,10 +289,7 @@ public final class Util {
     	return html;
     }
 
-    /**
-     * Parse html file and return its html model. Throw an unchecked exception
-     * if parsing fails.
-     */
+    /** Parse html file and return its html model. */
     public static Document parseHtml(Path path) {
     	String defaultCharsetName = null;
     	try {
