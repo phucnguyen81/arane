@@ -2,9 +2,11 @@ package lou.arane.util.script;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lou.arane.util.New;
 import lou.arane.util.Util;
 
 /**
@@ -17,7 +19,7 @@ public class ProcessFiles {
     private static final Pattern NUMERIC_PATTERN = Pattern.compile("\\d+(\\.\\d+)?");
     
     public static void main(String[] args) {
-        Path dir = Paths.get("C:/Ban Long");
+        Path dir = Paths.get("C:", "images");
         Util.list(dir)
             .filter(p -> Util.isDirectory(p))
             .forEach(p -> renameDirectory(p));
@@ -25,10 +27,13 @@ public class ProcessFiles {
 
     /** rename dir to keep only its numeric part */
     static void renameDirectory(Path dir) {
-        String match = null;
         Matcher matcher = NUMERIC_PATTERN.matcher(dir.getFileName().toString());
-        while (matcher.find()) match = matcher.group();
-        if (match != null) {
+        List<String> matches = New.list();
+        while (matcher.find()) {
+            matches.add(matcher.group());
+        }
+        if (!matches.isEmpty()) {
+            String match = Util.join(matches, "_");
             match = Util.padNumericSequences(match, 3);
             Util.renameDirectory(dir, match);
         }

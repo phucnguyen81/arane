@@ -26,6 +26,15 @@ public class Uri implements Comparable<Uri> {
         return new Uri(uri);
     }
 
+    public static boolean isValidUri(String uri) {
+        try {
+            new Uri(uri).getFilePath();
+            return true;
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+    
     private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
     /* alternate uris meant to locate the same resource as this uri */
