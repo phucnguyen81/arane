@@ -94,7 +94,7 @@ public class MangaCowDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadChapters() {
-        Document chapters = parseHtml(chapterList, BASE_URI);
+        Document chapters = Util.parseHtml(chapterList, BASE_URI);
         for (Element chapterAddr : chapters.select("ul[class=lst mng_chp] a[href][class=lst]")) {
             Uri chapterUri = new Uri(chapterAddr.absUrl("href"));
             String chapter = chapterUri.getFileName().toString();
@@ -108,8 +108,8 @@ public class MangaCowDownloader extends BaseDownloader {
 
     /** Download pages for each chapter */
     private void downloadPages() {
-        for (Path chapterHtml : findHtmlFiles(chaptersDir)) {
-            Document chapter = parseHtml(chapterHtml, BASE_URI);
+        for (Path chapterHtml : Util.findHtmlFiles(chaptersDir)) {
+            Document chapter = Util.parseHtml(chapterHtml, BASE_URI);
             String chapterIdx = chapterHtml.getFileName().toString();
             chapterIdx = Util.removeFileExtension(chapterIdx);
             addPages(chapter, chapterIdx);
@@ -157,8 +157,8 @@ public class MangaCowDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadImages() {
-        for (Path pageHtml : findAllHtmlFiles(pagesDir)) {
-            Document page = parseHtml(pageHtml);
+        for (Path pageHtml : Util.findAllHtmlFiles(pagesDir)) {
+            Document page = Util.parseHtml(pageHtml);
             Element img = page.select("div[class=prw] img[src]").first();
             Uri imageUri = new Uri(img.attr("src"));
             String imageName =  pagesDir.relativize(pageHtml).toString();

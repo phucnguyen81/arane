@@ -78,7 +78,7 @@ public class MangaHereDownloader extends BaseDownloader {
      * Download chapter pages by extracting their urls from the master html file
      */
     private void downloadChapters() {
-        Document rootFile = parseHtml(chapterList);
+        Document rootFile = Util.parseHtml(chapterList);
         rootFile.select("div[class=detail_list] a[class=color_0077]")
             .stream()
             .map(chapterAddr -> new Uri(chapterAddr.attr("href")))
@@ -102,8 +102,8 @@ public class MangaHereDownloader extends BaseDownloader {
     * </pre>
      */
     private void downloadPages() {
-        for (Path chapterHtml : findHtmlFiles(chapterDir)) {
-            Document chapter = parseHtml(chapterHtml);
+        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
+            Document chapter = Util.parseHtml(chapterHtml);
             for (Element opt : chapter.select("select[class=wid60] option[value]")) {
                 Uri pageUri = new Uri(opt.attr("value"));
                 String pageName = Util.join(pageUri.getFilePath(), "_");
@@ -124,8 +124,8 @@ public class MangaHereDownloader extends BaseDownloader {
      * </pre>
      * */
     private void downloadImages() {
-        for (Path pageHtml : findHtmlFiles(pageDir)) {
-            Document page = parseHtml(pageHtml);
+        for (Path pageHtml : Util.findHtmlFiles(pageDir)) {
+            Document page = Util.parseHtml(pageHtml);
             Element img = page.select("img[id=image][src]").first();
             Uri imageUri = new Uri(img.attr("src"));
             String pageName = imageName(pageHtml.getFileName().toString().replace(".html", ""));

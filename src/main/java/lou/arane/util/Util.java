@@ -16,9 +16,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -266,6 +271,50 @@ public final class Util {
     		range.add(String.valueOf(i));
     	}
     	return range;
+    }
+
+    /** @see Util#parseHtml(Path, String) */
+    public static Document parseHtml(Path path, Uri baseUri) {
+    	return Util.parseHtml(path, baseUri.toString());
+    }
+
+    /**
+     * Parse html file and return its html model. The base uri is set on the
+     * model to resolve urls
+     */
+    public static Document parseHtml(Path path, String baseUri) {
+    	Document html = Util.parseHtml(path);
+    	html.setBaseUri(baseUri);
+    	return html;
+    }
+
+    /**
+     * Parse html file and return its html model. Throw an unchecked exception
+     * if parsing fails.
+     */
+    public static Document parseHtml(Path path) {
+    	String defaultCharsetName = null;
+    	try {
+    		return Jsoup.parse(path.toFile(), defaultCharsetName);
+    	} catch (IOException e) {
+    		throw new Unchecked("Failed to parse html file " + path, e);
+    	}
+    }
+
+    /** Find html files of a given directory */
+    public static List<Path> findHtmlFiles(Path dir) {
+    	return list(dir)
+    	        .filter(Util::isRegularFile)
+    			.filter(file -> file.toString().endsWith(".html"))
+    			.collect(Collectors.toList());
+    }
+
+    /** Find all html files in the directory tree rooted at a given directory */
+    public static List<Path> findAllHtmlFiles(Path dir) {
+        return walk(dir)
+                .filter(Util::isRegularFile)
+                .filter(file -> file.toString().endsWith(".html"))
+                .collect(Collectors.toList());
     }
 
 }

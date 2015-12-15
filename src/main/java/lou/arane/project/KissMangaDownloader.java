@@ -79,7 +79,7 @@ public class KissMangaDownloader extends BaseDownloader {
      * Download chapter pages by extracting their urls from the master html file
      */
     private void downloadChapters() {
-        Document chapters = parseHtml(chapterList, BASE_URI);
+        Document chapters = Util.parseHtml(chapterList, BASE_URI);
         for (Element chapterAddr : chapters.select("table[class=listing] a[href]")) {
             Uri chapterUri = new Uri(chapterAddr.absUrl("href"));
             String chapterName = Util.join(chapterUri.getFilePath(), "_");
@@ -95,10 +95,10 @@ public class KissMangaDownloader extends BaseDownloader {
      * javascript's content using regex.
      */
     private void downloadImages() {
-        for (Path chapterHtml : findHtmlFiles(chapterDir)) {
+        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
             String chapterName = chapterHtml.getFileName().toString();
             chapterName = Util.removeFileExtension(chapterName);
-            Document chapter = parseHtml(chapterHtml);
+            Document chapter = Util.parseHtml(chapterHtml);
             for (Element script : chapter.select("script[type=text/javascript]")) {
                 Matcher matcher = IMAGE_PATTERN.matcher(script.html());
                 while (matcher.find()) {

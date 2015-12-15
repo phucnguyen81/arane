@@ -77,7 +77,7 @@ public class MangaKDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadChapters() {
-        Document rootFile = parseHtml(chapterList, BASE_URI);
+        Document rootFile = Util.parseHtml(chapterList, BASE_URI);
         Elements chapterAddresses = rootFile.select("div[class=chapter-list] a[href]");
         for (Element chapterAddr : chapterAddresses) {
             Uri chapterUri = new Uri(chapterAddr.absUrl("href"));
@@ -102,10 +102,10 @@ public class MangaKDownloader extends BaseDownloader {
      *  </pre>
      */
     private void downloadImages() {
-        for (Path chapterHtml : findHtmlFiles(chapterDir)) {
+        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
             String chapterFileName = chapterHtml.getFileName().toString();
             Path chapterPath = imageDir.resolve(Util.removeFileExtension(chapterFileName));
-            Document page = parseHtml(chapterHtml);
+            Document page = Util.parseHtml(chapterHtml);
             int idx = 0;
             for (Element img: page.select("div[class=vung_doc] img[src][alt]")) {
                 idx += 1;

@@ -89,7 +89,7 @@ public class EgScansDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadChapters() {
-        Document rootFile = parseHtml(chapterList, BASE_URI);
+        Document rootFile = Util.parseHtml(chapterList, BASE_URI);
         for (Element chapterOption : rootFile.select("select[name=chapter] option[value]")) {
             String chapterName = chapterOption.attr("value");
             Uri chapterUri = new Uri(BASE_URI + mangaName + "/" + chapterName);
@@ -100,7 +100,7 @@ public class EgScansDownloader extends BaseDownloader {
     }
 
     private void downloadImagesForAllChapters() {
-        for (Path chapterHtml : findHtmlFiles(chapterDir)) {
+        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
             addImages(chapterHtml);
         }
         download();
@@ -120,7 +120,7 @@ public class EgScansDownloader extends BaseDownloader {
     private void addImages(Path chapterHtml) {
         String chapterName = chapterHtml.getFileName().toString();
         chapterName = Util.removeFileExtension(chapterName);
-        Document chapter = parseHtml(chapterHtml, BASE_URI);
+        Document chapter = Util.parseHtml(chapterHtml, BASE_URI);
         for (Element script : chapter.select("script[type=text/javascript]")) {
             addImages(script, chapterName);
         }

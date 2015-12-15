@@ -65,7 +65,7 @@ public class MangaSeeDownloader extends BaseDownloader {
 
     private void downloadChapters() {
         Path indexPath = chapterList;
-        Document indexDoc = parseHtml(indexPath);
+        Document indexDoc = Util.parseHtml(indexPath);
         indexDoc.setBaseUri(rootUri);
         for (Element chapterAddr : indexDoc.getElementsByClass("chapter_link")) {
             String chapterName = chapterAddr.text().trim();
@@ -78,14 +78,14 @@ public class MangaSeeDownloader extends BaseDownloader {
     }
 
     private void downloadPages() {
-        for (Path chapterHtml : findHtmlFiles(chapterDir)) {
+        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
             Matcher chapterIndMatcher = numberPattern.matcher(chapterHtml.getFileName().toString());
             String chapterIdx = "";
             if (chapterIndMatcher.find())
                 chapterIdx = chapterIndMatcher.group();
             else
                 throw new IllegalArgumentException("Cannot detect chapter index for " + chapterHtml);
-            Document chapter = parseHtml(chapterHtml);
+            Document chapter = Util.parseHtml(chapterHtml);
             Element pageForm = chapter.getElementById("pages");
             int pageNo = pageForm.getElementsByTag("option").size();
             for (String pageIdx : Util.rangeClosed(1, pageNo)) {
@@ -110,8 +110,8 @@ public class MangaSeeDownloader extends BaseDownloader {
         </a>
      */
     private void downloadImages() {
-        for (Path pageHtml : findHtmlFiles(pageDir)) {
-            Document page = parseHtml(pageHtml);
+        for (Path pageHtml : Util.findHtmlFiles(pageDir)) {
+            Document page = Util.parseHtml(pageHtml);
             page.setBaseUri(rootUri);
             for (Element img : page.select("a[href] img[src]")) {
                 Uri imageUri = Uri.of(img.absUrl("src"));

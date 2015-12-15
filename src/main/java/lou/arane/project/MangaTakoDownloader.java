@@ -66,6 +66,10 @@ public class MangaTakoDownloader extends BaseDownloader {
         outputImagesDir = outputDir.resolve("images");
     }
 
+    public void setBaseUri(String uri) {
+        
+    }
+    
     public MangaTakoDownloader includeChapters(String first, String... more) {
         Set<String> chapters = New.set(first, more);
         return setChapterFilter(chapter -> chapters.contains(chapter));
@@ -104,7 +108,7 @@ public class MangaTakoDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadChapters() {
-        Document chapters = parseHtml(chapterList, BASE_URI);
+        Document chapters = Util.parseHtml(chapterList, BASE_URI);
         for (Element chapterAddr : chapters.select("a[class=chapter_link][href]")) {
             Uri chapterUri = new Uri(chapterAddr.absUrl("href"));
             String series = chapterUri.getQueryParm("series");
@@ -121,8 +125,8 @@ public class MangaTakoDownloader extends BaseDownloader {
 
     /** Download pages for each chapter */
     private void downloadPages() {
-        for (Path chapterHtml : findHtmlFiles(chaptersDir)) {
-            Document chapter = parseHtml(chapterHtml, BASE_URI);
+        for (Path chapterHtml : Util.findHtmlFiles(chaptersDir)) {
+            Document chapter = Util.parseHtml(chapterHtml, BASE_URI);
             addPages(chapter);
         }
         download();
@@ -182,14 +186,14 @@ public class MangaTakoDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadImages() {
-        for (Path pageHtml : findHtmlFiles(pagesDir)) {
+        for (Path pageHtml : Util.findHtmlFiles(pagesDir)) {
             addImageToDownload(pageHtml);
         }
         download();
     }
 
     private void addImageToDownload(Path pageHtml) {
-        Document page = parseHtml(pageHtml);
+        Document page = Util.parseHtml(pageHtml);
         Element img = page.select("img[class=img-responsive][src]").first();
         Uri imageUri = new Uri(img.attr("src"));
         String imageName = pageHtml.getFileName().toString();

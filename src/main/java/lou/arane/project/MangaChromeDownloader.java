@@ -68,7 +68,7 @@ public class MangaChromeDownloader extends BaseDownloader {
      * Download chapter pages by extracting their urls from the master html file
      */
     private void downloadChapters() {
-        Document rootFile = parseHtml(chapterList);
+        Document rootFile = Util.parseHtml(chapterList);
         for (Element chapterHref : rootFile.select("ul[class=chp_lst] li a[href]")) {
             Uri chapterUri = new Uri(chapterHref.attr("href"));
             String chapterName = Util.join(chapterUri.getFilePath(), "_");
@@ -81,8 +81,8 @@ public class MangaChromeDownloader extends BaseDownloader {
 
     /** Download pages for each chapter */
     private void downloadPages() {
-        for (Path chapterHtml : findHtmlFiles(chapterDir)) {
-            Document chapter = parseHtml(chapterHtml);
+        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
+            Document chapter = Util.parseHtml(chapterHtml);
             collectPagesToDownload(chapter);
         }
         downloader.download();
@@ -115,8 +115,8 @@ public class MangaChromeDownloader extends BaseDownloader {
 
     /** Download the actual images from the html image files. */
     private void downloadImages() {
-        for (Path pageHtml : findHtmlFiles(pageDir)) {
-            Document page = parseHtml(pageHtml);
+        for (Path pageHtml : Util.findHtmlFiles(pageDir)) {
+            Document page = Util.parseHtml(pageHtml);
             Element img = page.getElementById("img_mng_enl");
             Uri imageUri = new Uri(img.attr("src"));
             String imageName = pageHtml.getFileName().toString().replace(".html", "");

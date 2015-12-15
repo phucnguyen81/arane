@@ -21,9 +21,10 @@ public class MangaTakoDownloaderTest {
             .run();
     }
 
+    @Test
     public void Berserk() {
         createDownloader("Berserk", "Berserk")
-            .includeChapters("336","337")
+            .includeChapters("336","337","338","339","340","341")
             .run();
     }
 
@@ -59,7 +60,6 @@ public class MangaTakoDownloaderTest {
             .run();
     }
 
-    @Test
     public void TerraForMars() {
         Pattern fromChapter123 = Pattern.compile("(12[3456789])|(13\\d)");
         createDownloader("TerraForMars", "Terra ForMars")
@@ -67,7 +67,6 @@ public class MangaTakoDownloaderTest {
             .run();
     }
 
-    @Test
     public void ShingekiNoKyojin() {
         createDownloader("ShingekiNoKyojin", "Attack on Titan")
             .run();

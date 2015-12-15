@@ -92,7 +92,7 @@ public class MangaEdenDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadChapters() {
-        Document baseFile = parseHtml(chapterList, BASE_URI);
+        Document baseFile = Util.parseHtml(chapterList, BASE_URI);
         for (Element chapterAddr : baseFile.select("a[href][class=chapterLink]")) {
             Uri chapterUri = new Uri(chapterAddr.absUrl("href"));
             String chapterName = Util.join(chapterUri.getFilePath(), "_");
@@ -105,8 +105,8 @@ public class MangaEdenDownloader extends BaseDownloader {
 
     /** Download pages for each chapter */
     private void downloadPages() {
-        for (Path chapterHtml : findHtmlFiles(chapterDir)) {
-            Document chapter = parseHtml(chapterHtml, BASE_URI);
+        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
+            Document chapter = Util.parseHtml(chapterHtml, BASE_URI);
             collectPagesToDownload(chapter);
         }
         download();
@@ -164,8 +164,8 @@ public class MangaEdenDownloader extends BaseDownloader {
      * Download the actual images from the html image files
      */
     private void downloadImages() {
-        for (Path pageHtml : findHtmlFiles(pageDir)) {
-            Document page = parseHtml(pageHtml, BASE_URI);
+        for (Path pageHtml : Util.findHtmlFiles(pageDir)) {
+            Document page = Util.parseHtml(pageHtml, BASE_URI);
             Uri imageUri = extractImageUri(page);
             String imageName = pageHtml.getFileName().toString().replace(".html", "");
             Path imagePath = imageDir.resolve(imageName + "." + imageUri.getFileExtension());

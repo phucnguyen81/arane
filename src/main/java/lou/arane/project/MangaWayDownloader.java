@@ -85,7 +85,7 @@ public class MangaWayDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadChapters() {
-        Document chapterDoc = parseHtml(chapterList);
+        Document chapterDoc = Util.parseHtml(chapterList);
         for (Element chapterAddr : chapterDoc.select("div[id=list] div[class=ch] a[href]")) {
             Uri chapterUri = new Uri(chapterAddr.attr("href"));
             String chapterName = Util.join(chapterUri.getFilePath(), "_");
@@ -102,9 +102,9 @@ public class MangaWayDownloader extends BaseDownloader {
      * extracted using regex.
      */
     private void downloadImages() {
-        for (Path chapterHtml : findHtmlFiles(chapterDir)) {
+        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
             String chapterName = chapterHtml.getFileName().toString().replace(".html", "");
-            Document chapter = parseHtml(chapterHtml);
+            Document chapter = Util.parseHtml(chapterHtml);
             for (Element script : chapter.select("script[type=text/javascript]")) {
                 Matcher matcher = IMAGE_PATTERN.matcher(script.html());
                 while (matcher.find()) {

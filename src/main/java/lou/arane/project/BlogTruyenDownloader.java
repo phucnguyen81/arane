@@ -86,7 +86,7 @@ public class BlogTruyenDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadChapters() {
-        Document rootFile = parseHtml(chapterList, BASE_URI);
+        Document rootFile = Util.parseHtml(chapterList, BASE_URI);
         Elements chapterAddresses = rootFile.select("div[id=list-chapters] a[href]:not([rel]), a[href][rel=noreferrer]");
         for (Element chapterAddr : chapterAddresses) {
             Uri chapterUri = new Uri(chapterAddr.absUrl("href"));
@@ -123,8 +123,8 @@ public class BlogTruyenDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadImages() {
-        for (Path chapterHtml : findHtmlFiles(chapterDir)) {
-            Document page = parseHtml(chapterHtml);
+        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
+            Document page = Util.parseHtml(chapterHtml);
             Elements images = page.select("article[id=content] img[src]");
             for (int imageIdx = 0; imageIdx < images.size(); imageIdx++) {
                 Element image = images.get(imageIdx);

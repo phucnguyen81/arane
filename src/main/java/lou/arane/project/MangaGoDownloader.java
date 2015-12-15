@@ -73,7 +73,7 @@ public class MangaGoDownloader extends BaseDownloader {
      * Download chapter pages by extracting their urls from the master html file
      */
     private void downloadChapters() {
-        Document rootFile = parseHtml(chapterList);
+        Document rootFile = Util.parseHtml(chapterList);
         for (Element chapterAddr : rootFile.select("table[id=chapter_table] a[href]")) {
             Uri chapterUri = new Uri(chapterAddr.attr("href"));
             String chapterName = Util.join(chapterUri.getFilePath(), "_");
@@ -96,8 +96,8 @@ public class MangaGoDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadPages() {
-        for (Path chapterHtml : findHtmlFiles(chapterDir)) {
-            Document chapter = parseHtml(chapterHtml, rootUri);
+        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
+            Document chapter = Util.parseHtml(chapterHtml, rootUri);
             for (Element addr : chapter.select("ul[id=dropdown-menu-page] a[href]")) {
                 Uri pageUri = new Uri(addr.absUrl("href"));
                 String pageName = Util.join(pageUri.getFilePath(), "_");
@@ -111,8 +111,8 @@ public class MangaGoDownloader extends BaseDownloader {
 
     /** Download the actual images from the html pages */
     private void downloadImages() {
-        for (Path pageHtml : findHtmlFiles(pageDir)) {
-            Document page = parseHtml(pageHtml);
+        for (Path pageHtml : Util.findHtmlFiles(pageDir)) {
+            Document page = Util.parseHtml(pageHtml);
             Uri imageUri = findImageUri(page);
             String pageName = pageHtml.getFileName().toString().replace(".html", "");
             Path imagePath = imageDir.resolve(pageName + "." + imageUri.getFileExtension());
