@@ -66,10 +66,6 @@ public class MangaTakoDownloader extends BaseDownloader {
         outputImagesDir = outputDir.resolve("images");
     }
 
-    public void setBaseUri(String uri) {
-        
-    }
-    
     public MangaTakoDownloader includeChapters(String first, String... more) {
         Set<String> chapters = New.set(first, more);
         return setChapterFilter(chapter -> chapters.contains(chapter));
