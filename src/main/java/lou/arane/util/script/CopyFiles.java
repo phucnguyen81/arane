@@ -48,6 +48,10 @@ public class CopyFiles {
         setDirPattern(Pattern.compile("\\d+"));
     }
 
+    public CopyFiles setDirPattern(String regex) {
+        return setDirPattern(Pattern.compile(regex));
+    }
+
     /** @see #dirPattern */
     public CopyFiles setDirPattern(final Pattern dirPattern) {
         Check.notNull(dirPattern, "Null pattern");
@@ -110,7 +114,9 @@ public class CopyFiles {
 
     /** Copy a file to a directory; the target file-name is preserved */
     private static void copyFile(Path source, Path target) {
-        if (Util.exists(target)) return;
+        if (Util.exists(target)) {
+            return;
+        }
         Util.createDirectories(target.getParent());
         Util.copy(source, target);
     }

@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,6 +39,14 @@ public class New {
 
     public static <T> Stream<T> stream(T single) {
         return Arrays.asList(single).stream();
+    }
+
+    public static StringJoiner joiner(CharSequence delimiter) {
+        return new StringJoiner(delimiter);
+    }
+
+    public static StringJoiner joiner(CharSequence delimiter, CharSequence prefix) {
+        return new StringJoiner(delimiter, prefix, "");
     }
 
     public static <T> Holder<T> holder() {

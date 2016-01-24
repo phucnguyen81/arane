@@ -73,10 +73,13 @@ public final class Util {
 
     /** Assume a string is a path, get its file extension (without the dot) */
     public static String getFileExtension(String str) {
-        if (str == null) return null;
+        if (str == null) {
+            return null;
+        }
         int extensionIdx = str.lastIndexOf('.');
-        if (extensionIdx >= 0)
+        if (extensionIdx >= 0) {
             return str.substring(0, extensionIdx + 1);
+        }
         return null;
     }
 
@@ -118,7 +121,7 @@ public final class Util {
     }
 
     /**
-     * Delete a file, a symbolic link or an empty directory if it exists; 
+     * Delete a file, a symbolic link or an empty directory if it exists;
      * return whether the file is deleted.
      */
     public static boolean deleteIfExists(Path path) {
@@ -130,9 +133,10 @@ public final class Util {
         }
     }
 
-    /** @see Files#exists(Path, LinkOption...) */
+    /** Check if the absolute version of a path exists,
+     * which means the underlying file/folder exists */
     public static boolean exists(Path path, LinkOption... options) {
-        return Files.exists(path, options);
+        return Files.exists(path.toAbsolutePath(), options);
     }
 
     public static boolean isRegularFile(Path path, LinkOption... options) {
@@ -185,7 +189,7 @@ public final class Util {
         } catch (IOException e) {
             throw new Unchecked(e);
         }
-    }    
+    }
 
     /** Write/Overwrite a file with default settings */
     public static void write(Path path, String content) {
@@ -216,7 +220,7 @@ public final class Util {
         return Joiner.on(separator).join(parts);
     }
 
-    /** Given a string, pad numeric sequences shorter 
+    /** Given a string, pad numeric sequences shorter
      * than a minimum length found in that string. */
     public static String padNumericSequences(String str, int minLength) {
         // pattern to look for numeric sequences shorter than a minimum length
@@ -314,5 +318,4 @@ public final class Util {
                 .filter(file -> file.toString().endsWith(".html"))
                 .collect(Collectors.toList());
     }
-
 }
