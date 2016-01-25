@@ -168,7 +168,7 @@ public class MangaLifeDownloader extends BaseDownloader {
 
     private void addImageToDownload(Path pageHtml) {
         Document page = Util.parseHtml(pageHtml);
-        for (Element img : page.select("img[src]")) {
+        for (Element img : page.select("a[href] img[src]")) {
             Uri imgUri = new Uri(img.absUrl("src"));
             addOnErrorUri(imgUri, img.attr("onerror"));
             Path imgPath = imagesDir.resolve(imgUri.getFileName());
