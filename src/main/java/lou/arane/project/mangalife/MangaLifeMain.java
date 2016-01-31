@@ -12,7 +12,15 @@ import lou.arane.util.Util;
 public class MangaLifeMain {
 
     public static void main(String[] args) {
-        gate();
+        download("BattleThroughTheHeavens", "Battle Through The Heavens");
+    }
+
+    static void blackCross() {
+        download("RoppongiBlackCross", "Roppongi Black Cross");
+    }
+
+    static void vinlandSaga() {
+        download("VinlandSaga", "Vinland Saga");
     }
 
     /** A gate suddenly opens connecting Japan to a fantasy world */

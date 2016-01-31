@@ -25,6 +25,7 @@ public class BaseDownloader {
     /** Download all what been added so far */
     public void download() {
         downloader.sortByPath();
+        //TODO replace with log/reporting
         Util.println("Start download: " + downloader);
         downloader.download();
     }

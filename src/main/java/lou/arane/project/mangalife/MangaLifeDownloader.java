@@ -78,13 +78,7 @@ public class MangaLifeDownloader extends BaseDownloader {
      * file:
      *
      * <pre>
-        <a
-            class="list-group-item hidden-lg hidden-md hidden-sm"
-            style="color:black;"
-            href="/read-online/GateJietaiKareNoChiNiteKakuTatakeri/chapter-35/index-1/page-1"
-        >
-        Chapter 35
-        </a>
+     *   <a href="/read-online/GateJietaiKareNoChiNiteKakuTatakeri/chapter-35/index-1/page-1">Chapter 35</a>
      * </pre>
      */
     private void downloadChapters() {
@@ -117,34 +111,30 @@ public class MangaLifeDownloader extends BaseDownloader {
      * document
      */
     private void addPages(Document chapterDoc) {
-        //find chapter
-        for (Element chapterOpt : chapterDoc.select(
-                "select[class*=changeChapterSelect] option[value][selected]"))
-        {
-            String[] chapterOptSpec = chapterOpt.attr("value").split(";");
-            if (chapterOptSpec.length != 2) {
-                continue;
+        String selectChapter = "select[class*=changeChapterSelect] option[value][selected]";
+        for (Element chapterOpt : chapterDoc.select(selectChapter)) {
+            String[] chapterSpec = chapterOpt.attr("value").split(";");
+            if (chapterSpec.length == 2) {
+                String chapter = "chapter-" + chapterSpec[0];
+                String index = "index-" + chapterSpec[1];
+                addPages(chapterDoc, chapter, index);
             }
-            String chapter = "chapter-" + chapterOptSpec[0];
-            String index = "index-" + chapterOptSpec[1];
+        }
+    }
 
-            //find pages
-            for (Element pageOption : chapterDoc.select(
-                    "select[class*=changePageSelect] option[value]")) {
-                String page = pageOption.attr("value");
-                addPage(chapter, index, page);
-            }
+    private void addPages(Document chapterDoc, String chapter, String index) {
+        String selectPage = "select[class*=changePageSelect] option[value]";
+        for (Element pageOption : chapterDoc.select(selectPage)) {
+            String page = pageOption.attr("value");
+            addPage(chapter, index, page);
         }
     }
 
     private void addPage(String chapter, String index, String page) {
         String base = mangaUri.toUri().toString();
-        Uri pageUri = new Uri(
-            New.joiner("/", base + "/")
-            .add(chapter)
-            .add(index)
-            .add(page)
-            .toString());
+        String pageUriStr = New.joiner("/", base + "/")
+            .add(chapter).add(index).add(page).toString();
+        Uri pageUri = new Uri(pageUriStr);
         Path pagePath = pagesDir.resolve(chapter + "_" + page + ".html");
         add(pageUri, pagePath);
     }
@@ -153,21 +143,18 @@ public class MangaLifeDownloader extends BaseDownloader {
      * Download the actual images from the html image files such as:
      *
      * <pre>
-     *     <img style="max-width:98%;"
-     *          src="http://2.bp.blogspot.com/-7bz2zJ1mmsM/Vi7deeTfGsI/AAAAAAACiq8/bPiqkStGnRU/s16000/0010-001.jpg"
-     *          onerror="this.onerror=null;this.src='http://2.bp.blogspot.com/-7bz2zJ1mmsM/Vi7deeTfGsI/AAAAAAACiq8/bPiqkStGnRU/s800/0010-001.jpg'"
-     *      />
+     * <img src="http://.../0010-001.jpg" onerror="this.onerror=null;this.src='http://.../0010-001.jpg'"/>
      * </pre>
      */
     private void downloadImages() {
         for (Path pageHtml : Util.findHtmlFiles(pagesDir)) {
-            addImageToDownload(pageHtml);
+            Document page = Util.parseHtml(pageHtml);
+            addImageToDownload(page);
         }
         download();
     }
 
-    private void addImageToDownload(Path pageHtml) {
-        Document page = Util.parseHtml(pageHtml);
+    private void addImageToDownload(Document page) {
         for (Element img : page.select("a[href] img[src]")) {
             Uri imgUri = new Uri(img.absUrl("src"));
             addOnErrorUri(imgUri, img.attr("onerror"));

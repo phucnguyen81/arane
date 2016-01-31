@@ -16,9 +16,9 @@ public class HttpFileBatchDownloader {
 
     private final LinkedList<HttpFileDownloader> downloaders = New.linkedList();
 
-    private Integer maxDownloadAttempts = null;
+    private int maxDownloadAttempts = 1;
 
-    public HttpFileBatchDownloader setMaxDownloadAttempts(Integer maxDownloadAttempts) {
+    public HttpFileBatchDownloader setMaxDownloadAttempts(int maxDownloadAttempts) {
         Check.require(maxDownloadAttempts > 0, "Download attempts must be positive");
         this.maxDownloadAttempts = maxDownloadAttempts;
         return this;
@@ -54,7 +54,7 @@ public class HttpFileBatchDownloader {
     /** Retry download later if there are not too many errors */
     private void handleDownloadErrors(HttpFileDownloader downloader) {
         int downloadErrors = downloader.getDownloadExceptions().size();
-        if (maxDownloadAttempts == null || downloadErrors < maxDownloadAttempts) {
+        if (downloadErrors < maxDownloadAttempts) {
             downloaders.addLast(downloader);
         }
     }
