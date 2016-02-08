@@ -23,6 +23,8 @@ import org.jsoup.nodes.Element;
  */
 public class MangaLifeDownloader extends BaseDownloader {
 
+    private static final Pattern ONERROR_SRC_PATTERN = Pattern.compile("src=['\"]([^'\"]+)['\"]");
+
     /** base location of all mangas for this site */
     private static final String BASE_URI = "http://manga.life/";
 
@@ -173,8 +175,7 @@ public class MangaLifeDownloader extends BaseDownloader {
         if (onerror == null) {
             return Optional.empty();
         }
-        Pattern srcPattern = Pattern.compile("src=['\"]([^'\"]+)['\"]");
-        Matcher srcMatcher = srcPattern.matcher(onerror);
+        Matcher srcMatcher = ONERROR_SRC_PATTERN.matcher(onerror);
         if (srcMatcher.find()) {
             return Optional.of(srcMatcher.group(1));
         }

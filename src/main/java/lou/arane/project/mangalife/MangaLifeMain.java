@@ -12,11 +12,7 @@ import lou.arane.util.Util;
 public class MangaLifeMain {
 
     public static void main(String[] args) {
-        download("BattleThroughTheHeavens", "Battle Through The Heavens");
-    }
-
-    static void blackCross() {
-        download("RoppongiBlackCross", "Roppongi Black Cross");
+        download("HistoryStrongestDiscipleKenichi", "Strongest Disciple Kenichi");
     }
 
     static void vinlandSaga() {
