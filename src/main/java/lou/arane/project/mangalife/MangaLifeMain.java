@@ -12,6 +12,10 @@ import lou.arane.util.Util;
 public class MangaLifeMain {
 
     public static void main(String[] args) {
+        download("TheBreakerNewWaves", "The Breaker - New Waves");
+    }
+
+    static void historyStrongestDiscipleKenichi() {
         download("HistoryStrongestDiscipleKenichi", "Strongest Disciple Kenichi");
     }
 

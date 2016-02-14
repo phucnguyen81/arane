@@ -1,4 +1,4 @@
-package lou.arane.project;
+package lou.arane.project.mangatako;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
