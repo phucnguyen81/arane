@@ -1,16 +1,13 @@
-package lou.arane.project;
+package lou.arane.project.blogtruyen;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.nio.file.Paths;
 
 import lou.arane.util.BaseDownloader;
 import lou.arane.util.Check;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
-import lou.arane.util.script.CopyFiles;
-import lou.arane.util.script.GenerateImageViewer;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,19 +23,17 @@ public class BlogTruyenDownloader extends BaseDownloader {
     /** Scheme of this site */
     private static final String BASE_URI = "http://blogtruyen.com/";
 
-    private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+(\\.\\d+)?");
-
-    private static final Pattern CHAPTER_PATTERN = NUMBER_PATTERN;
+    /** Name of the manga used in its uri */
+    private final String story;
 
     private final Uri mangaUri;
 
-    private final Path baseDir;
     private final Path chapterList;
 
     private final Path chapterDir;
-    private final Path imageDir;
+    private final Path imagesDir;
+
     private final Path outputDir;
-    private final Path outputImagesDir;
 
     /**
      * Create a downloader to download a story to a directory
@@ -47,13 +42,13 @@ public class BlogTruyenDownloader extends BaseDownloader {
      * @param baseDir = dir to download to, e.g. "/mangas/Vo Than"
      */
     public BlogTruyenDownloader(String story, Path baseDir) {
-        this.baseDir = Check.notNull(baseDir, "Null base dir");
+        this.story = Check.notNull(story, "Null story");
+        Check.notNull(baseDir, "Null base dir");
         this.mangaUri = new Uri(BASE_URI + "/truyen/" + story);
         chapterList = baseDir.resolve("chapters.html");
         chapterDir = baseDir.resolve("chapters");
-        imageDir = baseDir.resolve("images");
-        outputDir = baseDir.resolve("output").resolve(baseDir.getFileName());
-        outputImagesDir = outputDir.resolve("images");
+        imagesDir = baseDir.resolve("images");
+        outputDir = baseDir.resolve("output");
     }
 
     /** Run the entire process of downloading the manga */
@@ -61,8 +56,7 @@ public class BlogTruyenDownloader extends BaseDownloader {
         downloadChapterList();
         downloadChapters();
         downloadImages();
-        collectImagesIntoChapters();
-        generateIndexFile();
+        copyImagesToOutputDir();
     }
 
     /** Download the newest page that lists all chapters */
@@ -87,31 +81,19 @@ public class BlogTruyenDownloader extends BaseDownloader {
      */
     private void downloadChapters() {
         Document rootFile = Util.parseHtml(chapterList, BASE_URI);
-        Elements chapterAddresses = rootFile.select("div[id=list-chapters] a[href]:not([rel]), a[href][rel=noreferrer]");
+        Elements chapterAddresses = rootFile.select("a[href]");
         for (Element chapterAddr : chapterAddresses) {
             Uri chapterUri = new Uri(chapterAddr.absUrl("href"));
-            String chapterName = chapterUri.getFileName().toString();
-            chapterName = cleanChapterName(chapterName);
-            if (!chapterName.endsWith(".html")) {
-                chapterName += ".html";
-            }
-            Path chapterPath = chapterDir.resolve(chapterName);
-            add(chapterUri, chapterPath);
+            chapterUri.getPath().filter(p -> p.contains(story)).ifPresent(p -> {
+                String chapterName = chapterUri.getFileName().toString();
+                if (!chapterName.endsWith(".html")) {
+                    chapterName += ".html";
+                }
+                Path chapterPath = chapterDir.resolve(chapterName);
+                add(chapterUri, chapterPath);
+            });
         }
         download();
-    }
-
-    /**
-     * Clean chapter names so that chapter order matches lexicographical order.
-     * For example, chapter "chap-1" is converted to "001".
-     */
-    private static String cleanChapterName(String chapterName) {
-        Matcher matcher = NUMBER_PATTERN.matcher(chapterName);
-        if (matcher.find()) {
-            chapterName = matcher.group();
-        }
-        chapterName = Util.padNumericSequences(chapterName, 3);
-        return chapterName;
     }
 
     /**
@@ -120,34 +102,37 @@ public class BlogTruyenDownloader extends BaseDownloader {
      * <pre>
      *   <article id="content">
      *       <img src="http://4.bp.blogspot.com/.../Vol8-Chap48-P00.jpg?imgmax=3000" />
+     *       ...
+     *   </article>
      * </pre>
      */
     private void downloadImages() {
         for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
+            String imageDir = chapterHtml.getFileName().toString();
+            imageDir = Util.removeFileExtension(imageDir);
             Document page = Util.parseHtml(chapterHtml);
             Elements images = page.select("article[id=content] img[src]");
-            for (int imageIdx = 0; imageIdx < images.size(); imageIdx++) {
-                Element image = images.get(imageIdx);
+            for (Element image : images) {
                 Uri imageUri = new Uri(image.absUrl("src"));
-                String imageName = chapterHtml.getFileName().toString();
-                imageName = Util.removeFileExtension(imageName);
-                imageName += "_" + imageIdx + "." + imageUri.getFileExtension();
-                imageName = Util.padNumericSequences(imageName, 3);
-                Path imagePath = imageDir.resolve(imageName);
+                String imageName = imageUri.getFileName().toString();
+                Path imagePath = Paths.get(imageDir, imageName);
+                imagePath = imagesDir.resolve(imagePath);
                 add(imageUri, imagePath);
             }
             download();
         }
     }
 
-    /** Organize the downloaded images into chapter sub-directories */
-    private void collectImagesIntoChapters() {
-        new CopyFiles(imageDir, outputImagesDir).setDirPattern(CHAPTER_PATTERN).run();
-    }
-
-    /** Generate an html index file to read the manga */
-    private void generateIndexFile() {
-        new GenerateImageViewer(outputImagesDir).setTitle(baseDir.getFileName()).run();
+    /** Make output chapters from downloaded images */
+    private void copyImagesToOutputDir() {
+        Util
+        .list(imagesDir)
+        .filter(Util::isNotEmpty)
+        .forEach(src -> {
+            Path rel = imagesDir.relativize(src);
+            Path dst = outputDir.resolve(rel);
+            Util.copy(src, dst);
+        });
     }
 
 }

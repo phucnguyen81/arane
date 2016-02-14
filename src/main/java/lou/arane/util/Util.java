@@ -147,6 +147,14 @@ public final class Util {
         return Files.isDirectory(path, options);
     }
 
+    public static boolean isNotEmpty(Path p) {
+        return list(p).findAny().isPresent();
+    }
+
+    public static boolean isEmpty(Path p) {
+        return !isNotEmpty(p);
+    }
+
     public static Path renameDirectory(Path dir, String newName) {
         return move(dir, dir.resolveSibling(newName));
     }
@@ -163,11 +171,16 @@ public final class Util {
 
     /** Get direct files and sub-dirs */
     public static Stream<Path> list(Path path) {
-        try {
-            return Files.list(path);
+        if (isDirectory(path)) {
+            try {
+                return Files.list(path);
+            }
+            catch (IOException e) {
+                throw new Unchecked(e);
+            }
         }
-        catch (IOException e) {
-            throw new Unchecked(e);
+        else {
+            return New.emptyStream();
         }
     }
 
@@ -181,14 +194,24 @@ public final class Util {
         }
     }
 
-    /** Copy a file to a target file.
+    /** Copy a file/dir to a target file/dir.
+     * Intermediate directories are created if they do not exist.
      * @see Files#copy(Path, Path, CopyOption...) */
     public static void copy(Path source, Path target, CopyOption... options) {
+        createDirectories(target.getParent());
+
         try {
             Files.copy(source, target, options);
         } catch (IOException e) {
             throw new Unchecked(e);
         }
+
+        //recursively copy sub-files/dirs
+        list(source).forEach(src -> {
+            Path rel = source.relativize(src);
+            Path dst = target.resolve(rel);
+            copy(src, dst);
+        });
     }
 
     /** Write/Overwrite a file with default settings */

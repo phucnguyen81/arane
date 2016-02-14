@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
+import java.util.Optional;
 
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
@@ -24,7 +25,7 @@ public class Uri implements Comparable<Uri> {
         return new Uri(uri);
     }
 
-    /** Create uri from a uri string. 
+    /** Create uri from a uri string.
      * If the uri scheme is not present, it defaults to http. */
     public static Uri http(String uriString) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriString);
@@ -131,7 +132,9 @@ public class Uri implements Comparable<Uri> {
     }
 
     public String getFileExtension() {
-        if (getFileName() == null) return null;
+        if (getFileName() == null) {
+            return null;
+        }
         String filename = getFileName().toString();
         String ext = Util.getFileExtension(filename);
         return ext == null ? "" : ext;
@@ -147,8 +150,11 @@ public class Uri implements Comparable<Uri> {
         String uriPath = uri.getPath();
         if (uriPath != null) {
             for (Path p : Paths.get(decode(uriPath))) {
-                if (path == null) path = p;
-                else path = path.resolve(p);
+                if (path == null) {
+                    path = p;
+                } else {
+                    path = path.resolve(p);
+                }
             }
         }
         return path;
@@ -163,5 +169,10 @@ public class Uri implements Comparable<Uri> {
         MultiValueMap<String, String> params = uri.getQueryParams();
         String val = params.getFirst(key);
         return decode(val);
+    }
+
+    public Optional<String> getPath() {
+        String path = uri.getPath();
+        return path == null ? Optional.empty() : Optional.of(path);
     }
 }

@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +18,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.StringJoiner;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -27,7 +27,6 @@ import javax.xml.ws.Holder;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterators;
 
 /**
@@ -122,23 +121,7 @@ public class New {
         return new IdentityHashMap<K, V>();
     }
 
-    public static HashMap<String, LinkedList<String>> map(Map<String, String[]> map) {
-        HashMap<String, LinkedList<String>> newMap = new HashMap<String, LinkedList<String>>();
-        for (Map.Entry<String, String[]> entry : map.entrySet()) {
-            newMap.put(entry.getKey(), new LinkedList<String>(Arrays.asList(entry.getValue())));
-        }
-        return newMap;
-    }
-
-    public static <K, V> ArrayListMultimap<K, V> multiMap() {
-        return ArrayListMultimap.create();
-    }
-
-    public static <K, V> ArrayListMultimap<K, V> multiMap(Map<K, V[]> map) {
-        ArrayListMultimap<K, V> multimap = ArrayListMultimap.create();
-        for (Map.Entry<K, V[]> entry : map.entrySet()) {
-            multimap.putAll(entry.getKey(), Arrays.asList(entry.getValue()));
-        }
-        return multimap;
+    public static <T> Stream<T> emptyStream() {
+        return Collections.<T>emptyList().stream();
     }
 }
