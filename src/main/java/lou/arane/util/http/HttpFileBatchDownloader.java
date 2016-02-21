@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 
 import lou.arane.util.Check;
+import lou.arane.util.Log;
 import lou.arane.util.New;
 import lou.arane.util.Uri;
 
@@ -43,8 +44,7 @@ public class HttpFileBatchDownloader {
                     downloader.download();
                 }
                 catch (HttpIOException e) {
-                    // FIXME show stack trace here is too ugly, at least use log
-                    e.printStackTrace();
+                    Log.error(e);
                     handleDownloadErrors(downloader);
                 }
             }

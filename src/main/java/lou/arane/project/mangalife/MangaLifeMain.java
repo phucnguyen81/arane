@@ -2,6 +2,7 @@ package lou.arane.project.mangalife;
 
 import java.nio.file.Path;
 
+import lou.arane.util.Log;
 import lou.arane.util.Util;
 
 /**
@@ -12,6 +13,14 @@ import lou.arane.util.Util;
 public class MangaLifeMain {
 
     public static void main(String[] args) {
+        ouroboros();
+    }
+
+    static void ouroboros() {
+        download("Ouroboros", "Ouroboros");
+    }
+
+    static void theBreakerNewWaves() {
         download("TheBreakerNewWaves", "The Breaker - New Waves");
     }
 
@@ -36,6 +45,7 @@ public class MangaLifeMain {
 
     private static void download(String mangaName, String dir) {
         Path mangaDir = Util.mangaDir("mangalife", dir);
+        Log.addOutFile(mangaDir.resolve("log.txt").toString());
         new MangaLifeDownloader(mangaName, mangaDir).run();
     }
 }

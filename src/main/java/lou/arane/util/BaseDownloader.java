@@ -22,11 +22,10 @@ public class BaseDownloader {
         downloader.add(fromUri, toPath);
     }
 
-    /** Download all what been added so far */
+    /** Download what been added so far */
     public void download() {
         downloader.sortByPath();
-        //TODO replace with log/reporting
-        Util.println("Start download: " + downloader);
+        Log.info("Start download: " + downloader);
         downloader.download();
     }
 
