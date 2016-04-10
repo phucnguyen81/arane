@@ -42,9 +42,9 @@ public class MangaLifeHandler extends BaseDownloader implements Runnable {
     private final String mangaName;
 
 	public MangaLifeHandler(Item item) {
-		this.mangaUri = item.initialUri;
+		this.mangaUri = item.source;
 		this.mangaName = Check.notNull(mangaUri.getFileName().toString(), "Null name");
-		Path baseDir = item.baseDir;
+		Path baseDir = item.target;
         Check.notNull(baseDir, "Null base dir");
         chapterList = baseDir.resolve("chapters.html");
         chaptersDir = baseDir.resolve("chapters");

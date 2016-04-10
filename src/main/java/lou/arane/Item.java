@@ -6,12 +6,12 @@ import lou.arane.util.Uri;
 
 public class Item {
 
-	public final Uri initialUri;
-	public final Path baseDir;
+	public final Uri source;
+	public final Path target;
 
 	public Item(Uri source, Path target) {
-		this.initialUri = source;
-		this.baseDir = target;
+		this.source = source;
+		this.target = target;
 	}
 
 }
