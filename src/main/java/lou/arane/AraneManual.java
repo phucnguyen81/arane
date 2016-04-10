@@ -9,6 +9,6 @@ package lou.arane;
 public class AraneManual {
 
 	public static void main(String[] args) {
-		Arane.main(new String[] {"http://manga.life/read-online/Berserk"});
+		Arane.main(new String[] {"http://manga.life/read-online/Ajin"});
 	}
 }
