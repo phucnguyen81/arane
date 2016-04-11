@@ -1,6 +1,5 @@
 package lou.arane.handlers;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -9,9 +8,7 @@ import java.util.regex.Pattern;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import lou.arane.Item;
-import lou.arane.util.BaseDownloader;
-import lou.arane.util.Check;
+import lou.arane.Context;
 import lou.arane.util.New;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
@@ -22,42 +19,24 @@ import lou.arane.util.script.CopyFiles;
  *
  * @author Phuc
  */
-public class MangaLifeHandler extends BaseDownloader implements Runnable {
+public class MangaLifeHandler implements Runnable {
 
     private static final Pattern ONERROR_SRC_PATTERN = Pattern.compile("src=['\"]([^'\"]+)['\"]");
 
     /** base location of all mangas for this site */
     private static final String BASE_URI = "http://manga.life/";
 
-    private final Uri mangaUri;
+	private final Context ctx;
 
-    private final Path chapterList;
-    private final Path chaptersDir;
-
-    private final Path pagesDir;
-
-    private final Path imagesDir;
-    private final Path outputDir;
-
-    private final String mangaName;
-
-	public MangaLifeHandler(Item item) {
-		this.mangaUri = item.source;
-		this.mangaName = Check.notNull(mangaUri.getFileName().toString(), "Null name");
-		Path baseDir = item.target;
-        Check.notNull(baseDir, "Null base dir");
-        chapterList = baseDir.resolve("chapters.html");
-        chaptersDir = baseDir.resolve("chapters");
-        pagesDir = baseDir.resolve("pages");
-        imagesDir = baseDir.resolve("images");
-        outputDir = baseDir.resolve("output").resolve(baseDir.getFileName());
+	public MangaLifeHandler(Context context) {
+		this.ctx = context;
     }
 
     /** Run the entire process of downloading the manga */
     @Override
 	public void run() {
-		if (mangaUri.toString().startsWith(BASE_URI)) {
-			downloadChapterList();
+		if (canRun()) {
+			ctx.downloadChapterList();
 			downloadChapters();
 			downloadPages();
 			downloadImages();
@@ -65,14 +44,11 @@ public class MangaLifeHandler extends BaseDownloader implements Runnable {
 		}
     }
 
-    /** Download the intial file that contains the chapter locations */
-    private void downloadChapterList() {
-        Util.deleteIfExists(chapterList);
-        add(mangaUri, chapterList);
-        download();
-        Check.postCond(Files.exists(chapterList),
-            "Chapter listing must be downloaded to " + chapterList);
-    }
+	private boolean canRun() {
+		//domain must match
+		String url = ctx.source.toString();
+		return url.startsWith(BASE_URI);
+	}
 
     /**
      * Download chapter pages by extracting their urls from the master html
@@ -83,27 +59,27 @@ public class MangaLifeHandler extends BaseDownloader implements Runnable {
      * </pre>
      */
     private void downloadChapters() {
-        Document chapters = Util.parseHtml(chapterList, BASE_URI);
+        Document chapters = Util.parseHtml(ctx.chapterList, BASE_URI);
         chapters
         .select("a[href]")
         .stream()
         .map(addr -> addr.absUrl("href"))
-        .filter(href -> href.contains(mangaName))
+        .filter(href -> href.contains(ctx.sourceName))
         .map(href -> new Uri(href))
         .forEach(chapterUri -> {
             String chapterPath = Util.join(chapterUri.getFilePath(), "_");
-            add(chapterUri, chaptersDir.resolve(chapterPath + ".html"));
+            ctx.add(chapterUri, ctx.chaptersDir.resolve(chapterPath + ".html"));
         });
-        download();
+        ctx.download();
     }
 
     /** Download pages for each chapter.
      * A page url is built from chapter-index and page-index. */
     private void downloadPages() {
-        for (Path chapterHtml : Util.findHtmlFiles(chaptersDir)) {
+        for (Path chapterHtml : Util.findHtmlFiles(ctx.chaptersDir)) {
             Document chapter = Util.parseHtml(chapterHtml, BASE_URI);
             addPages(chapter);
-            download();
+            ctx.download();
         }
     }
 
@@ -132,12 +108,12 @@ public class MangaLifeHandler extends BaseDownloader implements Runnable {
     }
 
     private void addPage(String chapter, String index, String page) {
-        String base = mangaUri.toUri().toString();
+        String base = ctx.source.toURI().toString();
         String pageUriStr = New.joiner("/", base + "/")
             .add(chapter).add(index).add(page).toString();
         Uri pageUri = new Uri(pageUriStr);
-        Path pagePath = pagesDir.resolve(chapter + "_" + page + ".html");
-        add(pageUri, pagePath);
+        Path pagePath = ctx.pagesDir.resolve(chapter + "_" + page + ".html");
+        ctx.add(pageUri, pagePath);
     }
 
     /**
@@ -148,19 +124,19 @@ public class MangaLifeHandler extends BaseDownloader implements Runnable {
      * </pre>
      */
     private void downloadImages() {
-        for (Path pageHtml : Util.findHtmlFiles(pagesDir)) {
+        for (Path pageHtml : Util.findHtmlFiles(ctx.pagesDir)) {
             Document page = Util.parseHtml(pageHtml);
             addImageToDownload(page);
         }
-        download();
+        ctx.download();
     }
 
     private void addImageToDownload(Document page) {
         for (Element img : page.select("a[href] img[src]")) {
             Uri imgUri = new Uri(img.absUrl("src"));
             addOnErrorUri(imgUri, img.attr("onerror"));
-            Path imgPath = imagesDir.resolve(imgUri.getFileName());
-            add(imgUri, imgPath);
+            Path imgPath = ctx.imagesDir.resolve(imgUri.getFileName());
+            ctx.add(imgUri, imgPath);
         }
     }
 
@@ -184,8 +160,8 @@ public class MangaLifeHandler extends BaseDownloader implements Runnable {
     /** Organize the downloaded images into sub-directories.
      * A sub-directory corresponds to a chapter. */
     private void collectImagesIntoChapters() {
-        Util.createDirectories(outputDir);
-        new CopyFiles(imagesDir, outputDir)
+        Util.createDirectories(ctx.outputDir);
+        new CopyFiles(ctx.imagesDir, ctx.outputDir)
             .setDirPattern("\\d+(\\.\\d+)?")
             .run();
     }

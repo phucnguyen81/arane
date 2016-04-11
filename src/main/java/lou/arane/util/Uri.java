@@ -88,7 +88,7 @@ public class Uri implements Comparable<Uri> {
 
     @Override
     public int compareTo(Uri other) {
-        return toUri().compareTo(other.toUri());
+        return toURI().compareTo(other.toURI());
     }
 
     @Override
@@ -111,23 +111,23 @@ public class Uri implements Comparable<Uri> {
 
     public Uri resolve(String str) {
         str = encode(str);
-        return new Uri(toUri().resolve(str));
+        return new Uri(toURI().resolve(str));
     }
 
     public Uri queryParam(String name, Object... values) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUri(toUri());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUri(toURI());
         builder.queryParam(name, values);
         return new Uri(builder);
     }
 
     /** Make a uri from this uri without the query part */
     public Uri removeQuery() {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUri(toUri());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUri(toURI());
         builder.replaceQuery(null);
         return new Uri(builder);
     }
 
-    public URI toUri() {
+    public URI toURI() {
         return uri.toUri();
     }
 

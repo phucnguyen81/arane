@@ -42,7 +42,7 @@ public class HttpDownloader {
     }
 
     public byte[] getBytes(Uri uri) throws HttpIOException {
-        return getBytes(uri.toUri());
+        return getBytes(uri.toURI());
     }
 
     public byte[] getBytes(URI uri) throws HttpIOException {

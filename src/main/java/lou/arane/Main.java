@@ -49,7 +49,7 @@ public class Main {
 
 	private static List<Runnable> createHandlers(String name, String url) {
 		List<Runnable> handlers = new ArrayList<>();
-		handlers.add(new MangaLifeHandler(new Item(new Uri(url), Util.mangaDir("manga.life", name))));
+		handlers.add(new MangaLifeHandler(new Context(name, new Uri(url), Util.mangaDir("manga.life", name))));
 		return handlers;
 	}
 
