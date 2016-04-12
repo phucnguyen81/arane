@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import lou.arane.Context;
+import lou.arane.core.Context;
 import lou.arane.util.New;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
@@ -32,15 +32,10 @@ public class MangaLifeHandler implements Runnable {
 		this.ctx = context;
     }
 
-    /** Run the entire process of downloading the manga */
     @Override
 	public void run() {
 		if (canRun()) {
-			ctx.downloadChapterList();
-			downloadChapters();
-			downloadPages();
-			downloadImages();
-			collectImagesIntoChapters();
+			doRun();
 		}
     }
 
@@ -48,6 +43,15 @@ public class MangaLifeHandler implements Runnable {
 		//domain must match
 		String url = ctx.source.toString();
 		return url.startsWith(BASE_URI);
+	}
+
+	/** Run all the steps of downloading the manga */
+	private void doRun() {
+		ctx.downloadChapterList();
+		downloadChapters();
+		downloadPages();
+		downloadImages();
+		collectImagesIntoChapters();
 	}
 
     /**

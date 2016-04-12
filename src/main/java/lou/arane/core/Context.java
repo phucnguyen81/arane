@@ -1,4 +1,4 @@
-package lou.arane;
+package lou.arane.core;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

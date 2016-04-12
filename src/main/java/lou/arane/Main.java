@@ -1,10 +1,10 @@
 package lou.arane;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import lou.arane.core.Context;
 import lou.arane.handlers.MangaLifeHandler;
+import lou.arane.util.New;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 
@@ -31,7 +31,7 @@ public class Main {
 
 	private static void printHelp(String[] args) {
 		System.err.println("*****************************************");
-		System.err.println("Failed to handle arguments: " + Arrays.asList(args));
+		System.err.println("Failed to handle arguments: " + New.list(args));
 		System.err.println("*****************************************");
 		System.err.println("Usage: arane name url");
 		System.err.println("name = name to identify the content");
@@ -48,7 +48,7 @@ public class Main {
 	}
 
 	private static List<Runnable> createHandlers(String name, String url) {
-		List<Runnable> handlers = new ArrayList<>();
+		List<Runnable> handlers = New.list();
 		handlers.add(new MangaLifeHandler(new Context(name, new Uri(url), Util.mangaDir("manga.life", name))));
 		return handlers;
 	}
