@@ -15,28 +15,14 @@ import lou.arane.util.Util;
 import lou.arane.util.http.HttpFileBatchDownloader;
 
 /**
- * Common data/methods made global.
+ * Apply Context Pattern for passing common data/methods down the call chain.
+ * <p>
+ * Design Choice: no static elements here, everything can be found/replaced
+ * on the context instance.
  *
  * @author Phuc
  */
 public class Context {
-
-    /**
-     * Pattern for extracting urls from text such as:
-     * src="mangas/Feng Shen Ji/Chapter 001/Feng_Shen_Ji_ch01_p00.jpg"
-     */
-    public static final Pattern SRC_PATTERN = Pattern.compile("src=['\"]([^'\"]+)['\"]");
-
-    /** Find urls enclosed in "src='url'" */
-	public static List<String> findSourceUrls(String str) {
-		if (str == null) return Collections.emptyList();
-		List<String> urls = new ArrayList<>();
-        Matcher matcher = SRC_PATTERN.matcher(str);
-        while (matcher.find()) {
-        	urls.add(matcher.group(1));
-        }
-        return urls;
-	}
 
 	public final String sourceName;
 
@@ -56,6 +42,10 @@ public class Context {
 
 	private final HttpFileBatchDownloader downloader = new HttpFileBatchDownloader()
 			.setMaxDownloadAttempts(3);
+
+    /** Pattern for extracting urls from text such as:
+     * src="mangas/Feng Shen Ji/Chapter 001/Feng_Shen_Ji_ch01_p00.jpg" */
+    public final Pattern srcPattern = Pattern.compile("src=['\"]([^'\"]+)['\"]");
 
 	public Context(String sourceName, Uri source, Path baseDir) {
 		this.source = source;
@@ -89,6 +79,19 @@ public class Context {
 		downloader.sortByPath();
 		Log.info("Start download: " + downloader);
 		downloader.download();
+	}
+
+    /** Find urls enclosed in text pattern "src='url'".
+     * This is needed because if the url is embedded in javascript
+     * elemements then we cannot search for it in html tags. */
+	public List<String> findSourceUrls(String str) {
+		if (str == null) return Collections.emptyList();
+		List<String> urls = new ArrayList<>();
+        Matcher matcher = srcPattern.matcher(str);
+        while (matcher.find()) {
+        	urls.add(matcher.group(1));
+        }
+        return urls;
 	}
 
 }

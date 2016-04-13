@@ -139,8 +139,8 @@ public class MangaLifeHandler implements Runnable {
         }
     }
 
-    private static void addOnErrorUri(Uri imgUri, String onerrorAttr) {
-        for (String onerrorUrl : Context.findSourceUrls(onerrorAttr)) {
+    private void addOnErrorUri(Uri imgUri, String onerrorAttr) {
+        for (String onerrorUrl : ctx.findSourceUrls(onerrorAttr)) {
         	Uri onerrorUri = new Uri(onerrorUrl);
         	imgUri.addAlternatives(onerrorUri);
         }

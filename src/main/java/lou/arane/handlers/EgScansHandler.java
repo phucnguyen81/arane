@@ -1,7 +1,6 @@
 package lou.arane.handlers;
 
 import java.nio.file.Path;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Document;
@@ -22,12 +21,6 @@ public class EgScansHandler implements Runnable {
     private static final String BASE_URI = "http://read.egscans.com/";
 
     private static final Pattern CHAPTER_PATTERN = Pattern.compile("chapter_\\d+[a-zA-Z]?");
-
-    /**
-     * Pattern for extracting urls from text such as:
-     * src="mangas/Feng Shen Ji/Chapter 001/Feng_Shen_Ji_ch01_p00.jpg"
-     */
-    private static final Pattern SRC_PATTERN = Pattern.compile("src=['\"]([^'\"]+)['\"]");
 
 	private final Context ctx;
 
@@ -107,14 +100,13 @@ public class EgScansHandler implements Runnable {
 
     /** Find images from text of a script element */
     private void addImages(Element script, String chapterName) {
-        Matcher matcher = SRC_PATTERN.matcher(script.html());
-        while (matcher.find()) {
-            Uri imageUri = new Uri(BASE_URI + matcher.group(1));
+    	for (String srcUrl : ctx.findSourceUrls(script.html())) {
+            Uri imageUri = new Uri(BASE_URI + srcUrl);
             String imageName = chapterName + "_" + imageUri.getFileName();
             imageName = Util.padNumericSequences(imageName.toLowerCase(), 3);
             Path imagePath = ctx.imagesDir.resolve(imageName);
             ctx.add(imageUri, imagePath);
-        }
+    	}
     }
 
     /**
