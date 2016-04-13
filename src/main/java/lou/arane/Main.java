@@ -3,6 +3,7 @@ package lou.arane;
 import java.util.List;
 
 import lou.arane.core.Context;
+import lou.arane.handlers.EgScansHandler;
 import lou.arane.handlers.MangaLifeHandler;
 import lou.arane.util.New;
 import lou.arane.util.Uri;
@@ -50,6 +51,7 @@ public class Main {
 	private static List<Runnable> createHandlers(String name, String url) {
 		List<Runnable> handlers = New.list();
 		handlers.add(new MangaLifeHandler(new Context(name, new Uri(url), Util.mangaDir("manga.life", name))));
+		handlers.add(new EgScansHandler(new Context(name, new Uri(url), Util.mangaDir("eggscans", name))));
 		return handlers;
 	}
 

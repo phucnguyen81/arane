@@ -2,6 +2,11 @@ package lou.arane.core;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lou.arane.util.Check;
 import lou.arane.util.Log;
@@ -15,6 +20,23 @@ import lou.arane.util.http.HttpFileBatchDownloader;
  * @author Phuc
  */
 public class Context {
+
+    /**
+     * Pattern for extracting urls from text such as:
+     * src="mangas/Feng Shen Ji/Chapter 001/Feng_Shen_Ji_ch01_p00.jpg"
+     */
+    public static final Pattern SRC_PATTERN = Pattern.compile("src=['\"]([^'\"]+)['\"]");
+
+    /** Find urls enclosed in "src='url'" */
+	public static List<String> findSourceUrls(String str) {
+		if (str == null) return Collections.emptyList();
+		List<String> urls = new ArrayList<>();
+        Matcher matcher = SRC_PATTERN.matcher(str);
+        while (matcher.find()) {
+        	urls.add(matcher.group(1));
+        }
+        return urls;
+	}
 
 	public final String sourceName;
 

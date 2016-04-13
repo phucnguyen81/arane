@@ -1,9 +1,6 @@
 package lou.arane.handlers;
 
 import java.nio.file.Path;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,8 +17,6 @@ import lou.arane.util.script.CopyFiles;
  * @author Phuc
  */
 public class MangaLifeHandler implements Runnable {
-
-    private static final Pattern ONERROR_SRC_PATTERN = Pattern.compile("src=['\"]([^'\"]+)['\"]");
 
     /** base location of all mangas for this site */
     private static final String BASE_URI = "http://manga.life/";
@@ -145,20 +140,10 @@ public class MangaLifeHandler implements Runnable {
     }
 
     private static void addOnErrorUri(Uri imgUri, String onerrorAttr) {
-        findOnErrorSrc(onerrorAttr)
-            .map(onerror -> new Uri(onerror))
-            .ifPresent(onerror -> imgUri.addAlternatives(onerror));
-    }
-
-    private static Optional<String> findOnErrorSrc(String onerror) {
-        if (onerror == null) {
-            return Optional.empty();
+        for (String onerrorUrl : Context.findSourceUrls(onerrorAttr)) {
+        	Uri onerrorUri = new Uri(onerrorUrl);
+        	imgUri.addAlternatives(onerrorUri);
         }
-        Matcher srcMatcher = ONERROR_SRC_PATTERN.matcher(onerror);
-        if (srcMatcher.find()) {
-            return Optional.of(srcMatcher.group(1));
-        }
-        return Optional.empty();
     }
 
     /** Organize the downloaded images into sub-directories.
