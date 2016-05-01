@@ -12,6 +12,17 @@ import lou.arane.util.Util;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+/** FIXME
+ * Find out why downloading from kissmanga failed.
+ * url = http://kissmanga.com/Manga/Lighter
+ * <p>
+ * The error code is 403, which means the site refuses to handle the requests.
+ * This is probably some security measure.
+ * Need time to find out how to bypass this.
+ * <p>
+ * Maybe making a fake browser request?
+ */
+
 /**
  * Download manga from kissmanga site.
  *
