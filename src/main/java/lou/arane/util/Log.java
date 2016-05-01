@@ -32,4 +32,8 @@ public class Log {
         LogEntryForwarder.forward(1, Level.ERROR, err);
     }
 
+    public static void error(String msg) {
+        LogEntryForwarder.forward(1, Level.ERROR, msg);
+    }
+
 }

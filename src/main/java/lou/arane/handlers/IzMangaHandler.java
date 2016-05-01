@@ -1,43 +1,27 @@
-package lou.arane.project;
+package lou.arane.handlers;
 
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lou.arane.util.BaseDownloader;
-import lou.arane.util.Check;
-import lou.arane.util.Uri;
-import lou.arane.util.Util;
-
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-/**
- * Download comics from izmanga site
- *
- * @author LOU
- */
-public class IzMangaDownloader extends BaseDownloader {
+import lou.arane.core.Context;
+import lou.arane.core.Handler;
+import lou.arane.util.Uri;
+import lou.arane.util.Util;
 
-	public static void main(String[] args) {
-	    String story = "ban_long-117";
-		Path outputDir = Util.mangaDir("izmanga", "Ban Long");
-        new IzMangaDownloader(story, outputDir).run();
-	}
-	
+public class IzMangaHandler implements Handler {
+
     /* scheme of this site */
     private static final String BASE_URI = "http://izmanga.com/";
 
     /* pattern to look for images embeded in the chapter pages */
     private static final Pattern DATA_IMAGES_PATTERN = Pattern.compile("data\\s*=\\s*'(?<imgs>http:.+)'");
 
-    private final Uri mangaUri;
-
-    private final Path chapterList;
-
-    private final Path chapterDir;
-    private final Path imageDir;
+	private final Context ctx;
 
     /**
      * Create a downloader to download a story to a directory
@@ -45,28 +29,23 @@ public class IzMangaDownloader extends BaseDownloader {
      * @param story = base name of the story, e.g. "ban_long-117"
      * @param baseDir = dir to download to, e.g. "mangas/Ban Long"
      */
-    public IzMangaDownloader(String story, Path baseDir) {
-        this.mangaUri = new Uri(BASE_URI + story);
-        chapterList = baseDir.resolve("chapters.html");
-        chapterDir = baseDir.resolve("chapters");
-        imageDir = baseDir.resolve("images");
+    public IzMangaHandler(Context context) {
+    	this.ctx = context;
     }
 
-    /** Run the entire process of downloading the manga */
-    public void run() {
-        downloadChapterList();
-        downloadChapters();
-        downloadImages();
+    @Override
+	public boolean canRun() {
+    	// domain must match
+    	String url = ctx.source.toString();
+    	return url.startsWith(BASE_URI);
     }
 
-    /** Download the newest page that lists all chapters */
-    private void downloadChapterList() {
-        Util.deleteIfExists(chapterList);
-        add(mangaUri, chapterList);
-        download();
-        Check.postCond(Util.exists(chapterList),
-            "Chapter listing must be downloaded to " + chapterList);
-    }
+    @Override
+	public void doRun() {
+    	ctx.downloadChapterList();
+    	downloadChapters();
+    	downloadImages();
+	}
 
     /**
      * Download chapter pages by extracting their urls from the master html
@@ -82,7 +61,7 @@ public class IzMangaDownloader extends BaseDownloader {
      * </pre>
      */
     private void downloadChapters() {
-        Document rootFile = Util.parseHtml(chapterList, BASE_URI);
+        Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URI);
         Elements chapterAddresses = rootFile.select("div[class=chapter-list] a[href]");
         for (Element chapterAddr : chapterAddresses) {
             Uri chapterUri = new Uri(chapterAddr.absUrl("href"));
@@ -90,36 +69,40 @@ public class IzMangaDownloader extends BaseDownloader {
             if (!chapterName.endsWith(".html")) {
                 chapterName += ".html";
             }
-            Path chapterPath = chapterDir.resolve(chapterName);
-            add(chapterUri, chapterPath);
+            Path chapterPath = ctx.chaptersDir.resolve(chapterName);
+            ctx.add(chapterUri, chapterPath);
         }
-        download();
+        ctx.download();
     }
-    
+
     /**
-     * Download the actual images for each chapter. 
+     * Download the actual images for each chapter.
      * The image links are found in javascript content:
      * <pre>
      *  data = 'http://2.bp.blogspot.com/-A9scOkmQ61Q/UP_zXu7qUbI/AAAAAAAAFFc/exlxGRoLYuw/0%252520copy.jpg?imgmax=2000|http://2.bp.blogspot.com/-8iv32sR7N2k/UP_zZDw3_yI/AAAAAAAAFFg/jXUNe3dRca0/0%252520Credit-ban-long.jpg?imgmax=2000|...
-     *  </pre>
+     * </pre>
+     * So we have to parse the string to get the image links.
      */
     private void downloadImages() {
-        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
+        for (Path chapterHtml : Util.findHtmlFiles(ctx.chaptersDir)) {
             String chapterFileName = chapterHtml.getFileName().toString();
-            Path chapterPath = imageDir.resolve(Util.removeFileExtension(chapterFileName));
+            chapterFileName = Util.removeFileExtension(chapterFileName);
+			Path chapterPath = ctx.imagesDir.resolve(chapterFileName);
             Document page = Util.parseHtml(chapterHtml);
             Matcher imagesMatcher = DATA_IMAGES_PATTERN.matcher(page.data());
+            /* TODO make a method for getting a stream of indexed matches */
             if (imagesMatcher.find()) {
                 int idx = 0;
                 for (String img : imagesMatcher.group("imgs").split("\\|")) {
                     idx += 1;
                     Uri imageUri = new Uri(img.trim());
-                    String imageName = String.format("%s.%s", idx, imageUri.getFileExtension());
+                    String imageName = idx + "_" + imageUri.getFileName();
                     Path imagePath = chapterPath.resolve(imageName);
-                    add(imageUri, imagePath);
+                    ctx.add(imageUri, imagePath);
                 }
             }
-            download();
+            ctx.download();
         }
     }
+
 }

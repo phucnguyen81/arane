@@ -17,7 +17,7 @@ import lou.arane.util.http.HttpFileBatchDownloader;
 /**
  * Apply Context Pattern for passing common data/methods down the call chain.
  * <p>
- * Design Choice: no static elements here, everything can be found/replaced
+ * Design Choice: no static elements here, everything is found/replaced
  * on the context instance.
  *
  * @author Phuc
@@ -45,7 +45,7 @@ public class Context {
 
     /** Pattern for extracting urls from text such as:
      * src="mangas/Feng Shen Ji/Chapter 001/Feng_Shen_Ji_ch01_p00.jpg" */
-    public final Pattern srcPattern = Pattern.compile("src=['\"]([^'\"]+)['\"]");
+    public Pattern srcPattern = Pattern.compile("src=['\"]([^'\"]+)['\"]");
 
 	public Context(String sourceName, Uri source, Path baseDir) {
 		this.source = source;

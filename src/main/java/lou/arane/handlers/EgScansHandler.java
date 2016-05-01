@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import lou.arane.core.Context;
+import lou.arane.core.Handler;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 import lou.arane.util.script.CopyFiles;
@@ -16,7 +17,7 @@ import lou.arane.util.script.CopyFiles;
  *
  * @author Phuc
  */
-public class EgScansHandler implements Runnable {
+public class EgScansHandler implements Handler {
 
     private static final String BASE_URI = "http://read.egscans.com/";
 
@@ -28,21 +29,16 @@ public class EgScansHandler implements Runnable {
 		this.ctx = context;
     }
 
-    @Override
-	public void run() {
-		if (canRun()) {
-			doRun();
-		}
-    }
-
-	private boolean canRun() {
+	@Override
+	public boolean canRun() {
 		//domain must match
 		String url = ctx.source.toString();
 		return url.startsWith(BASE_URI);
 	}
 
 	/** Run all the steps of downloading the manga */
-	private void doRun() {
+	@Override
+	public void doRun() {
 		ctx.downloadChapterList();
 		downloadChapters();
 		downloadImagesForAllChapters();

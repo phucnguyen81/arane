@@ -78,7 +78,7 @@ public final class Util {
         }
         int extensionIdx = str.lastIndexOf('.');
         if (extensionIdx >= 0) {
-            return str.substring(0, extensionIdx + 1);
+            return str.substring(extensionIdx + 1);
         }
         return null;
     }
@@ -294,7 +294,7 @@ public final class Util {
 
     /** Generate a list of numbers as strings, e.g range(1,3) = ["1","2","3"] */
     public static LinkedList<String> rangeClosed(int startInclusive, int endInclusive) {
-    	LinkedList<String> range = new LinkedList<String>();
+    	LinkedList<String> range = new LinkedList<>();
     	for (int i = startInclusive; i <= endInclusive; i++) {
     		range.add(String.valueOf(i));
     	}

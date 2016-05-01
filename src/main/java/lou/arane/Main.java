@@ -1,10 +1,14 @@
 package lou.arane;
 
 import java.util.List;
+import java.util.Optional;
 
 import lou.arane.core.Context;
+import lou.arane.core.Handler;
 import lou.arane.handlers.EgScansHandler;
+import lou.arane.handlers.IzMangaHandler;
 import lou.arane.handlers.MangaLifeHandler;
+import lou.arane.util.Log;
 import lou.arane.util.New;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
@@ -43,15 +47,24 @@ public class Main {
 
 	/** Call each handler to handle the url */
 	private static void download(String name, String url) {
-		for (Runnable handler : createHandlers(name, url)) {
-			handler.run();
+		Optional<Handler> handler = createHandlers(name, url)
+		.stream()
+		.filter(Handler::canRun)
+		.findAny()
+		;
+		if (handler.isPresent()) {
+			handler.get().doRun();
+		}
+		else {
+			Log.error("No handlers for: " + name + ", " + url);
 		}
 	}
 
-	private static List<Runnable> createHandlers(String name, String url) {
-		List<Runnable> handlers = New.list();
+	private static List<Handler> createHandlers(String name, String url) {
+		List<Handler> handlers = New.list();
 		handlers.add(new MangaLifeHandler(new Context(name, new Uri(url), Util.mangaDir("manga.life", name))));
 		handlers.add(new EgScansHandler(new Context(name, new Uri(url), Util.mangaDir("eggscans", name))));
+		handlers.add(new IzMangaHandler(new Context(name, new Uri(url), Util.mangaDir("izmanga", name))));
 		return handlers;
 	}
 
