@@ -15,8 +15,15 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
+import java.util.AbstractMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -341,4 +348,50 @@ public final class Util {
                 .filter(file -> file.toString().endsWith(".html"))
                 .collect(Collectors.toList());
     }
+
+    /** Use a pattern to collect and index matches found in input */
+	public static Map<Integer, MatchResult> findIndexed(CharSequence input, Pattern pattern) {
+		Map<Integer, MatchResult> matches = new LinkedHashMap<>();
+		Matcher matcher = pattern.matcher(input);
+		Integer index = 0;
+		while (matcher.find()) {
+			MatchResult match = matcher.toMatchResult();
+			matches.put(index, match);
+			index += 1;
+		}
+		return matches;
+	}
+
+	public static Iterable<Entry<Integer, MatchResult>> find(CharSequence input, Pattern pattern) {
+		return new Iterable<Entry<Integer, MatchResult>>() {
+			@Override
+			public Iterator<Entry<Integer, MatchResult>> iterator() {
+				return Util.findIter(input, pattern);
+			}
+		};
+	}
+
+	public static Iterator<Entry<Integer, MatchResult>> findIter(CharSequence input, Pattern pattern) {
+		return new Iterator<Entry<Integer, MatchResult>>() {
+			Matcher matcher = pattern.matcher(input);
+			boolean hasNext = matcher.find();
+			int index = 0;
+			@Override
+			public boolean hasNext() {
+				return hasNext;
+			}
+			@Override
+			public Entry<Integer, MatchResult> next() {
+				if (hasNext) {
+					MatchResult result = matcher.toMatchResult();
+					hasNext = matcher.find();
+					return new AbstractMap.SimpleEntry<>(index++, result);
+				}
+				else {
+					throw new NoSuchElementException("No more pattern " + pattern + " found in " + input);
+				}
+			}
+		};
+	}
+
 }

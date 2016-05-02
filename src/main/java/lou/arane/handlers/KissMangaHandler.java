@@ -18,8 +18,7 @@ import org.jsoup.nodes.Element;
  * <p>
  * The error code is 403, which means the site refuses to handle the requests.
  * This is probably some security measure.
- * Need time to find out how to bypass this.
- * <p>
+ * Need to find out how to bypass this blockage.
  * Maybe making a fake browser request?
  */
 

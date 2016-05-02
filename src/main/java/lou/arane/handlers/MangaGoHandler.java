@@ -23,13 +23,6 @@ public class MangaGoHandler implements Handler {
     private static final Pattern chapterPattern = Pattern.compile(
         "ch?(?<chapter>\\d+)", Pattern.CASE_INSENSITIVE);
 
-    /**
-     * Pattern to look for image url in javascript handler such as:
-     *
-     * <pre>javascript:this.src='http://i3.rocaca.net/r/newpiclink/kajika/1/a6150548e03c577efe5924463df969e7.jpeg';</pre>
-     */
-    private static final Pattern srcPattern = Pattern.compile("src='(.+)'");
-
     private static final String BASE_URL = "http://www.mangago.me/read-manga/";
 
 	private final Context ctx;
@@ -127,9 +120,8 @@ public class MangaGoHandler implements Handler {
         Uri imageUri = new Uri(img.attr("src"));
         if (img.hasAttr("onerror")) {
             String onerror = img.attr("onerror");
-            Matcher onerrorMatcher = srcPattern.matcher(onerror);
-            if (onerrorMatcher.find()) {
-                imageUri.addAlternatives(new Uri(onerrorMatcher.group(1)));
+            for (String srcUrl : ctx.findSourceUrls(onerror)) {
+            	imageUri.addAlternatives(new Uri(srcUrl));
             }
         }
         return imageUri;

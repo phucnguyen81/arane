@@ -90,7 +90,6 @@ public class IzMangaHandler implements Handler {
 			Path chapterPath = ctx.imagesDir.resolve(chapterFileName);
             Document page = Util.parseHtml(chapterHtml);
             Matcher imagesMatcher = DATA_IMAGES_PATTERN.matcher(page.data());
-            /* TODO make a method for getting a stream of indexed matches */
             if (imagesMatcher.find()) {
                 int idx = 0;
                 for (String img : imagesMatcher.group("imgs").split("\\|")) {

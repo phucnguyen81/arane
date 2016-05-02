@@ -24,7 +24,7 @@ public class MangaSeeHandler implements Handler {
 
     private static final Pattern chapterPattern = numberPattern;
 
-    private static final String rootUri = "http://mangasee.co/manga/";
+    private static final String baseUri = "http://mangasee.co/manga/";
 
 	private final Context ctx;
 
@@ -36,7 +36,7 @@ public class MangaSeeHandler implements Handler {
 	public boolean canRun() {
 		//domain must match
 		String url = ctx.source.toString();
-		return url.startsWith(rootUri);
+		return url.startsWith(baseUri);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class MangaSeeHandler implements Handler {
     private void downloadChapters() {
         Path indexPath = ctx.chapterList;
         Document indexDoc = Util.parseHtml(indexPath);
-        indexDoc.setBaseUri(rootUri);
+        indexDoc.setBaseUri(baseUri);
         for (Element chapterAddr : indexDoc.getElementsByClass("chapter_link")) {
             String chapterName = chapterAddr.text().trim();
             String href = chapterAddr.absUrl("href");
@@ -77,7 +77,7 @@ public class MangaSeeHandler implements Handler {
             int pageNo = pageForm.getElementsByTag("option").size();
             for (String pageIdx : Util.rangeClosed(1, pageNo)) {
                 Uri pageUri = Uri.of(
-                    rootUri + String.format(
+                    baseUri + String.format(
                         "?series=%s&chapter=%s&index=1&page=%s",
                         ctx.sourceName, chapterIdx, pageIdx));
                 Path pagePath = ctx.pagesDir.resolve(
@@ -99,7 +99,7 @@ public class MangaSeeHandler implements Handler {
     private void downloadImages() {
         for (Path pageHtml : Util.findHtmlFiles(ctx.pagesDir)) {
             Document page = Util.parseHtml(pageHtml);
-            page.setBaseUri(rootUri);
+            page.setBaseUri(baseUri);
             for (Element img : page.select("a[href] img[src]")) {
                 Uri imageUri = Uri.of(img.absUrl("src"));
                 Path pageName = imageUri.getFileName();
