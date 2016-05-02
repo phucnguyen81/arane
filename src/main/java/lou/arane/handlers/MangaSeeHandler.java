@@ -1,11 +1,11 @@
-package lou.arane.project;
+package lou.arane.handlers;
 
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lou.arane.util.BaseDownloader;
-import lou.arane.util.Check;
+import lou.arane.core.Context;
+import lou.arane.core.Handler;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 import lou.arane.util.script.CopyFiles;
@@ -18,7 +18,7 @@ import org.jsoup.nodes.Element;
  *
  * @author LOU
  */
-public class MangaSeeDownloader extends BaseDownloader {
+public class MangaSeeHandler implements Handler {
 
     private static final Pattern numberPattern = Pattern.compile("\\d+(\\.\\d+)?");
 
@@ -26,65 +26,52 @@ public class MangaSeeDownloader extends BaseDownloader {
 
     private static final String rootUri = "http://mangasee.co/manga/";
 
-    private final String mangaName;
-    private final Uri mangaUri;
-    private final Path chapterList;
+	private final Context ctx;
 
-    private final Path chapterDir;
-    private final Path pageDir;
-    private final Path imageDir;
-
-    private final Path outputDir;
-
-    public MangaSeeDownloader(String mangaName, Path baseDir) {
-        this.mangaName = mangaName;
-        mangaUri = Uri.of(rootUri + "?series=" + mangaName);
-        chapterList = baseDir.resolve("chapters.html");
-        chapterDir = baseDir.resolve("chapters");
-        pageDir = baseDir.resolve("pages");
-        imageDir = baseDir.resolve("images");
-        outputDir = baseDir.resolve("output").resolve(baseDir.getFileName());
+    public MangaSeeHandler(Context context) {
+    	this.ctx = context;
     }
 
-    public void run() {
-        downloadChaperList();
-        downloadChapters();
-        downloadPages();
-        downloadImages();
-        collectImagesIntoChapters();
-    }
+	@Override
+	public boolean canRun() {
+		//domain must match
+		String url = ctx.source.toString();
+		return url.startsWith(rootUri);
+	}
 
-    /** Download the initial chapter listing */
-    private void downloadChaperList() {
-        Util.deleteIfExists(chapterList);
-        add(mangaUri, chapterList);
-        download();
-        Check.postCond(Util.exists(chapterList),
-            "Chapter listing must be downloaded to " + chapterList);
-    }
+	@Override
+	public void doRun() {
+		ctx.downloadChapterList();
+		downloadChapters();
+		downloadPages();
+		downloadImages();
+		collectImagesIntoChapters();
+	}
 
     private void downloadChapters() {
-        Path indexPath = chapterList;
+        Path indexPath = ctx.chapterList;
         Document indexDoc = Util.parseHtml(indexPath);
         indexDoc.setBaseUri(rootUri);
         for (Element chapterAddr : indexDoc.getElementsByClass("chapter_link")) {
             String chapterName = chapterAddr.text().trim();
             String href = chapterAddr.absUrl("href");
             Uri chapterUri = Uri.of(href);
-            Path chapterPath = chapterDir.resolve(chapterName + ".html");
-            add(chapterUri, chapterPath);
+            Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
+            ctx.add(chapterUri, chapterPath);
         }
-        download();
+        ctx.download();
     }
 
     private void downloadPages() {
-        for (Path chapterHtml : Util.findHtmlFiles(chapterDir)) {
+        for (Path chapterHtml : Util.findHtmlFiles(ctx.chaptersDir)) {
             Matcher chapterIndMatcher = numberPattern.matcher(chapterHtml.getFileName().toString());
             String chapterIdx = "";
-            if (chapterIndMatcher.find())
+            if (chapterIndMatcher.find()) {
                 chapterIdx = chapterIndMatcher.group();
-            else
+            }
+            else {
                 throw new IllegalArgumentException("Cannot detect chapter index for " + chapterHtml);
+            }
             Document chapter = Util.parseHtml(chapterHtml);
             Element pageForm = chapter.getElementById("pages");
             int pageNo = pageForm.getElementsByTag("option").size();
@@ -92,15 +79,15 @@ public class MangaSeeDownloader extends BaseDownloader {
                 Uri pageUri = Uri.of(
                     rootUri + String.format(
                         "?series=%s&chapter=%s&index=1&page=%s",
-                        mangaName, chapterIdx, pageIdx));
-                Path pagePath = pageDir.resolve(
+                        ctx.sourceName, chapterIdx, pageIdx));
+                Path pagePath = ctx.pagesDir.resolve(
                     String.format("c%s_p%s.html",
                     Util.padStart(chapterIdx, 3, '0'),
                     Util.padStart(pageIdx, 3, '0')));
-                add(pageUri, pagePath);
+                ctx.add(pageUri, pagePath);
             }
         }
-        download();
+        ctx.download();
     }
 
     /**
@@ -110,22 +97,21 @@ public class MangaSeeDownloader extends BaseDownloader {
         </a>
      */
     private void downloadImages() {
-        for (Path pageHtml : Util.findHtmlFiles(pageDir)) {
+        for (Path pageHtml : Util.findHtmlFiles(ctx.pagesDir)) {
             Document page = Util.parseHtml(pageHtml);
             page.setBaseUri(rootUri);
             for (Element img : page.select("a[href] img[src]")) {
                 Uri imageUri = Uri.of(img.absUrl("src"));
                 Path pageName = imageUri.getFileName();
-                Path imagePath = imageDir.resolve(pageName);
-                add(imageUri, imagePath);
+                Path imagePath = ctx.imagesDir.resolve(pageName);
+                ctx.add(imageUri, imagePath);
             }
         }
-        download();
+        ctx.download();
     }
 
     /** Organize the downloaded images into chapters */
     private void collectImagesIntoChapters() {
-        new CopyFiles(imageDir, outputDir).setDirPattern(chapterPattern).run();
+        new CopyFiles(ctx.imagesDir, ctx.outputDir).setDirPattern(chapterPattern).run();
     }
-
 }

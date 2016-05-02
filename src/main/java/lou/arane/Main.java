@@ -9,6 +9,7 @@ import lou.arane.handlers.EgScansHandler;
 import lou.arane.handlers.IzMangaHandler;
 import lou.arane.handlers.KissMangaHandler;
 import lou.arane.handlers.MangaLifeHandler;
+import lou.arane.handlers.MangaSeeHandler;
 import lou.arane.util.Log;
 import lou.arane.util.New;
 import lou.arane.util.Uri;
@@ -51,7 +52,7 @@ public class Main {
 		Optional<Handler> handler = createHandlers(name, url)
 		.stream()
 		.filter(Handler::canRun)
-		.findAny()
+		.findFirst()
 		;
 		if (handler.isPresent()) {
 			handler.get().doRun();
@@ -67,6 +68,7 @@ public class Main {
 		handlers.add(new EgScansHandler(new Context(name, new Uri(url), Util.mangaDir("eggscans", name))));
 		handlers.add(new IzMangaHandler(new Context(name, new Uri(url), Util.mangaDir("izmanga", name))));
 		handlers.add(new KissMangaHandler(new Context(name, new Uri(url), Util.mangaDir("kissmanga", name))));
+		handlers.add(new MangaSeeHandler(new Context(name, new Uri(url), Util.mangaDir("mangasee", name))));
 		return handlers;
 	}
 
