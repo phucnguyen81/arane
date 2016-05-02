@@ -8,6 +8,7 @@ import lou.arane.core.Handler;
 import lou.arane.handlers.EgScansHandler;
 import lou.arane.handlers.IzMangaHandler;
 import lou.arane.handlers.KissMangaHandler;
+import lou.arane.handlers.MangaGoHandler;
 import lou.arane.handlers.MangaLifeHandler;
 import lou.arane.handlers.MangaSeeHandler;
 import lou.arane.util.Log;
@@ -58,7 +59,7 @@ public class Main {
 			handler.get().doRun();
 		}
 		else {
-			Log.error("No handlers defined for processing: " + name + ", " + url);
+			Log.error("No handlers defined for handling: " + name + ", " + url);
 		}
 	}
 
@@ -69,6 +70,7 @@ public class Main {
 		handlers.add(new IzMangaHandler(new Context(name, new Uri(url), Util.mangaDir("izmanga", name))));
 		handlers.add(new KissMangaHandler(new Context(name, new Uri(url), Util.mangaDir("kissmanga", name))));
 		handlers.add(new MangaSeeHandler(new Context(name, new Uri(url), Util.mangaDir("mangasee", name))));
+		handlers.add(new MangaGoHandler(new Context(name, new Uri(url), Util.mangaDir("mangago", name))));
 		return handlers;
 	}
 

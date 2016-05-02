@@ -1,4 +1,4 @@
-package lou.arane.project.blogtruyen;
+package lou.arane.project;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

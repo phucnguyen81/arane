@@ -9,6 +9,13 @@ public class MainTest {
 
 	public static void main(String[] args) {
 		Main.main(new String[] {
+			"07_ghost"
+			, "http://www.mangago.me/read-manga/07_ghost/"
+		});
+	}
+
+	static void testMangaSee() {
+		Main.main(new String[] {
 			"DrSlump"
 			, "http://mangasee.co/manga/?series=DrSlump"
 		});
