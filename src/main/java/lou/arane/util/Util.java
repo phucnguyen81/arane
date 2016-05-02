@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.StringJoiner;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,9 +32,6 @@ import java.util.stream.Stream;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 
 /**
  * Facade over the standard library
@@ -246,8 +244,12 @@ public final class Util {
 
     /** Join string representation of given parts.
      * The parts are separated by the given separator. */
-    public static String join(Iterable<?> parts, String separator) {
-        return Joiner.on(separator).join(parts);
+    public static String join(Iterable<?> parts, CharSequence separator) {
+    	StringJoiner joiner = new StringJoiner(separator);
+    	for (Object part : parts) {
+    		joiner.add(part == null ? "" : part.toString());
+    	}
+        return joiner.toString();
     }
 
     /** Given a string, pad numeric sequences shorter
@@ -268,8 +270,12 @@ public final class Util {
     }
 
     /** Get a padded string of length at least minLength */
-    public static String padStart(String string, int minLength, char padChar) {
-        return Strings.padStart(string, minLength, padChar);
+    public static String padStart(String str, int minLength, char padChar) {
+    	StringBuilder padded = new StringBuilder(str);
+    	for (int i = str.length(); i < minLength; i++) {
+    		padded.append(padChar);
+    	}
+        return padded.toString();
     }
 
     /** Get string representation of an exception's stack trace */

@@ -9,8 +9,8 @@ public class MainTest {
 
 	public static void main(String[] args) {
 		Main.main(new String[] {
-			"13"
-			, "http://www.mangago.me/read-manga/13"
+			"2001_nights"
+			, "http://www.mangago.me/read-manga/2001_nights/"
 		});
 	}
 

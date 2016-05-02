@@ -95,7 +95,7 @@ public class HttpFileDownloader {
 
     @Override
     public String toString() {
-        return New.toStringHelper(this).addValue(uri + " -> " + path).toString();
+    	return String.format("%s(%s->%s)" , getClass().getSimpleName(), uri, path);
     }
 
 }

@@ -1,7 +1,5 @@
 package lou.arane.util.html;
 
-import lou.arane.util.New;
-
 import org.jsoup.nodes.Element;
 
 /** Keep a matching result of an {@link Element} */
@@ -20,7 +18,7 @@ public class HtmlMatcher {
 
     @Override
     public String toString() {
-        return New.toStringHelper(this).addValue(ele).toString();
+    	return String.format("HtmlMatcher(%s)", ele);
     }
 
 }

@@ -1,7 +1,5 @@
 package lou.arane.util.html;
 
-import lou.arane.util.New;
-
 /** Used to model attribute */
 class Attr {
     final String key;
@@ -14,6 +12,6 @@ class Attr {
 
     @Override
     public String toString() {
-        return New.toStringHelper(this).add("key", key).add("value", value).toString();
+    	return String.format("Attr(key=%s, value=%s)", key, value);
     }
 }

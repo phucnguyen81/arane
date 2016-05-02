@@ -10,11 +10,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,10 +22,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.ws.Holder;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Objects.ToStringHelper;
-import com.google.common.collect.Iterators;
 
 /**
  * Create commonly used objects
@@ -49,11 +43,7 @@ public class New {
     }
 
     public static <T> Holder<T> holder() {
-        return new Holder<T>();
-    }
-
-    public static ToStringHelper toStringHelper(Object o) {
-        return Objects.toStringHelper(o);
+        return new Holder<>();
     }
 
     public static BufferedReader reader(InputStream stream) {
@@ -69,12 +59,8 @@ public class New {
         }
     }
 
-    public static <T> Enumeration<T> enumeration(final Iterator<T> iterator) {
-        return Iterators.asEnumeration(iterator);
-    }
-
     public static <T> ArrayList<T> list() {
-        return new ArrayList<T>();
+        return new ArrayList<>();
     }
 
     @SafeVarargs
@@ -83,11 +69,11 @@ public class New {
     }
 
     public static <T> ArrayList<T> list(Collection<T> toCopy) {
-        return new ArrayList<T>(toCopy);
+        return new ArrayList<>(toCopy);
     }
 
     public static <T> LinkedList<T> linkedList() {
-        return new LinkedList<T>();
+        return new LinkedList<>();
     }
 
     public static <T> Collector<T, ?, List<T>> listCollector() {
@@ -95,12 +81,12 @@ public class New {
     }
 
     public static <T> HashSet<T> set() {
-        return new HashSet<T>();
+        return new HashSet<>();
     }
 
     @SafeVarargs
     public static <T> HashSet<T> set(T first, T... more) {
-        HashSet<T> set = new HashSet<T>(1 + more.length);
+        HashSet<T> set = new HashSet<>(1 + more.length);
         set.add(first);
         for (T m : more) {
             set.add(m);
@@ -110,15 +96,15 @@ public class New {
 
     /** Create a set that honors insertion order */
     public static <T> LinkedHashSet<T> linkedHashSet() {
-        return new LinkedHashSet<T>();
+        return new LinkedHashSet<>();
     }
 
     public static <K, V> HashMap<K, V> map() {
-        return new HashMap<K, V>();
+        return new HashMap<>();
     }
 
     public static <K, V> IdentityHashMap<K, V> identityMap() {
-        return new IdentityHashMap<K, V>();
+        return new IdentityHashMap<>();
     }
 
     public static <T> Stream<T> emptyStream() {

@@ -29,7 +29,7 @@ public abstract class TreeBuilder<N> {
     }
 
     public TreeBuilder(N root) {
-        nodes = new TreeMap<Integer, LinkedList<N>>();
+        nodes = new TreeMap<>();
         reset(root);
         build();
     }
@@ -123,7 +123,7 @@ public abstract class TreeBuilder<N> {
 
     @Override
     public String toString() {
-        return New.toStringHelper(this).addValue(nodes).toString();
+    	return String.format("TreeBuilder(%s)", nodes);
     }
 
 }
