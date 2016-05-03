@@ -12,6 +12,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+/** FIXME
+ * results seem broken, see example of downloading 'paladin'
+ */
+
 /**
  * Download comics from blogtruyen site
  *
@@ -64,15 +68,16 @@ public class BlogTruyenHandler implements Handler {
         Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URL);
         Elements chapterAddresses = rootFile.select("a[href]");
         for (Element chapterAddr : chapterAddresses) {
-            Uri chapterUri = new Uri(chapterAddr.absUrl("href"));
-            chapterUri.getPath().filter(p -> p.contains(ctx.sourceName)).ifPresent(p -> {
-                String chapterName = chapterUri.getFileName().toString();
-                if (!chapterName.endsWith(".html")) {
-                    chapterName += ".html";
-                }
-                Path chapterPath = ctx.chaptersDir.resolve(chapterName);
-                ctx.add(chapterUri, chapterPath);
-            });
+            Uri chapterUri = Uri.fromUrl(chapterAddr.absUrl("href"));
+            String path = chapterUri.getPath();
+            if (path != null && path.contains(ctx.sourceName)) {
+            	String chapterName = chapterUri.getFileName().toString();
+            	if (!chapterName.endsWith(".html")) {
+            		chapterName += ".html";
+            	}
+            	Path chapterPath = ctx.chaptersDir.resolve(chapterName);
+            	ctx.add(chapterUri, chapterPath);
+            }
         }
         ctx.download();
     }
@@ -94,7 +99,7 @@ public class BlogTruyenHandler implements Handler {
             Document page = Util.parseHtml(chapterHtml);
             Elements images = page.select("article[id=content] img[src]");
             for (Element image : images) {
-                Uri imageUri = new Uri(image.absUrl("src"));
+                Uri imageUri = Uri.of(image.absUrl("src"));
                 String imageName = imageUri.getFileName().toString();
                 Path imagePath = Paths.get(imageDir, imageName);
                 imagePath = ctx.imagesDir.resolve(imagePath);

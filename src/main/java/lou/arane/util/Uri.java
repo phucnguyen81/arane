@@ -1,83 +1,52 @@
 package lou.arane.util;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
-import java.util.Optional;
 
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.web.util.UriUtils;
-
-/** Uri data as it is used by this project
+/**
+ * Uri data as it is used by this project
  *
  * @author pnguyen58
  */
 public class Uri implements Comparable<Uri> {
 
-    private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
+	/**
+	 * This is used when a url constains illegal uri characters (e.g. spaces).
+	 * This returns an encoded uri.
+	 */
+	public static Uri fromUrl(String url) {
+		StringBuilder encoded = new StringBuilder();
+		for (int codepoint : url.codePoints().toArray()) {
+			String str = new String(Character.toChars(codepoint));
+			if (codepoint != ':'
+				&& codepoint != '/'
+				&& codepoint != '?'
+				&& codepoint != '#'
+				&& codepoint != '&'
+			) {
+				str = Util.urlEncode(str);
+			}
+			encoded.append(str);
+		}
+		return of(encoded.toString());
+	}
 
-    public static Uri of(String uri) {
+	public static Uri of(String uri) {
+        return of(URI.create(uri));
+    }
+
+    public static Uri of(URI uri) {
         return new Uri(uri);
-    }
-
-    /** Create uri from a uri string.
-     * If the uri scheme is not present, it defaults to http. */
-    public static Uri http(String uriString) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(uriString);
-        if (builder.build().getScheme() == null) {
-            builder.scheme("http");
-        }
-        return new Uri(builder);
-    }
-
-    public static boolean isValidUri(String uri) {
-        try {
-            new Uri(uri).getFilePath();
-            return true;
-        } catch (RuntimeException e) {
-            return false;
-        }
-    }
-
-    public static String decode(String source) {
-        try {
-            return source == null ? null : UriUtils.decode(source, DEFAULT_ENCODING);
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new Unchecked("Should not happen", e);
-        }
-    }
-
-    public static String encode(String uriStr) {
-        UriComponents uri = UriComponentsBuilder.fromUriString(uriStr).build();
-        return encode(uri).toUriString();
-    }
-
-    private static UriComponents encode(UriComponents uri) {
-        try {
-            return uri.encode(DEFAULT_ENCODING);
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new Unchecked("Should not happen!", e);
-        }
     }
 
     /* alternate uris meant to locate the same resource as this uri */
     private final LinkedList<Uri> alternatives = New.linkedList();
 
-    private final UriComponents uri;
+    public final URI uri;
 
-    public Uri(URI uri) {
-        this(UriComponentsBuilder.fromUri(uri));
-    }
-
-    public Uri(String uri) {
-        this(UriComponentsBuilder.fromUriString(uri));
+    private Uri(URI uri) {
+        this.uri = uri;
     }
 
     @Override
@@ -88,17 +57,12 @@ public class Uri implements Comparable<Uri> {
 
     @Override
     public int compareTo(Uri other) {
-        return toURI().compareTo(other.toURI());
+        return uri.compareTo(other.uri);
     }
 
     @Override
     public boolean equals(Object other) {
         return compareTo(((Uri) other)) == 0;
-    }
-
-    /** Base method to create uri */
-    private Uri(UriComponentsBuilder builder) {
-        uri = encode(builder.build());
     }
 
     public void addAlternatives(Uri uri) {
@@ -110,69 +74,34 @@ public class Uri implements Comparable<Uri> {
     }
 
     public Uri resolve(String str) {
-        str = encode(str);
-        return new Uri(toURI().resolve(str));
-    }
-
-    public Uri queryParam(String name, Object... values) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUri(toURI());
-        builder.queryParam(name, values);
-        return new Uri(builder);
-    }
-
-    /** Make a uri from this uri without the query part */
-    public Uri removeQuery() {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUri(toURI());
-        builder.replaceQuery(null);
-        return new Uri(builder);
-    }
-
-    public URI toURI() {
-        return uri.toUri();
-    }
-
-    public String getFileExtension() {
-        if (getFileName() == null) {
-            return null;
-        }
-        String filename = getFileName().toString();
-        String ext = Util.getFileExtension(filename);
-        return ext == null ? "" : ext;
-    }
-
-    public Path getFileName() {
-        Path path = getFilePath();
-        return path == null ? null : path.getFileName();
-    }
-
-    public Path getFilePath() {
-        Path path = null;
-        String uriPath = uri.getPath();
-        if (uriPath != null) {
-            for (Path p : Paths.get(decode(uriPath))) {
-                if (path == null) {
-                    path = p;
-                } else {
-                    path = path.resolve(p);
-                }
-            }
-        }
-        return path;
+        return new Uri(uri.resolve(str));
     }
 
     public String getQuery() {
-        return decode(uri.getQuery());
+        return uri.getQuery();
     }
 
-    /** Get value of the first query parm */
-    public String getQueryParm(String key) {
-        MultiValueMap<String, String> params = uri.getQueryParams();
-        String val = params.getFirst(key);
-        return decode(val);
+    public String getFileExtension() {
+    	String fileName = getFileName();
+        if (fileName == null) {
+            return null;
+        }
+        String ext = Util.getFileExtension(fileName);
+        return ext == null ? "" : ext;
     }
 
-    public Optional<String> getPath() {
-        String path = uri.getPath();
-        return path == null ? Optional.empty() : Optional.of(path);
+    public String getFileName() {
+        String path = getFilePath();
+        if (path == null) return null;
+        return Paths.get(path).getFileName().toString();
+    }
+
+    public String getFilePath() {
+    	String p = uri.getPath();
+    	return p == null ? null : Paths.get(p).toString();
+    }
+
+    public String getPath() {
+        return uri.getPath();
     }
 }

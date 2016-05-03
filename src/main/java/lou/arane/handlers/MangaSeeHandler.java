@@ -102,7 +102,7 @@ public class MangaSeeHandler implements Handler {
             page.setBaseUri(baseUri);
             for (Element img : page.select("a[href] img[src]")) {
                 Uri imageUri = Uri.of(img.absUrl("src"));
-                Path pageName = imageUri.getFileName();
+                String pageName = imageUri.getFileName();
                 Path imagePath = ctx.imagesDir.resolve(pageName);
                 ctx.add(imageUri, imagePath);
             }

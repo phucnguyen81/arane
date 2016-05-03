@@ -49,7 +49,7 @@ public class MangaGoHandler implements Handler {
     private void downloadChapters() {
         Document rootFile = Util.parseHtml(ctx.chapterList);
         for (Element chapterAddr : rootFile.select("table[id=chapter_table] a[href]")) {
-            Uri chapterUri = new Uri(chapterAddr.attr("href"));
+            Uri chapterUri = Uri.of(chapterAddr.attr("href"));
             String chapterName = chapterUri.getFileName().toString();
             Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
             ctx.add(chapterUri, chapterPath);
@@ -74,7 +74,7 @@ public class MangaGoHandler implements Handler {
         	String chapterName = Util.removeFileExtension(chapterHtml.getFileName().toString());
             Document chapter = Util.parseHtml(chapterHtml, BASE_URL);
             for (Element addr : chapter.select("ul[id=dropdown-menu-page] a[href]")) {
-                Uri pageUri = new Uri(addr.absUrl("href"));
+                Uri pageUri = Uri.of(addr.absUrl("href"));
                 String pageName = chapterName + "_" + addr.ownText();
                 if (!pageName.endsWith(".html")) pageName += ".html";
                 Path pagePath = ctx.pagesDir.resolve(pageName);
@@ -114,11 +114,11 @@ public class MangaGoHandler implements Handler {
      */
     private Uri findImageUri(Document page) {
         Element img = page.select("a[id=pic_container] img[border][src]").first();
-        Uri imageUri = new Uri(img.attr("src"));
+        Uri imageUri = Uri.of(img.attr("src"));
         if (img.hasAttr("onerror")) {
             String onerror = img.attr("onerror");
             for (String srcUrl : ctx.findSourceUrls(onerror)) {
-            	imageUri.addAlternatives(new Uri(srcUrl));
+            	imageUri.addAlternatives(Uri.of(srcUrl));
             }
         }
         return imageUri;

@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.CopyOption;
@@ -47,6 +49,27 @@ public final class Util {
     public static void printlnErr(Object message) {
         System.err.println(message);
     }
+
+    /** Null or empty? */
+	public static boolean isBlank(CharSequence s) {
+		return s == null || s.length() == 0;
+	}
+
+	public static String urlEncode(String url) {
+		try {
+			return URLEncoder.encode(url, StandardCharsets.UTF_8.name());
+		} catch (UnsupportedEncodingException e) {
+			throw new Unchecked(e);
+		}
+	}
+
+	public static String urlDecode(String url) {
+		try {
+			return URLDecoder.decode(url, StandardCharsets.UTF_8.name());
+		} catch (UnsupportedEncodingException e) {
+			throw new Unchecked(e);
+		}
+	}
 
     public static String normalizeNewlines(String text) {
         if (text != null) {
@@ -400,5 +423,4 @@ public final class Util {
 			}
 		};
 	}
-
 }

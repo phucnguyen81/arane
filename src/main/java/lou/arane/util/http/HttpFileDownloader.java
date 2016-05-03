@@ -3,6 +3,7 @@ package lou.arane.util.http;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,9 +20,9 @@ public class HttpFileDownloader {
 
     /** Example usage: download a file from the net */
     public static void main(String[] args) throws Exception {
-        Uri source = new Uri("http://tvbmusic.tripod.com/sound/dgsd1.wma");
-        Path target = source.getFileName();
-        new HttpFileDownloader(source, target).download();
+        Uri source = Uri.of("http://orgmode.org/worg/org-glossary.html");
+        String target = source.getFileName();
+        new HttpFileDownloader(source, Paths.get(target)).download();
     }
 
     private final Uri uri;

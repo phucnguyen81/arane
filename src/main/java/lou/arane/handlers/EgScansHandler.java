@@ -60,7 +60,7 @@ public class EgScansHandler implements Handler {
         Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URL);
         for (Element chapterOption : rootFile.select("select[name=chapter] option[value]")) {
             String chapterName = chapterOption.attr("value");
-            Uri chapterUri = new Uri(BASE_URL + ctx.sourceName + "/" + chapterName);
+            Uri chapterUri = Uri.of(BASE_URL + ctx.sourceName + "/" + chapterName);
             Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
             ctx.add(chapterUri, chapterPath);
         }
@@ -97,7 +97,7 @@ public class EgScansHandler implements Handler {
     /** Find images from text of a script element */
     private void addImages(Element script, String chapterName) {
     	for (String srcUrl : ctx.findSourceUrls(script.html())) {
-            Uri imageUri = new Uri(BASE_URL + srcUrl);
+            Uri imageUri = Uri.of(BASE_URL + srcUrl);
             String imageName = chapterName + "_" + imageUri.getFileName();
             imageName = Util.padNumericSequences(imageName.toLowerCase(), 3);
             Path imagePath = ctx.imagesDir.resolve(imageName);

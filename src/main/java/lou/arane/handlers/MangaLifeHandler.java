@@ -1,6 +1,7 @@
 package lou.arane.handlers;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -60,9 +61,9 @@ public class MangaLifeHandler implements Handler {
         .stream()
         .map(addr -> addr.absUrl("href"))
         .filter(href -> href.contains(ctx.sourceName))
-        .map(href -> new Uri(href))
+        .map(href -> Uri.of(href))
         .forEach(chapterUri -> {
-            String chapterPath = Util.join(chapterUri.getFilePath(), "_");
+            String chapterPath = Util.join(Paths.get(chapterUri.getFilePath()), "_");
             ctx.add(chapterUri, ctx.chaptersDir.resolve(chapterPath + ".html"));
         });
         ctx.download();
@@ -103,10 +104,10 @@ public class MangaLifeHandler implements Handler {
     }
 
     private void addPage(String chapter, String index, String page) {
-        String base = ctx.source.toURI().toString();
+        String base = ctx.source.uri.toString();
         String pageUriStr = New.joiner("/", base + "/")
             .add(chapter).add(index).add(page).toString();
-        Uri pageUri = new Uri(pageUriStr);
+        Uri pageUri = Uri.of(pageUriStr);
         Path pagePath = ctx.pagesDir.resolve(chapter + "_" + page + ".html");
         ctx.add(pageUri, pagePath);
     }
@@ -128,7 +129,7 @@ public class MangaLifeHandler implements Handler {
 
     private void addImageToDownload(Document page) {
         for (Element img : page.select("a[href] img[src]")) {
-            Uri imgUri = new Uri(img.absUrl("src"));
+            Uri imgUri = Uri.of(img.absUrl("src"));
             addOnErrorUri(imgUri, img.attr("onerror"));
             Path imgPath = ctx.imagesDir.resolve(imgUri.getFileName());
             ctx.add(imgUri, imgPath);
@@ -137,7 +138,7 @@ public class MangaLifeHandler implements Handler {
 
     private void addOnErrorUri(Uri imgUri, String onerrorAttr) {
         for (String onerrorUrl : ctx.findSourceUrls(onerrorAttr)) {
-        	Uri onerrorUri = new Uri(onerrorUrl);
+        	Uri onerrorUri = Uri.of(onerrorUrl);
         	imgUri.addAlternatives(onerrorUri);
         }
     }

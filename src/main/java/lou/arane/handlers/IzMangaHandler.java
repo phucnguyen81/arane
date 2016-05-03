@@ -64,7 +64,7 @@ public class IzMangaHandler implements Handler {
         Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URI);
         Elements chapterAddresses = rootFile.select("div[class=chapter-list] a[href]");
         for (Element chapterAddr : chapterAddresses) {
-            Uri chapterUri = new Uri(chapterAddr.absUrl("href"));
+            Uri chapterUri = Uri.of(chapterAddr.absUrl("href"));
             String chapterName = chapterAddr.ownText();
             if (!chapterName.endsWith(".html")) {
                 chapterName += ".html";
@@ -94,7 +94,7 @@ public class IzMangaHandler implements Handler {
                 int idx = 0;
                 for (String img : imagesMatcher.group("imgs").split("\\|")) {
                     idx += 1;
-                    Uri imageUri = new Uri(img.trim());
+                    Uri imageUri = Uri.of(img.trim());
                     String imageName = idx + "_" + imageUri.getFileName();
                     Path imagePath = chapterPath.resolve(imageName);
                     ctx.add(imageUri, imagePath);

@@ -1,6 +1,7 @@
 package lou.arane.handlers;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,8 +63,8 @@ public class KissMangaHandler implements Handler {
     private void downloadChapters() {
         Document chapters = Util.parseHtml(ctx.chapterList, BASE_URI);
         for (Element chapterAddr : chapters.select("table[class=listing] a[href]")) {
-            Uri chapterUri = new Uri(chapterAddr.absUrl("href"));
-            String chapterName = Util.join(chapterUri.getFilePath(), "_");
+            Uri chapterUri = Uri.of(chapterAddr.absUrl("href"));
+            String chapterName = Util.join(Paths.get(chapterUri.getFilePath()), "_");
             if (!chapterName.endsWith(".html")) chapterName += ".html";
             Path chapterPath = ctx.chaptersDir.resolve(chapterName);
             ctx.add(chapterUri, chapterPath);
@@ -83,7 +84,7 @@ public class KissMangaHandler implements Handler {
             for (Element script : chapter.select("script[type=text/javascript]")) {
                 Matcher matcher = IMAGE_PATTERN.matcher(script.html());
                 while (matcher.find()) {
-                    Uri imageUri = new Uri(matcher.group(1));
+                    Uri imageUri = Uri.of(matcher.group(1));
                     String imageName = chapterName + "_" + imageUri.getFileName();
                     imageName = Util.padNumericSequences(imageName, 3);
                     Path imagePath = ctx.imagesDir.resolve(imageName);
