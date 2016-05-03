@@ -1,7 +1,6 @@
 package lou.arane.handlers;
 
 import java.nio.file.Path;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lou.arane.core.Context;
@@ -19,9 +18,6 @@ import org.jsoup.nodes.Element;
  * @author LOU
  */
 public class MangaGoHandler implements Handler {
-
-    private static final Pattern chapterPattern = Pattern.compile(
-        "ch?(?<chapter>\\d+)", Pattern.CASE_INSENSITIVE);
 
     private static final String BASE_URL = "http://www.mangago.me/read-manga/";
 
@@ -54,7 +50,7 @@ public class MangaGoHandler implements Handler {
         Document rootFile = Util.parseHtml(ctx.chapterList);
         for (Element chapterAddr : rootFile.select("table[id=chapter_table] a[href]")) {
             Uri chapterUri = new Uri(chapterAddr.attr("href"));
-            String chapterName = Util.join(chapterUri.getFilePath(), "_");
+            String chapterName = chapterUri.getFileName().toString();
             Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
             ctx.add(chapterUri, chapterPath);
         }
@@ -75,10 +71,11 @@ public class MangaGoHandler implements Handler {
      */
     private void downloadPages() {
         for (Path chapterHtml : Util.findHtmlFiles(ctx.chaptersDir)) {
+        	String chapterName = Util.removeFileExtension(chapterHtml.getFileName().toString());
             Document chapter = Util.parseHtml(chapterHtml, BASE_URL);
             for (Element addr : chapter.select("ul[id=dropdown-menu-page] a[href]")) {
                 Uri pageUri = new Uri(addr.absUrl("href"));
-                String pageName = Util.join(pageUri.getFilePath(), "_");
+                String pageName = chapterName + "_" + addr.ownText();
                 if (!pageName.endsWith(".html")) pageName += ".html";
                 Path pagePath = ctx.pagesDir.resolve(pageName);
                 ctx.add(pageUri, pagePath);
@@ -130,12 +127,9 @@ public class MangaGoHandler implements Handler {
     /** Copy the downloaded images to output directories */
     private void collectImagesIntoChapters() {
         new CopyFiles(ctx.imagesDir, ctx.outputDir)
-            .setDirResolver(fileName -> {
-                Matcher matcher = chapterPattern.matcher(fileName);
-                return matcher.find() ? matcher.group("chapter") : null;
-            })
-            .padNumericSequences(3)
-            .run();
+        .setDirPattern(Pattern.compile("\\d+"))
+        .padNumericSequences(3)
+        .run();
     }
 
 }

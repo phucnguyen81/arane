@@ -8,6 +8,17 @@ package lou.arane;
 public class MainTest {
 
 	public static void main(String[] args) {
+		testMangaGo();
+	}
+
+	static void testBlogTruyen() {
+		Main.main(new String[] {
+			"paladin"
+			, "http://blogtruyen.com/truyen/paladin"
+		});
+	}
+
+	static void testMangaGo() {
 		Main.main(new String[] {
 			"2001_nights"
 			, "http://www.mangago.me/read-manga/2001_nights/"
@@ -30,8 +41,8 @@ public class MainTest {
 
 	static void testEgScans() {
 		Main.main(new String[] {
-			"Cloud"
-			, "http://read.egscans.com/Cloud"
+			"Paladin"
+			, "http://read.egscans.com/Paladin"
 		});
 	}
 

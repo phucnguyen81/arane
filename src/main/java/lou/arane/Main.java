@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import lou.arane.core.Context;
 import lou.arane.core.Handler;
+import lou.arane.handlers.BlogTruyenHandler;
 import lou.arane.handlers.EgScansHandler;
 import lou.arane.handlers.IzMangaHandler;
 import lou.arane.handlers.KissMangaHandler;
@@ -65,12 +66,13 @@ public class Main {
 
 	private static List<Handler> createHandlers(String name, String url) {
 		List<Handler> handlers = New.list();
-		handlers.add(new MangaLifeHandler(new Context(name, new Uri(url), Util.mangaDir("manga.life", name))));
+		handlers.add(new BlogTruyenHandler(new Context(name, new Uri(url), Util.mangaDir("blogtruyen", name))));
 		handlers.add(new EgScansHandler(new Context(name, new Uri(url), Util.mangaDir("eggscans", name))));
 		handlers.add(new IzMangaHandler(new Context(name, new Uri(url), Util.mangaDir("izmanga", name))));
 		handlers.add(new KissMangaHandler(new Context(name, new Uri(url), Util.mangaDir("kissmanga", name))));
-		handlers.add(new MangaSeeHandler(new Context(name, new Uri(url), Util.mangaDir("mangasee", name))));
 		handlers.add(new MangaGoHandler(new Context(name, new Uri(url), Util.mangaDir("mangago", name))));
+		handlers.add(new MangaLifeHandler(new Context(name, new Uri(url), Util.mangaDir("manga.life", name))));
+		handlers.add(new MangaSeeHandler(new Context(name, new Uri(url), Util.mangaDir("mangasee", name))));
 		return handlers;
 	}
 

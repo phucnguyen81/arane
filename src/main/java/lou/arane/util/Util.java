@@ -270,11 +270,12 @@ public final class Util {
     }
 
     /** Get a padded string of length at least minLength */
-    public static String padStart(String str, int minLength, char padChar) {
-    	StringBuilder padded = new StringBuilder(str);
-    	for (int i = str.length(); i < minLength; i++) {
+    public static String padStart(String s, int minLength, char padChar) {
+    	StringBuilder padded = new StringBuilder();
+    	for (int i = s.length(); i < minLength; i++) {
     		padded.append(padChar);
     	}
+    	padded.append(s);
         return padded.toString();
     }
 
