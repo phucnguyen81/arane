@@ -3,6 +3,8 @@ package lou.arane.util;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -42,6 +44,18 @@ import org.jsoup.nodes.Document;
  */
 public final class Util {
 
+    /** default charset for I/O operations */
+    public static final Charset CHARSET = StandardCharsets.UTF_8;
+
+    /** default encoding for I/O operation */
+    public static final String ENCODING = CHARSET.name();
+
+    /** system-specific line separator */
+    public static final String LINE_BREAK = System.lineSeparator();
+
+    /** buffer size used for I/O operations */
+    public static final int BUFFER_SIZE = 1024 * 8;
+
     public static void println(Object message) {
         System.out.println(message);
     }
@@ -77,7 +91,7 @@ public final class Util {
             try (BufferedReader reader = new BufferedReader(new StringReader(text))) {
                 String line = reader.readLine();
                 for (; line != null; line = reader.readLine()) {
-                    buffer.append(line).append(lineSeparator());
+                    buffer.append(line).append(LINE_BREAK);
                 }
             }
             catch (IOException e) {
@@ -244,7 +258,7 @@ public final class Util {
 
     /** Write/Overwrite a file with default settings */
     public static void write(Path path, String content) {
-        write(path, content, defaultCharset());
+        write(path, content, CHARSET);
     }
 
     /** Write/Overwrite a file with default settings */
@@ -305,28 +319,15 @@ public final class Util {
     /** Get string representation of an exception's stack trace */
     public static String toString(Throwable error) {
         ByteArrayOutputStream stackTrace = new ByteArrayOutputStream();
-        String encoding = defaultEncoding();
         boolean autoFlushFlag = false;
         try {
-            PrintStream printer = new PrintStream(stackTrace, autoFlushFlag, encoding);
+            PrintStream printer = new PrintStream(stackTrace, autoFlushFlag, ENCODING);
             error.printStackTrace(printer);
-            return stackTrace.toString(encoding);
+            return stackTrace.toString(ENCODING);
         }
         catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("Should never happen!", e);
         }
-    }
-
-    public static String defaultEncoding() {
-        return defaultCharset().name();
-    }
-
-    public static Charset defaultCharset() {
-        return StandardCharsets.UTF_8;
-    }
-
-    public static String lineSeparator() {
-        return System.lineSeparator();
     }
 
     /** Generate a list of numbers as strings, e.g range(1,3) = ["1","2","3"] */
@@ -423,4 +424,32 @@ public final class Util {
 			}
 		};
 	}
+
+	/** Read then close a byte stream */
+	public static final byte[] read(InputStream in) throws IOException {
+		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+			copy(in, out);
+			return out.toByteArray();
+		}
+	}
+
+	/**
+	 * Reads all bytes from an input stream and writes them to an output stream.
+	 * NOTE: this is taken from {@link Files#copy(InputStream, OutputStream)}
+	 *
+	 * @return the number of bytes copied
+	 */
+    public static long copy(InputStream source, OutputStream sink)
+        throws IOException
+    {
+        long nread = 0L;
+        byte[] buf = new byte[BUFFER_SIZE];
+        int n;
+        while ((n = source.read(buf)) > 0) {
+            sink.write(buf, 0, n);
+            nread += n;
+        }
+        return nread;
+    }
+
 }

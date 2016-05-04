@@ -2,22 +2,17 @@ package lou.arane.util.http;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
+import java.io.Closeable;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import lou.arane.util.Check;
 import lou.arane.util.Uri;
-
-import com.ning.http.client.AsyncCompletionHandlerBase;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
-import com.ning.http.client.Response;
+import lou.arane.util.Util;
 
 /**
  * Downloads content from url via http protocol. Checked-exceptions are
@@ -25,74 +20,75 @@ import com.ning.http.client.Response;
  */
 public class HttpDownloader {
 
-    private final long timeout;
-    private final TimeUnit timeoutUnit;
+	private final long timeout;
+	private final TimeUnit timeoutUnit;
 
-    /** Create a downloader with default timeout */
-    public HttpDownloader() {
-        this(2, MINUTES);
-    }
+	/** Create a downloader with default timeout */
+	public HttpDownloader() {
+		this(2, MINUTES);
+	}
 
-    /** Create a downloader with a given timeout */
-    public HttpDownloader(long timeout, TimeUnit timeoutUnit) {
-        Check.require(timeout > 0, "Expect positive timeout, actual value: " + timeout);
-        Check.notNull(timeoutUnit, "Null time unit");
-        this.timeout = timeout;
-        this.timeoutUnit = timeoutUnit;
-    }
+	/** Create a downloader with a given timeout */
+	public HttpDownloader(long timeout, TimeUnit timeoutUnit) {
+		Check.require(timeout > 0, "Expect positive timeout, actual value: " + timeout);
+		Check.notNull(timeoutUnit, "Null time unit");
+		this.timeout = timeout;
+		this.timeoutUnit = timeoutUnit;
+	}
 
-    public byte[] getBytes(Uri uri) throws HttpIOException {
-        return getBytes(uri.uri);
-    }
+	public byte[] getBytes(Uri uri) throws HttpIOException {
+		return getBytes(uri.uri);
+	}
 
-    public byte[] getBytes(URI uri) throws HttpIOException {
-        try {
-            return getBytes(uri.toURL());
-        }
-        catch (MalformedURLException urlError) {
-            throw new HttpIOException(urlError);
-        }
-    }
+	public byte[] getBytes(URI uri) throws HttpIOException {
+		try {
+			return getBytes(uri.toURL());
+		} catch (MalformedURLException urlError) {
+			throw new HttpIOException(urlError);
+		}
+	}
 
-    public byte[] getBytes(URL url) throws HttpIOException {
-        return getBytes(url.toString());
-    }
+	public byte[] getBytes(URL url) throws HttpIOException {
+		return getBytes(url.toString());
+	}
 
-    public byte[] getBytes(String url) throws HttpIOException {
-        try {
-            return getBytesInternal(url);
-        }
-        catch (IOException e) {
-            throw new HttpIOException(e);
-        }
-    }
+	public byte[] getBytes(String url) throws HttpIOException {
+		try {
+			return getBytesInternal(url);
+		} catch (IOException e) {
+			throw new HttpIOException(e);
+		}
+	}
 
-    private byte[] getBytesInternal(String url) throws HttpIOException, IOException {
-        Check.notNull(url, "Null url");
-        Response response = getResponse(url);
-        int status = response.getStatusCode();
-        if (status < 200 || status > 299) {
-            String message = "Failed to download from %s %n %s";
-            message = String.format(message, url, response.getResponseBody());
-            throw new HttpIOException(message);
-        }
-        else {
-            return response.getResponseBodyAsBytes();
-        }
-    }
+	/**
+	 * Core method for downloading content at url.
+	 * <p>
+	 * TODO performance seems not good.
+	 * Check out apache-http-components or async-http-client for improving performance.
+	 * Try to do it with just Java Standard.
+	 */
+	private byte[] getBytesInternal(String urlStr) throws HttpIOException, IOException {
+		Check.notNull(urlStr, "Null url");
+		URL url = new URL(urlStr);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		try (Closeable disconnect = () -> conn.disconnect()) {
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Accept-Charset", Util.ENCODING);
+			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1");
+			conn.setConnectTimeout(getTimeoutInMillis());
+			conn.setReadTimeout(getTimeoutInMillis());
 
-    /**
-     * Try to get response before timeout. Will close connection by itself.
-     */
-    private Response getResponse(String url) throws HttpIOException {
-        try (AsyncHttpClient client = new AsyncHttpClient()) {
-            BoundRequestBuilder request = client.prepareGet(url);
-            Future<Response> receiver = request.execute(new AsyncCompletionHandlerBase());
-            return receiver.get(timeout, timeoutUnit);
-        }
-        catch (IOException | InterruptedException | ExecutionException | TimeoutException cause) {
-            throw new HttpIOException(cause);
-        }
-    }
+			int responseCode = conn.getResponseCode();
+			if (responseCode < 200 || responseCode > 299) {
+				throw new HttpIOException(String.format(
+					"Failed to download from %s %n %s", urlStr, conn.getContent()));
+			} else {
+				return Util.read(conn.getInputStream());
+			}
+		}
+	}
 
+	private int getTimeoutInMillis() {
+		return (int) TimeUnit.MILLISECONDS.convert(timeout, timeoutUnit);
+	}
 }

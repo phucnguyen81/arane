@@ -8,9 +8,9 @@ package lou.arane;
 public class MainTest {
 
 	public static void main(String[] args) {
-//		testMangaGo();
+		testMangaGo();
 //		testBlogTruyen();
-		testMangaSee();
+//		testMangaSee();
 	}
 
 	static void testBlogTruyen() {
