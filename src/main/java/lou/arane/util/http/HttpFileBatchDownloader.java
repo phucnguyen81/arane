@@ -7,6 +7,7 @@ import lou.arane.util.Check;
 import lou.arane.util.Log;
 import lou.arane.util.New;
 import lou.arane.util.Uri;
+import lou.arane.util.Util;
 
 /**
  * Download a batch of urls to files
@@ -41,6 +42,7 @@ public class HttpFileBatchDownloader {
             HttpFileDownloader downloader = downloaders.removeFirst();
             if (!downloader.pathExists()) {
                 try {
+                	Log.info("Start " + downloader);
                     downloader.download();
                 }
                 catch (HttpIOException e) {
@@ -61,6 +63,8 @@ public class HttpFileBatchDownloader {
 
     @Override
     public String toString() {
-        return downloaders.toString();
+    	return String.format("%s[%n%s%n]",
+    		getClass().getSimpleName(),
+    		Util.join(downloaders, Util.LINE_BREAK));
     }
 }

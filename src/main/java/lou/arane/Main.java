@@ -1,5 +1,7 @@
 package lou.arane;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,14 +68,21 @@ public class Main {
 
 	private static List<Handler> createHandlers(String name, String url) {
 		List<Handler> handlers = New.list();
-		handlers.add(new BlogTruyenHandler(new Context(name, Uri.of(url), Util.mangaDir("blogtruyen", name))));
-		handlers.add(new EgScansHandler(new Context(name, Uri.of(url), Util.mangaDir("eggscans", name))));
-		handlers.add(new IzMangaHandler(new Context(name, Uri.of(url), Util.mangaDir("izmanga", name))));
-		handlers.add(new KissMangaHandler(new Context(name, Uri.of(url), Util.mangaDir("kissmanga", name))));
-		handlers.add(new MangaGoHandler(new Context(name, Uri.of(url), Util.mangaDir("mangago", name))));
-		handlers.add(new MangaLifeHandler(new Context(name, Uri.of(url), Util.mangaDir("manga.life", name))));
-		handlers.add(new MangaSeeHandler(new Context(name, Uri.of(url), Util.mangaDir("mangasee", name))));
+		handlers.add(new BlogTruyenHandler(new Context(name, Uri.of(url), mangaDir("blogtruyen", name))));
+		handlers.add(new EgScansHandler(new Context(name, Uri.of(url), mangaDir("eggscans", name))));
+		handlers.add(new IzMangaHandler(new Context(name, Uri.of(url), mangaDir("izmanga", name))));
+		handlers.add(new KissMangaHandler(new Context(name, Uri.of(url), mangaDir("kissmanga", name))));
+		handlers.add(new MangaGoHandler(new Context(name, Uri.of(url), mangaDir("mangago", name))));
+		handlers.add(new MangaLifeHandler(new Context(name, Uri.of(url), mangaDir("manga.life", name))));
+		handlers.add(new MangaSeeHandler(new Context(name, Uri.of(url), mangaDir("mangasee", name))));
 		return handlers;
+	}
+
+	/** Common way to get a base directory for downloading a manga. */
+	public static Path mangaDir(String first, String... more) {
+	    Path mangasDir = Util.userHomeDir().resolve("mangas");
+	    Path baseDir = mangasDir.resolve(Paths.get(first, more));
+	    return baseDir;
 	}
 
 }

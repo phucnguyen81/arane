@@ -1,8 +1,11 @@
-package lou.arane.util;
+package lou.arane.util.script;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+import lou.arane.util.New;
+import lou.arane.util.Util;
 
 /**
  * A story output model. A story has a name and chapters contained in a

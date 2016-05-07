@@ -50,7 +50,7 @@ public final class Util {
     /** default encoding for I/O operation */
     public static final String ENCODING = CHARSET.name();
 
-    /** system-specific line separator */
+    /** system-dependent line separator */
     public static final String LINE_BREAK = System.lineSeparator();
 
     /** buffer size used for I/O operations */
@@ -69,55 +69,49 @@ public final class Util {
 		return s == null || s.length() == 0;
 	}
 
-	public static String urlEncode(String url) {
+	public static String encodeUrl(String url) {
 		try {
-			return URLEncoder.encode(url, StandardCharsets.UTF_8.name());
+			return URLEncoder.encode(url, ENCODING);
 		} catch (UnsupportedEncodingException e) {
 			throw new Unchecked(e);
 		}
 	}
 
-	public static String urlDecode(String url) {
+	public static String decodeUrl(String url) {
 		try {
-			return URLDecoder.decode(url, StandardCharsets.UTF_8.name());
+			return URLDecoder.decode(url, ENCODING);
 		} catch (UnsupportedEncodingException e) {
 			throw new Unchecked(e);
 		}
 	}
 
+	/** Convert all newlines to platform-specific newlines.
+	 * Not good on performance, just need to be simple enough. */
     public static String normalizeNewlines(String text) {
-        if (text != null) {
-            StringBuilder buffer = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new StringReader(text))) {
-                String line = reader.readLine();
-                for (; line != null; line = reader.readLine()) {
-                    buffer.append(line).append(LINE_BREAK);
-                }
-            }
-            catch (IOException e) {
-                throw new IllegalStateException("Should never happen!", e);
-            }
-            text = buffer.toString();
+    	if (text == null) return null;
+        StringBuilder buffer = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new StringReader(text))) {
+        	reader.lines().forEach(line -> buffer.append(line).append(LINE_BREAK));
         }
-        return text;
+        catch (IOException e) {
+            throw new Unchecked("Should never happen!", e);
+        }
+        return buffer.toString();
     }
 
-    /** Assume a string is a path, remove its file extension */
+    /** Assume a string is a path, remove its file extension if there is one */
     public static String removeFileExtension(String str) {
-        if (str != null) {
-            int extensionIdx = str.lastIndexOf('.');
-            if (extensionIdx >= 0) {
-                str = str.substring(0, extensionIdx);
-            }
+    	if (str == null) return null;
+        int extensionIdx = str.lastIndexOf('.');
+        if (extensionIdx >= 0) {
+            return str.substring(0, extensionIdx);
         }
         return str;
     }
 
     /** Assume a string is a path, get its file extension (without the dot) */
     public static String getFileExtension(String str) {
-        if (str == null) {
-            return null;
-        }
+        if (str == null) return null;
         int extensionIdx = str.lastIndexOf('.');
         if (extensionIdx >= 0) {
             return str.substring(extensionIdx + 1);
@@ -125,27 +119,21 @@ public final class Util {
         return null;
     }
 
-    /** Common way to get a base directory for downloading a manga. */
-    public static Path mangaDir(String first, String... more) {
-        Path mangasDir = userHomeDir().resolve("mangas");
-        Path baseDir = mangasDir.resolve(Paths.get(first, more));
-        return baseDir;
-    }
-
-    /** Common user home directory; should work for many environments */
+    /** Common user home directory;
+     * should work on both Windows/Unix (not tested on Unix though) */
     public static Path userHomeDir() {
         String userHome = System.getProperty("user.home");
         if (userHome == null) {
             throw new Unchecked("user.home system property is not available");
         }
         Path userHomeDir = Paths.get(userHome);
-        if (!exists(userHomeDir)) {
+        if (notExists(userHomeDir)) {
             throw new Unchecked("User home directory does not exist at " + userHomeDir);
         }
         return userHomeDir;
     }
 
-    public static Path createDirectories(Path dir, FileAttribute<?>... attrs) {
+	public static Path createDirectories(Path dir, FileAttribute<?>... attrs) {
         try {
             return Files.createDirectories(dir, attrs);
         }
@@ -180,6 +168,11 @@ public final class Util {
     public static boolean exists(Path path, LinkOption... options) {
         return Files.exists(path.toAbsolutePath(), options);
     }
+
+    /** Negation of {@link #exists(Path, LinkOption...)} */
+    public static boolean notExists(Path path, LinkOption... options) {
+    	return !exists(path, options);
+	}
 
     public static boolean isRegularFile(Path path, LinkOption... options) {
         return Files.isRegularFile(path, options);

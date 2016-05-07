@@ -25,7 +25,7 @@ public class Uri implements Comparable<Uri> {
 				&& codepoint != '#'
 				&& codepoint != '&'
 			) {
-				str = Util.urlEncode(str);
+				str = Util.encodeUrl(str);
 			}
 			encoded.append(str);
 		}

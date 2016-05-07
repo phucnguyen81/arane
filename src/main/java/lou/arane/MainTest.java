@@ -8,7 +8,9 @@ package lou.arane;
 public class MainTest {
 
 	public static void main(String[] args) {
-		testMangaGo();
+		testMangaLife();
+//		testMangaGo();
+//		testKissManga();
 //		testBlogTruyen();
 //		testMangaSee();
 	}
@@ -50,8 +52,8 @@ public class MainTest {
 
 	static void testMangaLife() {
 		Main.main(new String[] {
-			"Gleipnir"
-			, "http://manga.life/read-online/Gleipnir"
+			"BokuNoHeroAcademia"
+			, "http://manga.life/read-online/BokuNoHeroAcademia"
 		});
 	}
 
