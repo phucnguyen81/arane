@@ -5,15 +5,15 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 
 /**
- * Uri data as it is used by this project
+ * Uris as they are used by this project
  *
  * @author pnguyen58
  */
 public class Uri implements Comparable<Uri> {
 
 	/**
-	 * This is used when a url constains illegal uri characters (e.g. spaces).
-	 * This returns an encoded uri.
+	 * When a url constains illegal uri characters (e.g. spaces),
+	 * the url needs to be encoded to make a valid uri.
 	 */
 	public static Uri fromUrl(String url) {
 		StringBuilder encoded = new StringBuilder();

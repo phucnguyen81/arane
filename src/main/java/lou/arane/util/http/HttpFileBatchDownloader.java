@@ -1,5 +1,6 @@
 package lou.arane.util.http;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
 
@@ -45,7 +46,7 @@ public class HttpFileBatchDownloader {
                 	Log.info("Start " + downloader);
                     downloader.download();
                 }
-                catch (HttpIOException e) {
+                catch (IOException e) {
                     Log.error(e);
                     handleDownloadErrors(downloader);
                 }

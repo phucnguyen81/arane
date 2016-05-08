@@ -52,8 +52,8 @@ public class MainTest {
 
 	static void testMangaLife() {
 		Main.main(new String[] {
-			"BokuNoHeroAcademia"
-			, "http://manga.life/read-online/BokuNoHeroAcademia"
+			"OnepunchMan"
+			, "http://manga.life/read-online/OnepunchMan"
 		});
 	}
 

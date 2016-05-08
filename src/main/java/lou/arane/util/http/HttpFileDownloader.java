@@ -30,7 +30,7 @@ public class HttpFileDownloader {
 
     private final HttpDownloader downloader = new HttpDownloader();
 
-    private final LinkedList<HttpIOException> exceptions = New.linkedList();
+    private final LinkedList<IOException> exceptions = New.linkedList();
 
     public HttpFileDownloader(Uri uri, Path path) {
         this.uri = Check.notNull(uri);
@@ -47,22 +47,19 @@ public class HttpFileDownloader {
     }
 
     /** Return the exceptions caught when calling {@link #download} */
-    public LinkedList<HttpIOException> getDownloadExceptions() {
+    public LinkedList<IOException> getDownloadExceptions() {
         return exceptions;
     }
 
     /** Download uri content and save to path. Keep track of exception. */
-    public void download() throws HttpIOException {
-        HttpIOException error = null;
+    public void download() throws IOException {
+        IOException error = null;
         try {
             Path parentDir = path.toAbsolutePath().getParent();
             Files.createDirectories(parentDir);
             Files.write(path, downloadBytes());
         }
         catch (IOException e) {
-            error = new HttpIOException(e);
-        }
-        catch (HttpIOException e) {
             error = e;
         }
         finally {
@@ -77,17 +74,17 @@ public class HttpFileDownloader {
      * Download uri content as bytes. Try alternate uris if the original one
      * fails. Throw only the last error.
      */
-    private byte[] downloadBytes() throws HttpIOException {
+    private byte[] downloadBytes() throws IOException {
         List<Uri> uris = New.list();
         uris.add(uri);
         uris.addAll(uri.getAlternatives());
 
-        HttpIOException error = null;
+        IOException error = null;
         for (Uri uri : uris) {
             try {
                 return downloader.getBytes(uri);
             }
-            catch (HttpIOException e) {
+            catch (IOException e) {
                 error = e;
             }
         }

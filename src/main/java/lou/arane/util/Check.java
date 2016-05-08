@@ -22,7 +22,7 @@ public class Check {
         }
     }
 
-    public static void forbid(boolean unexpected, String errorMessage) {
+    public static void prevent(boolean unexpected, String errorMessage) {
         if (unexpected) {
             throw new AssertionError(errorMessage);
         }

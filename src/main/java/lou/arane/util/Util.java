@@ -1,13 +1,16 @@
 package lou.arane.util;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -19,6 +22,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
+import java.time.Duration;
 import java.util.AbstractMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -416,6 +420,47 @@ public final class Util {
 				}
 			}
 		};
+	}
+
+	public static Response getUrl(String urlStr, Duration timeout) {
+		Response r = new Response();
+		try {
+			URL url = new URL(urlStr);
+			return get(url, timeout);
+		} catch (IOException e) {
+			r.exception = e;
+		}
+		return r;
+	}
+
+	public static Response get(URL url, Duration timeout) {
+		Response r = new Response();
+		try {
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			try (Closeable disconnect = () -> conn.disconnect()) {
+				conn.setRequestMethod("GET");
+				conn.setRequestProperty("Accept-Charset", Util.ENCODING);
+				conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1");
+				conn.setConnectTimeout((int) timeout.toMillis());
+				conn.setReadTimeout((int) timeout.toMillis());
+
+				r.content = Util.read(conn.getInputStream());
+				r.code = conn.getResponseCode();
+				if (r.code < 200 || r.code > 299) {
+					r.exception = new IOException(String.format(
+						"Error code is %s for getting %s", r.code, url));
+				}
+			}
+		} catch (IOException e) {
+			r.exception = e;
+		}
+		return r;
+	}
+
+	public static class Response {
+		public IOException exception;
+		public Integer code;
+		public byte[] content;
 	}
 
 	/** Read then close a byte stream */
