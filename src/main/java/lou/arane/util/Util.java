@@ -313,7 +313,7 @@ public final class Util {
         return padded.toString();
     }
 
-    /** Get string representation of an exception's stack trace */
+    /** Get string representation of an error's stack trace */
     public static String toString(Throwable error) {
         ByteArrayOutputStream stackTrace = new ByteArrayOutputStream();
         boolean autoFlushFlag = false;
@@ -338,7 +338,7 @@ public final class Util {
 
     /** @see Util#parseHtml(Path, String) */
     public static Document parseHtml(Path path, Uri baseUri) {
-    	return Util.parseHtml(path, baseUri.toString());
+    	return parseHtml(path, baseUri.toString());
     }
 
     /**
@@ -346,7 +346,7 @@ public final class Util {
      * model to resolve urls
      */
     public static Document parseHtml(Path path, String baseUri) {
-    	Document html = Util.parseHtml(path);
+    	Document html = parseHtml(path);
     	html.setBaseUri(baseUri);
     	return html;
     }
@@ -394,7 +394,7 @@ public final class Util {
 		return new Iterable<Entry<Integer, MatchResult>>() {
 			@Override
 			public Iterator<Entry<Integer, MatchResult>> iterator() {
-				return Util.findIter(input, pattern);
+				return findIter(input, pattern);
 			}
 		};
 	}
@@ -428,7 +428,7 @@ public final class Util {
 			URL url = new URL(urlStr);
 			return get(url, timeout);
 		} catch (IOException e) {
-			r.exception = e;
+			r.error = e;
 		}
 		return r;
 	}
@@ -439,27 +439,35 @@ public final class Util {
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			try (Closeable disconnect = () -> conn.disconnect()) {
 				conn.setRequestMethod("GET");
-				conn.setRequestProperty("Accept-Charset", Util.ENCODING);
+				conn.setRequestProperty("Accept-Charset", ENCODING);
 				conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1");
 				conn.setConnectTimeout((int) timeout.toMillis());
 				conn.setReadTimeout((int) timeout.toMillis());
 
-				r.content = Util.read(conn.getInputStream());
+				r.content = read(conn.getInputStream());
 				r.code = conn.getResponseCode();
 				if (r.code < 200 || r.code > 299) {
-					r.exception = new IOException(String.format(
+					r.error = new IOException(String.format(
 						"Error code is %s for getting %s", r.code, url));
 				}
 			}
 		} catch (IOException e) {
-			r.exception = e;
+			r.error = e;
 		}
 		return r;
 	}
 
+	/** Results from http-request operations */
 	public static class Response {
-		public IOException exception;
+		/** anything wrong; if this is null, content should not be null */
+		public IOException error;
+
+		/** http response code */
 		public Integer code;
+
+		/** what can be retrieved
+		 * ; could be incomplete or an error page
+		 * ; check response code and error to see if this is what was requested */
 		public byte[] content;
 	}
 

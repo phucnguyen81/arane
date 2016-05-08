@@ -2,7 +2,7 @@ package lou.arane.util;
 
 /**
  * Exceptions that cannot be handled or simply should not happen.
- * For example: UTF-8 encoding exception, local files io exception, etc.
+ * For example: UTF-8 encoding error, local files io error, etc.
  * Meant to wrap checked exeption.
  *
  * @author LOU

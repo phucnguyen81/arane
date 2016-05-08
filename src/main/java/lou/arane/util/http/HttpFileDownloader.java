@@ -4,12 +4,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.List;
 
 import lou.arane.util.Check;
 import lou.arane.util.New;
+import lou.arane.util.Unchecked;
 import lou.arane.util.Uri;
+import lou.arane.util.Util;
+import lou.arane.util.Util.Response;
 
 /**
  * Download content from a source uri and write to a target path
@@ -25,10 +30,11 @@ public class HttpFileDownloader {
         new HttpFileDownloader(source, Paths.get(target)).download();
     }
 
+    /** Connection timeout for connecting to urls */
+    public Duration timeout = Duration.of(2, ChronoUnit.MINUTES);
+
     private final Uri uri;
     private final Path path;
-
-    private final HttpDownloader downloader = new HttpDownloader();
 
     private final LinkedList<IOException> exceptions = New.linkedList();
 
@@ -51,7 +57,7 @@ public class HttpFileDownloader {
         return exceptions;
     }
 
-    /** Download uri content and save to path. Keep track of exception. */
+    /** Download uri content and save to path. Keep track of error. */
     public void download() throws IOException {
         IOException error = null;
         try {
@@ -79,16 +85,18 @@ public class HttpFileDownloader {
         uris.add(uri);
         uris.addAll(uri.getAlternatives());
 
-        IOException error = null;
+        Response r = null;
         for (Uri uri : uris) {
-            try {
-                return downloader.getBytes(uri);
-            }
-            catch (IOException e) {
-                error = e;
-            }
+        	r = Util.getUrl(uri.uri.toURL().toString(), timeout);
+        	if (r.error == null) return r.content;
         }
-        throw error;
+        if (r == null) {
+        	throw new Unchecked("Downloading fails without response for " + uris);
+        } else if (r.error == null) {
+        	throw new Unchecked("Downloading fails without error for " + uris);
+        } else {
+        	throw r.error;
+        }
     }
 
     @Override
