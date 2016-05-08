@@ -101,6 +101,7 @@ public class IzTruyenTranhHandler implements Handler {
                     idx += 1;
                     Uri imageUri = Uri.of(img.trim());
                     String imageName = idx + "_" + imageUri.getFileName();
+                    imageName = Util.padNumericSequences(imageName, 3);
                     Path imagePath = chapterPath.resolve(imageName);
                     ctx.add(imageUri, imagePath);
                 }

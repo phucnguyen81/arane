@@ -422,18 +422,18 @@ public final class Util {
 		};
 	}
 
-	public static DownloadResponse getUrl(String urlStr, Duration timeout) {
+	public static DownloadResponse request(String urlStr, Duration timeout) {
 		DownloadResponse r = new DownloadResponse();
 		try {
 			URL url = new URL(urlStr);
-			return get(url, timeout);
+			return request(url, timeout);
 		} catch (IOException e) {
 			r.error = e;
 		}
 		return r;
 	}
 
-	public static DownloadResponse get(URL url, Duration timeout) {
+	public static DownloadResponse request(URL url, Duration timeout) {
 		DownloadResponse r = new DownloadResponse();
 		try {
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();

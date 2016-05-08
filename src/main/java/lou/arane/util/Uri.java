@@ -43,7 +43,7 @@ public class Uri implements Comparable<Uri> {
     /* alternate uris meant to locate the same resource as this uri */
     private final LinkedList<Uri> alternatives = New.linkedList();
 
-    public final URI uri;
+    private final URI uri;
 
     private Uri(URI uri) {
         this.uri = uri;
@@ -53,6 +53,10 @@ public class Uri implements Comparable<Uri> {
     public String toString() {
         return uri.toString() +
             (alternatives.isEmpty() ? "" : " " + alternatives.toString());
+    }
+
+    public String toUriString() {
+    	return uri.toString();
     }
 
     @Override

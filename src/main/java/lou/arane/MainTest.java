@@ -61,8 +61,8 @@ public class MainTest {
 
 	static void testIzTruyenTranh() {
 		Main.main(new String[] {
-			"kid_gang_2"
-			, "http://iztruyentranh.com/truyen-tranh/kid_gang_2"
+			"trinity_wonder"
+			, "http://iztruyentranh.com/truyen-tranh/trinity_wonder"
 		});
 	}
 }

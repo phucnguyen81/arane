@@ -104,7 +104,7 @@ public class MangaLifeHandler implements Handler {
     }
 
     private void addPage(String chapter, String index, String page) {
-        String base = ctx.source.uri.toString();
+        String base = ctx.source.toString();
         String pageUriStr = New.joiner("/", base + "/")
             .add(chapter).add(index).add(page).toString();
         Uri pageUri = Uri.of(pageUriStr);
