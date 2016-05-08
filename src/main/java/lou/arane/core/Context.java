@@ -9,10 +9,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lou.arane.util.Check;
+import lou.arane.util.Downloader;
 import lou.arane.util.Log;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
-import lou.arane.util.http.HttpFileBatchDownloader;
 
 /**
  * Apply Context Pattern for passing common data/methods down the call chain.
@@ -40,7 +40,7 @@ public class Context {
 	public final Path imagesDir;
 	public final Path outputDir;
 
-	private final HttpFileBatchDownloader downloader = new HttpFileBatchDownloader()
+	private final Downloader downloader = new Downloader()
 			.setMaxDownloadAttempts(3);
 
     /** Pattern for extracting urls from text such as:

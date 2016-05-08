@@ -9,7 +9,7 @@ import lou.arane.core.Context;
 import lou.arane.core.Handler;
 import lou.arane.handlers.BlogTruyenHandler;
 import lou.arane.handlers.EgScansHandler;
-import lou.arane.handlers.IzMangaHandler;
+import lou.arane.handlers.IzTruyenTranhHandler;
 import lou.arane.handlers.KissMangaHandler;
 import lou.arane.handlers.MangaGoHandler;
 import lou.arane.handlers.MangaLifeHandler;
@@ -70,7 +70,7 @@ public class Main {
 		List<Handler> handlers = New.list();
 		handlers.add(new BlogTruyenHandler(new Context(name, Uri.of(url), mangaDir("blogtruyen", name))));
 		handlers.add(new EgScansHandler(new Context(name, Uri.of(url), mangaDir("eggscans", name))));
-		handlers.add(new IzMangaHandler(new Context(name, Uri.of(url), mangaDir("izmanga", name))));
+		handlers.add(new IzTruyenTranhHandler(new Context(name, Uri.of(url), mangaDir("izmanga", name))));
 		handlers.add(new KissMangaHandler(new Context(name, Uri.of(url), mangaDir("kissmanga", name))));
 		handlers.add(new MangaGoHandler(new Context(name, Uri.of(url), mangaDir("mangago", name))));
 		handlers.add(new MangaLifeHandler(new Context(name, Uri.of(url), mangaDir("manga.life", name))));

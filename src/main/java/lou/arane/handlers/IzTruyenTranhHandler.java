@@ -13,10 +13,15 @@ import lou.arane.core.Handler;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 
-public class IzMangaHandler implements Handler {
+/**
+ * Download from iztruyetranh site
+ *
+ * @author Phuc
+ */
+public class IzTruyenTranhHandler implements Handler {
 
-    /* scheme of this site */
-    private static final String BASE_URI = "http://izmanga.com/";
+    /* domain */
+    private static final String BASE_URI = "http://iztruyentranh.com/";
 
     /* pattern to look for images embeded in the chapter pages */
     private static final Pattern DATA_IMAGES_PATTERN = Pattern.compile("data\\s*=\\s*'(?<imgs>http:.+)'");
@@ -29,7 +34,7 @@ public class IzMangaHandler implements Handler {
      * @param story = base name of the story, e.g. "ban_long-117"
      * @param baseDir = dir to download to, e.g. "mangas/Ban Long"
      */
-    public IzMangaHandler(Context context) {
+    public IzTruyenTranhHandler(Context context) {
     	this.ctx = context;
     }
 

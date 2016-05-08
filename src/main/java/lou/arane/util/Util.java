@@ -422,8 +422,8 @@ public final class Util {
 		};
 	}
 
-	public static Response getUrl(String urlStr, Duration timeout) {
-		Response r = new Response();
+	public static DownloadResponse getUrl(String urlStr, Duration timeout) {
+		DownloadResponse r = new DownloadResponse();
 		try {
 			URL url = new URL(urlStr);
 			return get(url, timeout);
@@ -433,8 +433,8 @@ public final class Util {
 		return r;
 	}
 
-	public static Response get(URL url, Duration timeout) {
-		Response r = new Response();
+	public static DownloadResponse get(URL url, Duration timeout) {
+		DownloadResponse r = new DownloadResponse();
 		try {
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			try (Closeable disconnect = () -> conn.disconnect()) {
@@ -455,20 +455,6 @@ public final class Util {
 			r.error = e;
 		}
 		return r;
-	}
-
-	/** Results from http-request operations */
-	public static class Response {
-		/** anything wrong; if this is null, content should not be null */
-		public IOException error;
-
-		/** http response code */
-		public Integer code;
-
-		/** what can be retrieved
-		 * ; could be incomplete or an error page
-		 * ; check response code and error to see if this is what was requested */
-		public byte[] content;
 	}
 
 	/** Read then close a byte stream */
