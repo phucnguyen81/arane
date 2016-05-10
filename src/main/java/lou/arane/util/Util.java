@@ -268,13 +268,17 @@ public final class Util {
      * truncating an existing file to a size of 0. */
     public static void write(Path path, byte[] bytes) {
         try {
-            Files.createDirectories(path.getParent());
-            Files.write(path, bytes);
+            tryWrite(path, bytes);
         }
         catch (IOException e) {
             throw new Unchecked(e);
         }
     }
+
+	public static void tryWrite(Path path, byte[] bytes) throws IOException {
+		Files.createDirectories(path.toAbsolutePath().getParent());
+		Files.write(path, bytes);
+	}
 
     /** Join string representation of given parts.
      * The parts are separated by the given separator. */

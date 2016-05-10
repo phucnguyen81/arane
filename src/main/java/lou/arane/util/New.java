@@ -55,7 +55,7 @@ public class New {
             return Files.newBufferedReader(path, Util.CHARSET);
         }
         catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new Unchecked(e);
         }
     }
 

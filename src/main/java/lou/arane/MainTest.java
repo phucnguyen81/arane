@@ -9,8 +9,8 @@ public class MainTest {
 
 	public static void main(String[] args) {
 		boolean on = true, off = false;
-		if (on) testIzTruyenTranh();
-		if (off) testMangaLife();
+		if (off) testIzTruyenTranh();
+		if (on) testMangaLife();
 		if (off) testMangaGo();
 		if (off) testKissManga();
 		if (off) testBlogTruyen();
@@ -54,8 +54,8 @@ public class MainTest {
 
 	static void testMangaLife() {
 		Main.main(new String[] {
-			"OnepunchMan"
-			, "http://manga.life/read-online/OnepunchMan"
+			"KnightRun"
+			, "http://manga.life/read-online/KnightRun"
 		});
 	}
 
