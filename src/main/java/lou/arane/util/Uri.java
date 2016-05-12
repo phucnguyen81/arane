@@ -1,6 +1,9 @@
 package lou.arane.util;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 
@@ -25,7 +28,7 @@ public class Uri implements Comparable<Uri> {
 				&& codepoint != '#'
 				&& codepoint != '&'
 			) {
-				str = Util.encodeUrl(str);
+				str = encodeUrl(str);
 			}
 			encoded.append(str);
 		}
@@ -39,6 +42,22 @@ public class Uri implements Comparable<Uri> {
     public static Uri of(URI uri) {
         return new Uri(uri);
     }
+
+	public static String encodeUrl(String url) {
+		try {
+			return URLEncoder.encode(url, IO.ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			throw new AssertionError(e);
+		}
+	}
+
+	public static String decodeUrl(String url) {
+		try {
+			return URLDecoder.decode(url, IO.ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			throw new AssertionError(e);
+		}
+	}
 
     /* alternate uris meant to locate the same resource as this uri */
     private final LinkedList<Uri> alternatives = New.linkedList();

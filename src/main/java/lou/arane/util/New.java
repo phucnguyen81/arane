@@ -47,15 +47,15 @@ public class New {
     }
 
     public static BufferedReader reader(InputStream stream) {
-        return new BufferedReader(new InputStreamReader(stream, Util.CHARSET));
+        return new BufferedReader(new InputStreamReader(stream, IO.CHARSET));
     }
 
     public static BufferedReader reader(Path path) {
         try {
-            return Files.newBufferedReader(path, Util.CHARSET);
+            return Files.newBufferedReader(path, IO.CHARSET);
         }
         catch (IOException e) {
-            throw new Unchecked(e);
+            throw new AssertionError(e);
         }
     }
 

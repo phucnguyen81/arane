@@ -1,5 +1,6 @@
 package lou.arane.util.script;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Function;
@@ -79,7 +80,7 @@ public class CopyFiles {
      * directory */
     public void run() {
         Util.list(sourceDir)
-            .filter(Util::isRegularFile)
+            .filter(Files::isRegularFile)
             .forEach(sourcePath -> {
                 String targetName = targetFileName(sourcePath);
                 Path targetPath = targetPath(targetName);

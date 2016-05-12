@@ -1,6 +1,5 @@
 package lou.arane.util;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
 
@@ -37,7 +36,7 @@ public class Downloader {
 	        	try {
 	        		item.tryDownload();
 	        	}
-	        	catch (IOException e) {
+	        	catch (Exception e) {
 	        		Log.error(e);
 	        		// re-try later
 	        		if (item.canTryDownload()) {
@@ -55,8 +54,8 @@ public class Downloader {
 
 	@Override
     public String toString() {
-    	return String.format("%s[%n%s%n]",
-    		getClass().getSimpleName(),
-    		Util.join(items, Util.LINE_BREAK));
+    	String className = getClass().getSimpleName();
+		String joinedItems = Util.join(items, Util.LINE_BREAK);
+		return String.format("%s[%n%s%n]", className, joinedItems);
     }
 }

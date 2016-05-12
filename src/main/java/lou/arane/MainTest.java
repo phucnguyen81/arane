@@ -54,8 +54,8 @@ public class MainTest {
 
 	static void testMangaLife() {
 		Main.main(new String[] {
-			"KnightRun"
-			, "http://manga.life/read-online/KnightRun"
+			"ShutHell"
+			, "http://manga.life/read-online/ShutHell"
 		});
 	}
 

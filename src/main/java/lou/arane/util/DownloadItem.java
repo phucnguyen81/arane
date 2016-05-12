@@ -1,6 +1,5 @@
 package lou.arane.util;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -9,7 +8,7 @@ import java.util.List;
 /** Perform a single download operation */
 public class DownloadItem {
 
-	public final Uri uri;
+	public Uri uri;
 	public final Path path;
 
 	public Duration timeout = Duration.of(2, ChronoUnit.MINUTES);
@@ -27,42 +26,40 @@ public class DownloadItem {
 	}
 
 	/** Download from item uri to item path */
-	public void tryDownload() throws IOException {
+	public void tryDownload() throws Exception {
 		if (canTryDownload()) try {
-			Util.tryWrite(path, getBytes());
-		} catch (IOException e) {
+			download();
+		} catch (Exception e) {
 			downloadAttempts -= 1;
 			throw e;
 		}
 		else {
-			throw new IOException("Download attempts exceeded for " + this);
+			throw new Exception("Download attempts exceeded for " + this);
 		}
 	}
 
-    /**
-     * Get uri content as bytes. Try alternate uris if the original one
-     * fails. Throw only the last error.
-     */
-    private byte[] getBytes() throws IOException {
+    /** Download from uri to file.
+     * Try alternate uris if the original one fails.
+     * Throw only the error of the last uri being tried. */
+    private void download() throws Exception {
         List<Uri> uris = New.list();
         uris.add(uri);
         uris.addAll(uri.getAlternatives());
-
-        DownloadResponse r = null;
-        for (Uri uri : uris) {
-        	r = Util.request(uri.toUriString(), timeout);
-        	if (r.error == null) return r.content;
+        while (!uris.isEmpty()) {
+        	Uri aUri = uris.remove(0);
+        	try {
+        		IO.download(aUri.toUriString(), path, timeout);
+        	}
+        	catch (Exception e) {
+        		if (uris.isEmpty()) {
+        			throw e;
+        		}
+        	}
         }
-        if (r == null) {
-        	throw new Unchecked("Downloading fails without response for " + uris);
-        } else if (r.error == null) {
-        	throw new Unchecked("Downloading fails without error for " + uris);
-        } else {
-        	throw r.error;
-        }
+        throw new Exception("This error should be unreachable!");
     }
 
-	@Override
+    @Override
 	public String toString() {
 		return String.format("[%s -> %s]", uri, path);
 	}

@@ -1,20 +1,11 @@
 package lou.arane.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.BufferedReader;
-import java.io.Closeable;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.CopyOption;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
@@ -22,7 +13,6 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
-import java.time.Duration;
 import java.util.AbstractMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -48,17 +38,8 @@ import org.jsoup.nodes.Document;
  */
 public final class Util {
 
-    /** default charset for I/O operations */
-    public static final Charset CHARSET = StandardCharsets.UTF_8;
-
-    /** default encoding for I/O operation */
-    public static final String ENCODING = CHARSET.name();
-
     /** system-dependent line separator */
     public static final String LINE_BREAK = System.lineSeparator();
-
-    /** buffer size used for I/O operations */
-    public static final int BUFFER_SIZE = 1024 * 8;
 
     public static void println(Object message) {
         System.out.println(message);
@@ -73,22 +54,6 @@ public final class Util {
 		return s == null || s.length() == 0;
 	}
 
-	public static String encodeUrl(String url) {
-		try {
-			return URLEncoder.encode(url, ENCODING);
-		} catch (UnsupportedEncodingException e) {
-			throw new Unchecked(e);
-		}
-	}
-
-	public static String decodeUrl(String url) {
-		try {
-			return URLDecoder.decode(url, ENCODING);
-		} catch (UnsupportedEncodingException e) {
-			throw new Unchecked(e);
-		}
-	}
-
 	/** Convert all newlines to platform-specific newlines.
 	 * Not good on performance, just need to be simple enough. */
     public static String normalizeNewlines(String text) {
@@ -98,7 +63,7 @@ public final class Util {
         	reader.lines().forEach(line -> buffer.append(line).append(LINE_BREAK));
         }
         catch (IOException e) {
-            throw new Unchecked("Should never happen!", e);
+            throw new AssertionError("Should never happen!", e);
         }
         return buffer.toString();
     }
@@ -128,11 +93,11 @@ public final class Util {
     public static Path userHomeDir() {
         String userHome = System.getProperty("user.home");
         if (userHome == null) {
-            throw new Unchecked("user.home system property is not available");
+            throw new AssertionError("user.home system property is not available");
         }
         Path userHomeDir = Paths.get(userHome);
         if (notExists(userHomeDir)) {
-            throw new Unchecked("User home directory does not exist at " + userHomeDir);
+            throw new AssertionError("User home directory does not exist at " + userHomeDir);
         }
         return userHomeDir;
     }
@@ -142,7 +107,7 @@ public final class Util {
             return Files.createDirectories(dir, attrs);
         }
         catch (IOException e) {
-            throw new Unchecked(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -150,7 +115,7 @@ public final class Util {
         try {
             Files.delete(path);
         } catch (IOException e) {
-            throw new Unchecked(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -163,7 +128,7 @@ public final class Util {
             return Files.deleteIfExists(path);
         }
         catch (IOException e) {
-            throw new Unchecked(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -177,14 +142,6 @@ public final class Util {
     public static boolean notExists(Path path, LinkOption... options) {
     	return !exists(path, options);
 	}
-
-    public static boolean isRegularFile(Path path, LinkOption... options) {
-        return Files.isRegularFile(path, options);
-    }
-
-    public static boolean isDirectory(Path path, LinkOption... options) {
-        return Files.isDirectory(path, options);
-    }
 
     public static boolean isNotEmpty(Path p) {
         return list(p).findAny().isPresent();
@@ -204,18 +161,18 @@ public final class Util {
             return Files.move(source, target, options);
         }
         catch (IOException e) {
-            throw new Unchecked(e);
+            throw new AssertionError(e);
         }
     }
 
     /** Get direct files and sub-dirs */
     public static Stream<Path> list(Path path) {
-        if (isDirectory(path)) {
+        if (Files.isDirectory(path)) {
             try {
                 return Files.list(path);
             }
             catch (IOException e) {
-                throw new Unchecked(e);
+                throw new AssertionError(e);
             }
         }
         else {
@@ -229,7 +186,7 @@ public final class Util {
             return Files.walk(start, options);
         }
         catch (IOException e) {
-            throw new Unchecked(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -242,7 +199,7 @@ public final class Util {
         try {
             Files.copy(source, target, options);
         } catch (IOException e) {
-            throw new Unchecked(e);
+            throw new AssertionError(e);
         }
 
         //recursively copy sub-files/dirs
@@ -252,33 +209,6 @@ public final class Util {
             copy(src, dst);
         });
     }
-
-    /** Write/Overwrite a file with default settings */
-    public static void write(Path path, String content) {
-        write(path, content, CHARSET);
-    }
-
-    /** Write/Overwrite a file with default settings */
-    public static void write(Path path, String content, Charset charset) {
-        write(path, content.getBytes(charset));
-    }
-
-    /** Write to a file with default behaviors: create all parent directories if
-     * they do not exist, create the file if it does not exist, or initially
-     * truncating an existing file to a size of 0. */
-    public static void write(Path path, byte[] bytes) {
-        try {
-            tryWrite(path, bytes);
-        }
-        catch (IOException e) {
-            throw new Unchecked(e);
-        }
-    }
-
-	public static void tryWrite(Path path, byte[] bytes) throws IOException {
-		Files.createDirectories(path.toAbsolutePath().getParent());
-		Files.write(path, bytes);
-	}
 
     /** Join string representation of given parts.
      * The parts are separated by the given separator. */
@@ -322,9 +252,9 @@ public final class Util {
         ByteArrayOutputStream stackTrace = new ByteArrayOutputStream();
         boolean autoFlushFlag = false;
         try {
-            PrintStream printer = new PrintStream(stackTrace, autoFlushFlag, ENCODING);
+            PrintStream printer = new PrintStream(stackTrace, autoFlushFlag, IO.ENCODING);
             error.printStackTrace(printer);
-            return stackTrace.toString(ENCODING);
+            return stackTrace.toString(IO.ENCODING);
         }
         catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("Should never happen!", e);
@@ -361,14 +291,14 @@ public final class Util {
     	try {
     		return Jsoup.parse(path.toFile(), defaultCharsetName);
     	} catch (IOException e) {
-    		throw new Unchecked("Failed to parse html file " + path, e);
+    		throw new AssertionError("Failed to parse html file " + path, e);
     	}
     }
 
     /** Find html files of a given directory */
     public static List<Path> findHtmlFiles(Path dir) {
     	return list(dir)
-    	        .filter(Util::isRegularFile)
+    	        .filter(Files::isRegularFile)
     			.filter(file -> file.toString().endsWith(".html"))
     			.collect(Collectors.toList());
     }
@@ -376,7 +306,7 @@ public final class Util {
     /** Find all html files in the directory tree rooted at a given directory */
     public static List<Path> findAllHtmlFiles(Path dir) {
         return walk(dir)
-                .filter(Util::isRegularFile)
+                .filter(Files::isRegularFile)
                 .filter(file -> file.toString().endsWith(".html"))
                 .collect(Collectors.toList());
     }
@@ -425,67 +355,4 @@ public final class Util {
 			}
 		};
 	}
-
-	public static DownloadResponse request(String urlStr, Duration timeout) {
-		DownloadResponse r = new DownloadResponse();
-		try {
-			URL url = new URL(urlStr);
-			return request(url, timeout);
-		} catch (IOException e) {
-			r.error = e;
-		}
-		return r;
-	}
-
-	public static DownloadResponse request(URL url, Duration timeout) {
-		DownloadResponse r = new DownloadResponse();
-		try {
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			try (Closeable disconnect = () -> conn.disconnect()) {
-				conn.setRequestMethod("GET");
-				conn.setRequestProperty("Accept-Charset", ENCODING);
-				conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1");
-				conn.setConnectTimeout((int) timeout.toMillis());
-				conn.setReadTimeout((int) timeout.toMillis());
-
-				r.content = read(conn.getInputStream());
-				r.code = conn.getResponseCode();
-				if (r.code < 200 || r.code > 299) {
-					r.error = new IOException(String.format(
-						"Error code is %s for getting %s", r.code, url));
-				}
-			}
-		} catch (IOException e) {
-			r.error = e;
-		}
-		return r;
-	}
-
-	/** Read then close a byte stream */
-	public static final byte[] read(InputStream in) throws IOException {
-		try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-			copy(in, out);
-			return out.toByteArray();
-		}
-	}
-
-	/**
-	 * Reads all bytes from an input stream and writes them to an output stream.
-	 * NOTE: this is taken from {@link Files#copy(InputStream, OutputStream)}
-	 *
-	 * @return the number of bytes copied
-	 */
-    public static long copy(InputStream source, OutputStream sink)
-        throws IOException
-    {
-        long nread = 0L;
-        byte[] buf = new byte[BUFFER_SIZE];
-        int n;
-        while ((n = source.read(buf)) > 0) {
-            sink.write(buf, 0, n);
-            nread += n;
-        }
-        return nread;
-    }
-
 }

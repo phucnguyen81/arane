@@ -12,6 +12,8 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import lou.arane.util.Check;
+import lou.arane.util.IO;
+import lou.arane.util.Log;
 import lou.arane.util.Util;
 
 import org.stringtemplate.v4.ST;
@@ -82,11 +84,20 @@ public class GenerateImageViewer {
 
     private void generateStoryIndex(Story storyModel) {
         STGroup templates = new STGroupFile("StoryHtml.stg");
-        templates.encoding = Util.ENCODING;
+        templates.encoding = IO.ENCODING;
         ST template = templates.getInstanceOf("story");
         template.add("story", storyModel);
         String story = template.render();
-        Util.write(indexFile, story);
+        tryWrite(story);
     }
+
+	private void tryWrite(String story) {
+		try {
+        	IO.write(story, indexFile);
+        } catch (Exception e) {
+        	Log.error("Failed to copy to " + indexFile);
+        	throw new AssertionError(e);
+		}
+	}
 
 }
