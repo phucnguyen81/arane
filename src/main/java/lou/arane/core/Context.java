@@ -14,9 +14,8 @@ import lou.arane.util.Util;
 import lou.arane.util.http.HttpBatchDownloader;
 
 /**
- * Apply Context Pattern for passing common data/methods down the call chain.
- * There are no static elements, everything is found/replaced
- * on the context instance.
+ * Common data/methods for all {@link Handler}.
+ * There are no static elements, everything is found on the instance.
  *
  * @author Phuc
  */

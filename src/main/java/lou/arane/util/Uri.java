@@ -47,7 +47,7 @@ public class Uri implements Comparable<Uri> {
 		try {
 			return URLEncoder.encode(url, IO.ENCODING);
 		} catch (UnsupportedEncodingException e) {
-			throw new AssertionError(e);
+			throw new AssertionError(IO.ENCODING + " should be supported!", e);
 		}
 	}
 
@@ -55,7 +55,7 @@ public class Uri implements Comparable<Uri> {
 		try {
 			return URLDecoder.decode(url, IO.ENCODING);
 		} catch (UnsupportedEncodingException e) {
-			throw new AssertionError(e);
+			throw new AssertionError(IO.ENCODING + " should be supported!", e);
 		}
 	}
 
@@ -121,9 +121,5 @@ public class Uri implements Comparable<Uri> {
 
     public String getFilePath() {
     	return uri.getPath();
-    }
-
-    public String getPath() {
-        return uri.getPath();
     }
 }

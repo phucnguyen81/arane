@@ -69,7 +69,7 @@ public class BlogTruyenHandler implements Handler {
         Elements chapterAddresses = rootFile.select("a[href]");
         for (Element chapterAddr : chapterAddresses) {
             Uri chapterUri = Uri.fromUrl(chapterAddr.absUrl("href"));
-            String path = chapterUri.getPath();
+            String path = chapterUri.getFilePath();
             if (path != null && path.contains(ctx.sourceName)) {
             	String chapterName = chapterUri.getFileName().toString();
             	if (!chapterName.endsWith(".html")) {
