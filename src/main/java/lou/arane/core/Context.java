@@ -1,6 +1,5 @@
 package lou.arane.core;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,10 +8,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lou.arane.util.Check;
-import lou.arane.util.HttpBatchDownloader;
 import lou.arane.util.Log;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
+import lou.arane.util.http.HttpBatchDownloader;
 
 /**
  * Apply Context Pattern for passing common data/methods down the call chain.
@@ -39,12 +38,12 @@ public class Context {
 	public final Path imagesDir;
 	public final Path outputDir;
 
-	private final HttpBatchDownloader downloader = new HttpBatchDownloader()
-			.setMaxDownloadAttempts(3);
-
     /** Pattern for extracting urls from text such as:
      * src="mangas/Feng Shen Ji/Chapter 001/Feng_Shen_Ji_ch01_p00.jpg" */
     public Pattern srcPattern = Pattern.compile("src=['\"]([^'\"]+)['\"]");
+
+	private final HttpBatchDownloader downloader = new HttpBatchDownloader()
+			.setMaxDownloadAttempts(3);
 
 	public Context(String sourceName, Uri source, Path baseDir) {
 		this.source = source;
@@ -64,11 +63,11 @@ public class Context {
 		Util.deleteIfExists(chapterList);
 		add(source, chapterList);
 		download();
-		Check.postCond(Files.exists(chapterList),
-				"Failed to download chapter listing to " + chapterList);
+		Check.postCond(Util.exists(chapterList),
+			"Failed to download chapter listing to " + chapterList);
 	}
 
-	/** Register a pair of uri-path to download later */
+	/** Add a pair of uri-path to download later */
 	public void add(Uri fromUri, Path toPath) {
 		downloader.add(fromUri, toPath);
 	}

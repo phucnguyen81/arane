@@ -68,6 +68,15 @@ public final class Util {
         return buffer.toString();
     }
 
+	/** Remove a part of a string if it ends with that part */
+	public static String removeEnding(String str, String ending) {
+		if (str.endsWith(ending)) {
+			return str.substring(0, str.length() - ending.length());
+		} else {
+			return str;
+		}
+	}
+
     /** Assume a string is a path, remove its file extension if there is one */
     public static String removeFileExtension(String str) {
     	if (str == null) return null;
@@ -355,4 +364,5 @@ public final class Util {
 			}
 		};
 	}
+
 }

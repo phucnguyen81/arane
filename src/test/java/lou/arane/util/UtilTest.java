@@ -12,4 +12,12 @@ public class UtilTest extends TestBase {
         assertEquals(Util.padNumericSequences("a12b456c78d", 3), "a012b456c078d");
     }
 
+    @Test
+    public void removeEnding() {
+        assertEquals(Util.removeEnding("abc", "c"), "ab");
+        assertEquals(Util.removeEnding("abc", "bc"), "a");
+        assertEquals(Util.removeEnding("abc", "b"), "abc");
+        assertEquals(Util.removeEnding("abc", ""), "abc");
+    }
+
 }

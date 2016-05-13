@@ -2,13 +2,13 @@ package lou.arane.handlers;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import lou.arane.core.Context;
 import lou.arane.core.Handler;
-import lou.arane.util.New;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 import lou.arane.util.script.CopyFiles;
@@ -103,16 +103,17 @@ public class MangaLifeHandler implements Handler {
         }
     }
 
+    /** TODO do uri.resolve(chapter, index, page) here, not doing strings */
     private void addPage(String chapter, String index, String page) {
         String base = ctx.source.toString();
-        String pageUriStr = New.joiner("/", base + "/")
-            .add(chapter).add(index).add(page).toString();
+        base = Util.removeEnding(base, "/");
+        String pageUriStr = Util.join(Arrays.asList(base, chapter, index, page), "/");
         Uri pageUri = Uri.of(pageUriStr);
         Path pagePath = ctx.pagesDir.resolve(chapter + "_" + page + ".html");
         ctx.add(pageUri, pagePath);
     }
 
-    /**
+	/**
      * Download the actual images from the html image files such as:
      *
      * <pre>

@@ -1,9 +1,14 @@
-package lou.arane.util;
+package lou.arane.util.http;
 
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+
+import lou.arane.util.IO;
+import lou.arane.util.New;
+import lou.arane.util.Uri;
+import lou.arane.util.Util;
 
 /** Perform a single download operation */
 public class HttpDownloader {

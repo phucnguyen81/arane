@@ -1,7 +1,13 @@
-package lou.arane.util;
+package lou.arane.util.http;
 
 import java.nio.file.Path;
 import java.util.LinkedList;
+
+import lou.arane.util.Check;
+import lou.arane.util.Log;
+import lou.arane.util.New;
+import lou.arane.util.Uri;
+import lou.arane.util.Util;
 
 /**
  * Download a batch of urls to files

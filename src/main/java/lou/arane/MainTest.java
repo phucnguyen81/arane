@@ -9,12 +9,19 @@ public class MainTest {
 
 	public static void main(String[] args) {
 		boolean on = true, off = false;
-		if (off) testIzTruyenTranh();
 		if (on) testMangaLife();
+		if (off) testIzTruyenTranh();
 		if (off) testMangaGo();
 		if (off) testKissManga();
 		if (off) testBlogTruyen();
 		if (off) testMangaSee();
+	}
+
+	static void testMangaLife() {
+		Main.main(new String[] {
+			"Guarding"
+			, "http://manga.life/read-online/Guarding"
+		});
 	}
 
 	static void testBlogTruyen() {
@@ -49,13 +56,6 @@ public class MainTest {
 		Main.main(new String[] {
 			"Paladin"
 			, "http://read.egscans.com/Paladin"
-		});
-	}
-
-	static void testMangaLife() {
-		Main.main(new String[] {
-			"ShokugekiNoSoma"
-			, "http://manga.life/read-online/ShokugekiNoSoma"
 		});
 	}
 

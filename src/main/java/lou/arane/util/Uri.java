@@ -120,8 +120,7 @@ public class Uri implements Comparable<Uri> {
     }
 
     public String getFilePath() {
-    	String p = uri.getPath();
-    	return p == null ? null : Paths.get(p).toString();
+    	return uri.getPath();
     }
 
     public String getPath() {

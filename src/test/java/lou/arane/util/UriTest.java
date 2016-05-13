@@ -1,7 +1,5 @@
 package lou.arane.util;
 
-import java.nio.file.Paths;
-
 import org.junit.Test;
 
 /**
@@ -17,7 +15,7 @@ public class UriTest extends TestBase {
 
     @Test
     public void getPathAndFileName() {
-        assertEquals(Paths.get("onlinereading","Break+Blade"), uri.getFilePath());
-        assertEquals(Paths.get("Break+Blade"), uri.getFileName());
+        assertEquals("/onlinereading/Break+Blade/", uri.getFilePath());
+        assertEquals("Break+Blade", uri.getFileName());
     }
 }
