@@ -9,15 +9,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lou.arane.util.Check;
-import lou.arane.util.Downloader;
+import lou.arane.util.HttpBatchDownloader;
 import lou.arane.util.Log;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 
 /**
  * Apply Context Pattern for passing common data/methods down the call chain.
- * <p>
- * Design Choice: no static elements here, everything is found/replaced
+ * There are no static elements, everything is found/replaced
  * on the context instance.
  *
  * @author Phuc
@@ -40,7 +39,7 @@ public class Context {
 	public final Path imagesDir;
 	public final Path outputDir;
 
-	private final Downloader downloader = new Downloader()
+	private final HttpBatchDownloader downloader = new HttpBatchDownloader()
 			.setMaxDownloadAttempts(3);
 
     /** Pattern for extracting urls from text such as:

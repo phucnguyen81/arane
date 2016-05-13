@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /** Perform a single download operation */
-public class DownloadItem {
+public class HttpDownloader {
 
 	public Uri uri;
 	public final Path path;
@@ -15,7 +15,7 @@ public class DownloadItem {
 
 	public int downloadAttempts = 1;
 
-	public DownloadItem(Uri uri, Path path) {
+	public HttpDownloader(Uri uri, Path path) {
 		this.uri = uri;
 		this.path = path;
 	}

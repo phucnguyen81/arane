@@ -8,13 +8,13 @@ import java.util.LinkedList;
  *
  * @author LOU
  */
-public class Downloader {
+public class HttpBatchDownloader {
 
-	private final LinkedList<DownloadItem> items = New.linkedList();
+	private final LinkedList<HttpDownloader> items = New.linkedList();
 
     private int maxDownloadAttempts = 1;
 
-    public Downloader setMaxDownloadAttempts(int maxDownloadAttempts) {
+    public HttpBatchDownloader setMaxDownloadAttempts(int maxDownloadAttempts) {
         Check.require(maxDownloadAttempts > 0, "Download attempts must be positive");
         this.maxDownloadAttempts = maxDownloadAttempts;
         return this;
@@ -22,7 +22,7 @@ public class Downloader {
 
     /** Add a pair of uri-path to download */
     public void add(Uri uri, Path path) {
-        DownloadItem item = new DownloadItem(uri, path);
+        HttpDownloader item = new HttpDownloader(uri, path);
         item.downloadAttempts = maxDownloadAttempts;
 		items.add(item);
     }
@@ -30,7 +30,7 @@ public class Downloader {
     /** Download the pairs of uri-path that were added */
     public void download() {
         while (!items.isEmpty()) {
-            DownloadItem item = items.removeFirst();
+            HttpDownloader item = items.removeFirst();
             if (item.canTryDownload()) {
             	Log.info("Start " + item);
 	        	try {
