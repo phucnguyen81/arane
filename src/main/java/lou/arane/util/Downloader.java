@@ -36,7 +36,7 @@ public class Downloader {
 	        	try {
 	        		item.tryDownload();
 	        	}
-	        	catch (Exception e) {
+	        	catch (RuntimeException e) {
 	        		Log.error(e);
 	        		// re-try later
 	        		if (item.canTryDownload()) {
@@ -47,7 +47,7 @@ public class Downloader {
         }
     }
 
-    /** Sort download order by the target path */
+    /** Sort download by the target path */
     public void sortByPath() {
         items.sort((d1, d2) -> d1.path.compareTo(d2.path));
     }

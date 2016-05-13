@@ -26,22 +26,22 @@ public class DownloadItem {
 	}
 
 	/** Download from item uri to item path */
-	public void tryDownload() throws Exception {
+	public void tryDownload() {
 		if (canTryDownload()) try {
 			download();
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			downloadAttempts -= 1;
 			throw e;
 		}
 		else {
-			throw new Exception("Download attempts exceeded for " + this);
+			throw new RuntimeException("Download attempts exceeded for " + this);
 		}
 	}
 
     /** Download from uri to file.
      * Try alternate uris if the original one fails.
      * Throw only the error of the last uri being tried. */
-    private void download() throws Exception {
+    private void download() {
         List<Uri> uris = New.list();
         uris.add(uri);
         uris.addAll(uri.getAlternatives());
@@ -49,14 +49,15 @@ public class DownloadItem {
         	Uri aUri = uris.remove(0);
         	try {
         		IO.download(aUri.toUriString(), path, timeout);
+        		return;
         	}
-        	catch (Exception e) {
+        	catch (RuntimeException e) {
         		if (uris.isEmpty()) {
         			throw e;
         		}
         	}
         }
-        throw new Exception("This error should be unreachable!");
+        throw new AssertionError("This error should be unreachable!");
     }
 
     @Override

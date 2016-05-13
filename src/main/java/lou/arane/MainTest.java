@@ -54,8 +54,8 @@ public class MainTest {
 
 	static void testMangaLife() {
 		Main.main(new String[] {
-			"ShutHell"
-			, "http://manga.life/read-online/ShutHell"
+			"ShokugekiNoSoma"
+			, "http://manga.life/read-online/ShokugekiNoSoma"
 		});
 	}
 

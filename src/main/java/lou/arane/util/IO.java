@@ -10,6 +10,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -33,40 +35,60 @@ public class IO {
 	/** buffer size used for I/O operations */
 	public static final int BUFFER_SIZE = 1024 * 8;
 
-	public static void createFileIfNotExists(Path file) throws 	Exception {
-		if (Files.notExists(file)) {
-			Files.createDirectories(file.getParent());
-			Files.createFile(file);
+	public static void createFileIfNotExists(Path file) {
+		try {
+			if (Files.notExists(file)) {
+				Files.createDirectories(file.getParent());
+				Files.createFile(file);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	/** Download from a url to a file.
 	 * If there is no exception, the right content should be downloaded to the file. */
-	public static void download(String url, Path file, Duration timeout) throws Exception {
+	public static void download(String url, Path file, Duration timeout) {
 		createFileIfNotExists(file);
 		try ( HttpResponse response = get(url, timeout)
 	    	; OutputStream output = Files.newOutputStream(file)
 	    ){
 			if (response.hasErrorCode()) {
-				throw new Exception(String.format("Error code is %s for getting %s", response.code, url));
+				throw new RuntimeException(String.format("Error code is %s for getting %s", response.code, url));
 	    	} else {
 	    		copy(response.input, output);
 	    	}
 	    }
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public static HttpResponse get(String aUrl, Duration timeout) throws Exception {
-		URL url = new URL(aUrl);
-		return get(url, timeout);
+	public static HttpResponse get(String aUrl, Duration timeout) {
+		try {
+			URL url = new URL(aUrl);
+			return get(url, timeout);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public static HttpResponse get(URL url, Duration timeout) throws Exception {
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		return get(conn, timeout);
+	public static HttpResponse get(URL url, Duration timeout) {
+		HttpURLConnection conn;
+		try {
+			conn = (HttpURLConnection) url.openConnection();
+			return get(conn, timeout);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public static HttpResponse get(HttpURLConnection conn, Duration timeout) throws Exception {
-		conn.setRequestMethod("GET");
+	public static HttpResponse get(HttpURLConnection conn, Duration timeout) {
+		try {
+			conn.setRequestMethod("GET");
+		} catch (ProtocolException e) {
+			throw new RuntimeException(e);
+		}
 		conn.setRequestProperty("Accept-Charset", ENCODING);
 		// pretend to be Mozilla since some server might check it
 		conn.setRequestProperty("User-Agent",
@@ -77,11 +99,19 @@ public class IO {
 	}
 
 	/** Copy all bytes from input to output.
-	 * @see Files#copy(InputStream, OutputStream)
 	 * @return the number of bytes copied */
-	public static long copy(InputStream source, OutputStream sink) throws Exception {
+	public static long copy(InputStream source, OutputStream sink) {
 		source = new BufferedInputStream(source);
 		sink = new BufferedOutputStream(sink);
+		try {
+			return tryCopy(source, sink);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/** @see Files#copy(InputStream, OutputStream) */
+	private static long tryCopy(InputStream source, OutputStream sink) throws Exception {
 		long nread = 0L;
 		byte[] buf = new byte[BUFFER_SIZE];
 		int n;
@@ -95,26 +125,37 @@ public class IO {
 	/** Write string reprentation of an object to file.
 	 * The file is created if not exists.
 	 * Encoding is set to {@link #CHARSET}. */
-	public static void write(Object o, Path file) throws Exception {
+	public static void write(Object o, Path file) {
 		write(o, file, CHARSET);
 	}
 
 	/** Extended version of {@link #write(Object, Path)} with explicit charset */
-	public static void write(Object o, Path file, Charset charset) throws Exception {
+	public static void write(Object o, Path file, Charset charset) {
 		createFileIfNotExists(file);
 	    try ( Reader reader = new StringReader(o.toString())
 	    	; Writer writer = Files.newBufferedWriter(file, charset)
 	    ){
 	    	copy(reader, writer);
 	    }
+	    catch (Exception e) {
+	    	throw new RuntimeException(e);
+	    }
 	}
 
 	/** Copy all chars from a reader to a writer.
 	 * @return the number of chars copied
 	 * @see #copy(InputStream, OutputStream) */
-	public static long copy(Reader reader, Writer writer) throws Exception {
+	public static long copy(Reader reader, Writer writer) {
 		reader = new BufferedReader(reader);
 		writer = new BufferedWriter(writer);
+		try {
+			return tryCopy(reader, writer);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static long tryCopy(Reader reader, Writer writer) throws Exception {
 		long nread = 0L;
 		char[] buf = new char[BUFFER_SIZE];
 		int n;
@@ -124,4 +165,5 @@ public class IO {
 		}
 		return nread;
 	}
+
 }

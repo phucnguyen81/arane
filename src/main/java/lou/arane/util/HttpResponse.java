@@ -12,21 +12,33 @@ public class HttpResponse implements AutoCloseable {
 
 	public final int code;
 
-	public HttpResponse(HttpURLConnection conn) throws Exception {
+	public HttpResponse(HttpURLConnection conn) {
 		this.conn = conn;
-		this.input = conn.getInputStream();
-		this.code = conn.getResponseCode();
+		try {
+			this.input = conn.getInputStream();
+			this.code = conn.getResponseCode();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/** Whether response code indicates error */
-	public boolean hasErrorCode() throws Exception {
-		int code = conn.getResponseCode();
-		return code < 200 || code > 299;
+	public boolean hasErrorCode() {
+		try {
+			int code = conn.getResponseCode();
+			return code < 200 || code > 299;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
-	public void close() throws Exception {
-		input.close();
-		conn.disconnect();
+	public void close() {
+		try {
+			input.close();
+			conn.disconnect();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
