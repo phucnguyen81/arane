@@ -9,7 +9,7 @@ import org.junit.Test;
  */
 public class UriTest extends TestBase {
 
-    /* uri example that contains illegal spaces in its path */
+    /* source example that contains illegal spaces in its target */
     private final Uri uri = Uri.fromUrl(
     	"http://ex2.unixmanga.net/onlinereading/Break Blade/?image=Break Blade/0001.jpg&server=nas");
 

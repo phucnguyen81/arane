@@ -12,7 +12,7 @@ import org.pmw.tinylog.writers.FileWriter;
  */
 public class Log {
 
-    /** Add a path for writing logs */
+    /** Add a target for writing logs */
     public static void addOutFile(String filepath) {
         Logger
         .getConfiguration()

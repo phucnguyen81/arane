@@ -3,18 +3,20 @@ package lou.arane.core;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lou.arane.util.Check;
-import lou.arane.util.Log;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 import lou.arane.util.http.HttpBatchDownloader;
 
 /**
- * Common data/methods for all {@link Handler}.
+ * Common data/methods for all {@link Command}.
  * There are no static elements, everything is found on the instance.
  *
  * @author Phuc
@@ -37,12 +39,14 @@ public class Context {
 	public final Path imagesDir;
 	public final Path outputDir;
 
+	/** Re-try limit if a download fails */
+	public int maxDownloadAttempts = 3;
+
     /** Pattern for extracting urls from text such as:
      * src="mangas/Feng Shen Ji/Chapter 001/Feng_Shen_Ji_ch01_p00.jpg" */
     public Pattern srcPattern = Pattern.compile("src=['\"]([^'\"]+)['\"]");
 
-	private final HttpBatchDownloader downloader = new HttpBatchDownloader()
-			.setMaxDownloadAttempts(3);
+    private final Map<Uri, Path> items = new LinkedHashMap<>();
 
 	public Context(String sourceName, Uri source, Path baseDir) {
 		this.source = source;
@@ -66,16 +70,26 @@ public class Context {
 			"Failed to download chapter listing to " + chapterList);
 	}
 
-	/** Add a pair of uri-path to download later */
+	/** Add a pair of source-target to download later */
 	public void add(Uri fromUri, Path toPath) {
-		downloader.add(fromUri, toPath);
+		items.put(fromUri, toPath);
 	}
 
 	/** Download what been added so far */
 	public void download() {
-		downloader.sortByPath();
-		Log.info("Start download: " + downloader);
-		downloader.download();
+		HttpBatchDownloader downloader = new HttpBatchDownloader();
+		downloader.setMaxDownloadAttempts(maxDownloadAttempts);
+		for (Entry<Uri, Path> i: getSortedItems()) {
+			downloader.add(i.getKey(), i.getValue());
+		}
+		downloader.run();
+	}
+
+	/** Sort by the target path */
+	private List<Entry<Uri, Path>> getSortedItems() {
+		List<Entry<Uri, Path>> itemList = new ArrayList<>(items.entrySet());
+		itemList.sort((e1, e2) -> e1.getValue().compareTo(e2.getValue()));
+		return itemList;
 	}
 
     /** Find urls enclosed in text pattern "src='url'".

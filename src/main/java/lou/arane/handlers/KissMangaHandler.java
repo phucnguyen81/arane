@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lou.arane.core.Context;
-import lou.arane.core.Handler;
+import lou.arane.core.Command;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 
@@ -17,7 +17,7 @@ import org.jsoup.nodes.Element;
  * Find out why downloading from kissmanga failed.
  * url = http://kissmanga.com/Manga/Lighter
  * <p>
- * The error code is 403, which means the site refuses to handle the requests.
+ * The error code is 403 or 503.
  * This is probably some security measure.
  * Need to find out how to bypass this blockage.
  * Maybe making a fake browser request?
@@ -28,7 +28,7 @@ import org.jsoup.nodes.Element;
  *
  * @author LOU
  */
-public class KissMangaHandler implements Handler {
+public class KissMangaHandler implements Command {
 
     private static final String BASE_URI = "http://kissmanga.com/";
 

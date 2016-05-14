@@ -77,7 +77,7 @@ public final class Util {
 		}
 	}
 
-    /** Assume a string is a path, remove its file extension if there is one */
+    /** Assume a string is a target, remove its file extension if there is one */
     public static String removeFileExtension(String str) {
     	if (str == null) return null;
         int extensionIdx = str.lastIndexOf('.');
@@ -87,7 +87,7 @@ public final class Util {
         return str;
     }
 
-    /** Assume a string is a path, get its file extension (without the dot) */
+    /** Assume a string is a target, get its file extension (without the dot) */
     public static String getFileExtension(String str) {
         if (str == null) return null;
         int extensionIdx = str.lastIndexOf('.');
@@ -110,6 +110,21 @@ public final class Util {
         }
         return userHomeDir;
     }
+
+	public static void createFileIfNotExists(Path file) {
+		if (notExists(file)) {
+			createDirectories(file.getParent());
+			createFile(file);
+		}
+	}
+
+    public static void createFile(Path path, FileAttribute<?>... attrs) {
+		try {
+			Files.createFile(path, attrs);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public static Path createDirectories(Path dir, FileAttribute<?>... attrs) {
         try {
@@ -141,7 +156,7 @@ public final class Util {
         }
     }
 
-    /** Check if the absolute version of a path exists,
+    /** Check if the absolute version of a target exists,
      * which means the underlying file/folder exists */
     public static boolean exists(Path path, LinkOption... options) {
         return Files.exists(path.toAbsolutePath(), options);
@@ -189,7 +204,7 @@ public final class Util {
         }
     }
 
-    /** Get all files and dirs under a start path */
+    /** Get all files and dirs under a start target */
     public static Stream<Path> walk(Path start, FileVisitOption... options) {
         try {
             return Files.walk(start, options);
@@ -285,7 +300,7 @@ public final class Util {
     }
 
     /**
-     * Parse html file and return its html model. The base uri is set on the
+     * Parse html file and return its html model. The base source is set on the
      * model to resolve urls
      */
     public static Document parseHtml(Path path, String baseUri) {
@@ -364,5 +379,4 @@ public final class Util {
 			}
 		};
 	}
-
 }

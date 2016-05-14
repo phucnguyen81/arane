@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lou.arane.core.Context;
-import lou.arane.core.Handler;
+import lou.arane.core.Command;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 import lou.arane.util.script.CopyFiles;
@@ -18,7 +18,7 @@ import org.jsoup.nodes.Element;
  *
  * @author LOU
  */
-public class MangaSeeHandler implements Handler {
+public class MangaSeeHandler implements Command {
 
     private static final Pattern numberPattern = Pattern.compile("\\d+(\\.\\d+)?");
 

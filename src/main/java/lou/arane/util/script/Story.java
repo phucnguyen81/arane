@@ -33,7 +33,7 @@ public class Story {
         });
     }
 
-    /** Make all paths within this story relative to a base path */
+    /** Make all paths within this story relative to a base target */
     public void makeRelativeTo(Path base) {
         dir = base.relativize(dir);
         for (Chapter chapter : chapters) {

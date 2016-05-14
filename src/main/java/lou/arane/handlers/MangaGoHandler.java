@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 import lou.arane.core.Context;
-import lou.arane.core.Handler;
+import lou.arane.core.Command;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 import lou.arane.util.script.CopyFiles;
@@ -17,7 +17,7 @@ import org.jsoup.nodes.Element;
  *
  * @author LOU
  */
-public class MangaGoHandler implements Handler {
+public class MangaGoHandler implements Command {
 
     private static final String BASE_URL = "http://www.mangago.me/read-manga/";
 
@@ -97,7 +97,7 @@ public class MangaGoHandler implements Handler {
     }
 
     /**
-     * Find the uri of the image from corresponding html page.
+     * Find the source of the image from corresponding html page.
      * Look for img element such as:
      *
      * <pre>
@@ -118,7 +118,7 @@ public class MangaGoHandler implements Handler {
         if (img.hasAttr("onerror")) {
             String onerror = img.attr("onerror");
             for (String srcUrl : ctx.findSourceUrls(onerror)) {
-            	imageUri.addAlternatives(Uri.of(srcUrl));
+            	imageUri.alternatives.add(Uri.of(srcUrl));
             }
         }
         return imageUri;

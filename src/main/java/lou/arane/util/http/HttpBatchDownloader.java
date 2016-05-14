@@ -3,6 +3,8 @@ package lou.arane.util.http;
 import java.nio.file.Path;
 import java.util.LinkedList;
 
+import lou.arane.core.Command;
+import lou.arane.core.RetryCommand;
 import lou.arane.util.Check;
 import lou.arane.util.Log;
 import lou.arane.util.New;
@@ -14,9 +16,9 @@ import lou.arane.util.Util;
  *
  * @author LOU
  */
-public class HttpBatchDownloader {
+public class HttpBatchDownloader implements Command {
 
-	private final LinkedList<HttpDownloader> items = New.linkedList();
+	private final LinkedList<RetryCommand> downloaders = New.linkedList();
 
     private int maxDownloadAttempts = 1;
 
@@ -26,42 +28,43 @@ public class HttpBatchDownloader {
         return this;
     }
 
-    /** Add a pair of uri-path to download */
+    /** Add a pair of source-target to download */
     public void add(Uri uri, Path path) {
-        HttpDownloader item = new HttpDownloader(uri, path);
-        item.downloadAttempts = maxDownloadAttempts;
-		items.add(item);
+    	HttpDownloader d = new HttpDownloader(uri, path);
+        RetryCommand rd = new RetryCommand(d);
+        rd.runLimit = maxDownloadAttempts;
+		downloaders.add(rd);
     }
 
-    /** Download the pairs of uri-path that were added */
-    public void download() {
-        while (!items.isEmpty()) {
-            HttpDownloader item = items.removeFirst();
-            if (item.canTryDownload()) {
-            	Log.info("Start " + item);
-	        	try {
-	        		item.tryDownload();
-	        	}
-	        	catch (RuntimeException e) {
-	        		Log.error(e);
-	        		// re-try later
-	        		if (item.canTryDownload()) {
-	        			items.addLast(item);
-	        		}
-	        	}
-            }
+    @Override
+	public boolean canRun() {
+    	return downloaders.stream().anyMatch(d -> d.canRun());
+    }
+
+    /** Download the pairs of source-target that were added */
+    @Override
+	public void doRun() {
+        while (!downloaders.isEmpty()) {
+            RetryCommand item = downloaders.removeFirst();
+            try {
+        		Log.info("Start: " + item);
+        		item.run();
+        		Log.info("End: " + item);
+        	}
+        	catch (RuntimeException e) {
+        		Log.error(e);
+        		// re-try later
+        		if (item.canRun()) {
+        			downloaders.addLast(item);
+        		}
+        	}
         }
-    }
-
-    /** Sort download by the target path */
-    public void sortByPath() {
-        items.sort((d1, d2) -> d1.path.compareTo(d2.path));
     }
 
 	@Override
     public String toString() {
     	String className = getClass().getSimpleName();
-		String joinedItems = Util.join(items, Util.LINE_BREAK);
+		String joinedItems = Util.join(downloaders, Util.LINE_BREAK);
 		return String.format("%s[%n%s%n]", className, joinedItems);
     }
 }

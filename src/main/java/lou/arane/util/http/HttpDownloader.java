@@ -5,68 +5,66 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import lou.arane.core.Command;
 import lou.arane.util.IO;
 import lou.arane.util.New;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 
-/** Perform a single download operation */
-public class HttpDownloader {
+/**
+ * Perform a single download operation
+ *
+ * @author Phuc
+ */
+public class HttpDownloader implements Command {
 
-	public Uri uri;
-	public final Path path;
+	public final Uri source;
+	public final Path target;
 
-	public Duration timeout = Duration.of(2, ChronoUnit.MINUTES);
+	public final Duration timeout;
 
-	public int downloadAttempts = 1;
-
-	public HttpDownloader(Uri uri, Path path) {
-		this.uri = uri;
-		this.path = path;
+	/** Create a downloader with default timeout */
+	public HttpDownloader(Uri source, Path target) {
+		this(source, target, Duration.of(2, ChronoUnit.MINUTES));
 	}
 
-	/** Whether next call to {@link #tryDownload()} has any effect */
-	public boolean canTryDownload() {
-		return downloadAttempts > 0 && Util.notExists(path);
+	/** Create a downloader given source, target and timeout */
+	public HttpDownloader(Uri uri, Path path, Duration timeout) {
+		this.source = uri;
+		this.target = path;
+		this.timeout = timeout;
 	}
 
-	/** Download from item uri to item path */
-	public void tryDownload() {
-		if (canTryDownload()) try {
-			download();
-		} catch (RuntimeException e) {
-			downloadAttempts -= 1;
-			throw e;
+	@Override
+	public boolean canRun() {
+		return Util.notExists(target);
+	}
+
+	/** Download from source to target.
+	 * Try alternate sources if the original one fails.
+	 * Throw only the error of the last source being tried. */
+	@Override
+	public void doRun() {
+		List<Uri> uris = New.list();
+		uris.add(source);
+		uris.addAll(source.alternatives);
+		while (!uris.isEmpty()) {
+			Uri aUri = uris.remove(0);
+			try {
+				IO.download(aUri.toUriString(), target, timeout);
+				return;
+			}
+			catch (RuntimeException e) {
+				if (uris.isEmpty()) {
+					throw e;
+				}
+			}
 		}
-		else {
-			throw new RuntimeException("Download attempts exceeded for " + this);
-		}
+		throw new AssertionError("This error should be unreachable!");
 	}
-
-    /** Download from uri to file.
-     * Try alternate uris if the original one fails.
-     * Throw only the error of the last uri being tried. */
-    private void download() {
-        List<Uri> uris = New.list();
-        uris.add(uri);
-        uris.addAll(uri.getAlternatives());
-        while (!uris.isEmpty()) {
-        	Uri aUri = uris.remove(0);
-        	try {
-        		IO.download(aUri.toUriString(), path, timeout);
-        		return;
-        	}
-        	catch (RuntimeException e) {
-        		if (uris.isEmpty()) {
-        			throw e;
-        		}
-        	}
-        }
-        throw new AssertionError("This error should be unreachable!");
-    }
 
     @Override
 	public String toString() {
-		return String.format("[%s -> %s]", uri, path);
+		return String.format("Download[%n  source:%s%n  target:%s%n]", source, target);
 	}
 }

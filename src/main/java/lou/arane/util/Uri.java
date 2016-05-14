@@ -5,7 +5,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.file.Paths;
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Uris as they are used by this project
@@ -15,22 +15,24 @@ import java.util.LinkedList;
 public class Uri implements Comparable<Uri> {
 
 	/**
-	 * When a url constains illegal uri characters (e.g. spaces),
-	 * the url needs to be encoded to make a valid uri.
+	 * When a url constains illegal source characters (e.g. spaces),
+	 * the url needs to be encoded to make a valid source.
 	 */
 	public static Uri fromUrl(String url) {
 		StringBuilder encoded = new StringBuilder();
 		for (int codepoint : url.codePoints().toArray()) {
-			String str = new String(Character.toChars(codepoint));
-			if (codepoint != ':'
-				&& codepoint != '/'
-				&& codepoint != '?'
-				&& codepoint != '#'
-				&& codepoint != '&'
+			String chars = new String(Character.toChars(codepoint));
+			if (   codepoint == ':'
+				|| codepoint == '/'
+				|| codepoint == '?'
+				|| codepoint == '#'
+				|| codepoint == '&'
 			) {
-				str = encodeUrl(str);
+				encoded.append(chars);
+			} else {
+				String charsEncoded = encodeUrl(chars);
+				encoded.append(charsEncoded);
 			}
-			encoded.append(str);
 		}
 		return of(encoded.toString());
 	}
@@ -59,8 +61,8 @@ public class Uri implements Comparable<Uri> {
 		}
 	}
 
-    /* alternate uris meant to locate the same resource as this uri */
-    private final LinkedList<Uri> alternatives = New.linkedList();
+    /* alternate uris meant to locate the same resource as this source */
+    public final List<Uri> alternatives = New.list();
 
     private final URI uri;
 
@@ -86,14 +88,6 @@ public class Uri implements Comparable<Uri> {
     @Override
     public boolean equals(Object other) {
         return compareTo(((Uri) other)) == 0;
-    }
-
-    public void addAlternatives(Uri uri) {
-        alternatives.add(uri);
-    }
-
-    public LinkedList<Uri> getAlternatives() {
-        return alternatives;
     }
 
     public Uri resolve(String str) {

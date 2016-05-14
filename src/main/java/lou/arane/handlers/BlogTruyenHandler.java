@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import lou.arane.core.Context;
-import lou.arane.core.Handler;
+import lou.arane.core.Command;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 
@@ -21,7 +21,7 @@ import org.jsoup.select.Elements;
  *
  * @author LOU
  */
-public class BlogTruyenHandler implements Handler {
+public class BlogTruyenHandler implements Command {
 
     /** Scheme of this site */
     private static final String BASE_URL = "http://blogtruyen.com/";

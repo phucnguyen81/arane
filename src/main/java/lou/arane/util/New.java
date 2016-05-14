@@ -81,4 +81,5 @@ public class New {
     public static <T> Stream<T> emptyStream() {
         return Collections.<T>emptyList().stream();
     }
+
 }

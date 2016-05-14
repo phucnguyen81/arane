@@ -43,7 +43,7 @@ public class HtmlBuilder extends TreeBuilder<Element> {
     @Override
     protected void addChild(Element parent, Element child) {
         if (child.baseUri().isEmpty()) {
-            // inherit base uri
+            // inherit base source
             child.setBaseUri(parent.baseUri());
         }
         parent.appendChild(child);

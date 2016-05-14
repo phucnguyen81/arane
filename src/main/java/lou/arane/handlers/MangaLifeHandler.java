@@ -8,7 +8,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import lou.arane.core.Context;
-import lou.arane.core.Handler;
+import lou.arane.core.Command;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 import lou.arane.util.script.CopyFiles;
@@ -18,7 +18,7 @@ import lou.arane.util.script.CopyFiles;
  *
  * @author Phuc
  */
-public class MangaLifeHandler implements Handler {
+public class MangaLifeHandler implements Command {
 
     /** base location of all mangas for this site */
     private static final String BASE_URI = "http://manga.life/";
@@ -103,7 +103,7 @@ public class MangaLifeHandler implements Handler {
         }
     }
 
-    /** TODO do uri.resolve(chapter, index, page) here, not doing strings */
+    /** TODO do source.resolve(chapter, index, page) here, not doing strings */
     private void addPage(String chapter, String index, String page) {
         String base = ctx.source.toString();
         base = Util.removeEnding(base, "/");
@@ -140,7 +140,7 @@ public class MangaLifeHandler implements Handler {
     private void addOnErrorUri(Uri imgUri, String onerrorAttr) {
         for (String onerrorUrl : ctx.findSourceUrls(onerrorAttr)) {
         	Uri onerrorUri = Uri.of(onerrorUrl);
-        	imgUri.addAlternatives(onerrorUri);
+        	imgUri.alternatives.add(onerrorUri);
         }
     }
 

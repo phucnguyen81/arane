@@ -37,21 +37,10 @@ public class IO {
 	/** buffer size used for I/O operations */
 	public static final int BUFFER_SIZE = 1024 * 8;
 
-	public static void createFileIfNotExists(Path file) {
-		try {
-			if (Files.notExists(file)) {
-				Files.createDirectories(file.getParent());
-				Files.createFile(file);
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	/** Download from a url to a file.
 	 * If there is no exception, the right content should be downloaded to the file. */
 	public static void download(String url, Path file, Duration timeout) {
-		createFileIfNotExists(file);
+		Util.createFileIfNotExists(file);
 		try ( HttpResponse response = get(url, timeout)
 	    	; OutputStream output = Files.newOutputStream(file)
 	    ){
@@ -66,10 +55,10 @@ public class IO {
 		}
 	}
 
-	public static HttpResponse get(String aUrl, Duration timeout) {
+	public static HttpResponse get(String url, Duration timeout) {
 		try {
-			URL url = new URL(aUrl);
-			return get(url, timeout);
+			URL aUrl = new URL(url);
+			return get(aUrl, timeout);
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
@@ -133,7 +122,7 @@ public class IO {
 
 	/** Extended version of {@link #write(Object, Path)} with explicit charset */
 	public static void write(Object o, Path file, Charset charset) {
-		createFileIfNotExists(file);
+		Util.createFileIfNotExists(file);
 	    try ( Reader reader = new StringReader(o.toString())
 	    	; Writer writer = Files.newBufferedWriter(file, charset)
 	    ){

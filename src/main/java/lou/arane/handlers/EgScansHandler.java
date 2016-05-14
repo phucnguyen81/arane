@@ -7,7 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import lou.arane.core.Context;
-import lou.arane.core.Handler;
+import lou.arane.core.Command;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 import lou.arane.util.script.CopyFiles;
@@ -17,7 +17,7 @@ import lou.arane.util.script.CopyFiles;
  *
  * @author Phuc
  */
-public class EgScansHandler implements Handler {
+public class EgScansHandler implements Command {
 
     private static final String BASE_URL = "http://read.egscans.com/";
 

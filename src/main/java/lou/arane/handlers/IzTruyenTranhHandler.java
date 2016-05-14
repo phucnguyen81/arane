@@ -9,7 +9,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import lou.arane.core.Context;
-import lou.arane.core.Handler;
+import lou.arane.core.Command;
 import lou.arane.util.Uri;
 import lou.arane.util.Util;
 
@@ -18,7 +18,7 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class IzTruyenTranhHandler implements Handler {
+public class IzTruyenTranhHandler implements Command {
 
     /* domain */
     private static final String BASE_URI = "http://iztruyentranh.com/";
