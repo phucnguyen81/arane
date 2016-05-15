@@ -18,7 +18,7 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class IzTruyenTranhHandler implements Command {
+public class IzTruyenTranh implements Command {
 
     /* domain */
     private static final String BASE_URI = "http://iztruyentranh.com/";
@@ -34,7 +34,7 @@ public class IzTruyenTranhHandler implements Command {
      * @param story = base name of the story, e.g. "ban_long-117"
      * @param baseDir = dir to download to, e.g. "mangas/Ban Long"
      */
-    public IzTruyenTranhHandler(Context context) {
+    public IzTruyenTranh(Context context) {
     	this.ctx = context;
     }
 

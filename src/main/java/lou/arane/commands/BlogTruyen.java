@@ -21,7 +21,7 @@ import org.jsoup.select.Elements;
  *
  * @author LOU
  */
-public class BlogTruyenHandler implements Command {
+public class BlogTruyen implements Command {
 
     /** Scheme of this site */
     private static final String BASE_URL = "http://blogtruyen.com/";
@@ -34,7 +34,7 @@ public class BlogTruyenHandler implements Command {
      * @param story = name of the story, e.g. "vo-than"
      * @param baseDir = dir to download to, e.g. "/mangas/Vo Than"
      */
-    public BlogTruyenHandler(Context context) {
+    public BlogTruyen(Context context) {
     	this.ctx = context;
     }
 

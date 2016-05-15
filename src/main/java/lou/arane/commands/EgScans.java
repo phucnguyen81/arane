@@ -17,7 +17,7 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class EgScansHandler implements Command {
+public class EgScans implements Command {
 
     private static final String BASE_URL = "http://read.egscans.com/";
 
@@ -25,7 +25,7 @@ public class EgScansHandler implements Command {
 
 	private final Context ctx;
 
-	public EgScansHandler(Context context) {
+	public EgScans(Context context) {
 		this.ctx = context;
     }
 

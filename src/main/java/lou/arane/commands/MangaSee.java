@@ -18,7 +18,7 @@ import org.jsoup.nodes.Element;
  *
  * @author LOU
  */
-public class MangaSeeHandler implements Command {
+public class MangaSee implements Command {
 
     private static final Pattern numberPattern = Pattern.compile("\\d+(\\.\\d+)?");
 
@@ -28,7 +28,7 @@ public class MangaSeeHandler implements Command {
 
 	private final Context ctx;
 
-    public MangaSeeHandler(Context context) {
+    public MangaSee(Context context) {
     	this.ctx = context;
     }
 

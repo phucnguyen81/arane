@@ -18,14 +18,14 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class MangaLifeHandler implements Command {
+public class MangaLife implements Command {
 
     /** base location of all mangas for this site */
     private static final String BASE_URI = "http://manga.life/";
 
 	private final Context ctx;
 
-	public MangaLifeHandler(Context context) {
+	public MangaLife(Context context) {
 		this.ctx = context;
     }
 

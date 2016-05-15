@@ -17,13 +17,13 @@ import org.jsoup.nodes.Element;
  *
  * @author LOU
  */
-public class MangaGoHandler implements Command {
+public class MangaGo implements Command {
 
     private static final String BASE_URL = "http://www.mangago.me/read-manga/";
 
 	private final Context ctx;
 
-    public MangaGoHandler(Context context) {
+    public MangaGo(Context context) {
     	this.ctx = context;
     }
 

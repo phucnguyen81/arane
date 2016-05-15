@@ -28,7 +28,7 @@ import org.jsoup.nodes.Element;
  *
  * @author LOU
  */
-public class KissMangaHandler implements Command {
+public class KissManga implements Command {
 
     private static final String BASE_URI = "http://kissmanga.com/";
 
@@ -39,7 +39,7 @@ public class KissMangaHandler implements Command {
 
 	private final Context ctx;
 
-	public KissMangaHandler(Context context) {
+	public KissManga(Context context) {
 		this.ctx = context;
     }
 

@@ -10,13 +10,13 @@ import java.util.Optional;
 
 import lou.arane.base.Command;
 import lou.arane.base.Context;
-import lou.arane.commands.BlogTruyenHandler;
-import lou.arane.commands.EgScansHandler;
-import lou.arane.commands.IzTruyenTranhHandler;
-import lou.arane.commands.KissMangaHandler;
-import lou.arane.commands.MangaGoHandler;
-import lou.arane.commands.MangaLifeHandler;
-import lou.arane.commands.MangaSeeHandler;
+import lou.arane.commands.BlogTruyen;
+import lou.arane.commands.EgScans;
+import lou.arane.commands.IzTruyenTranh;
+import lou.arane.commands.KissManga;
+import lou.arane.commands.MangaGo;
+import lou.arane.commands.MangaLife;
+import lou.arane.commands.MangaSee;
 import lou.arane.util.Log;
 import lou.arane.util.Url;
 import lou.arane.util.Util;
@@ -69,25 +69,25 @@ public class Main {
 		Context ctx;
 
 		ctx = new Context(name, new Url(url), mangaDir("blogtruyen", name));
-		commands.add(createLogHandler(ctx, new BlogTruyenHandler(ctx)));
+		commands.add(createLogHandler(ctx, new BlogTruyen(ctx)));
 
 		ctx = new Context(name, new Url(url), mangaDir("eggscans", name));
-		commands.add(createLogHandler(ctx, new EgScansHandler(ctx)));
+		commands.add(createLogHandler(ctx, new EgScans(ctx)));
 
 		ctx = new Context(name, new Url(url), mangaDir("izmanga", name));
-		commands.add(createLogHandler(ctx, new IzTruyenTranhHandler(ctx)));
+		commands.add(createLogHandler(ctx, new IzTruyenTranh(ctx)));
 
 		ctx = new Context(name, new Url(url), mangaDir("kissmanga", name));
-		commands.add(createLogHandler(ctx, new KissMangaHandler(ctx)));
+		commands.add(createLogHandler(ctx, new KissManga(ctx)));
 
 		ctx = new Context(name, new Url(url), mangaDir("mangago", name));
-		commands.add(createLogHandler(ctx, new MangaGoHandler(ctx)));
+		commands.add(createLogHandler(ctx, new MangaGo(ctx)));
 
 		ctx = new Context(name, new Url(url), mangaDir("manga.life", name));
-		commands.add(createLogHandler(ctx, new MangaLifeHandler(ctx)));
+		commands.add(createLogHandler(ctx, new MangaLife(ctx)));
 
 		ctx = new Context(name, new Url(url), mangaDir("mangasee", name));
-		commands.add(createLogHandler(ctx, new MangaSeeHandler(ctx)));
+		commands.add(createLogHandler(ctx, new MangaSee(ctx)));
 
 		return commands;
 	}
