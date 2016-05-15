@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ public class Url {
 
     /** Alternate urls meant to locate the same resource as this url.
      * Not clean code but works for now */
-    public final List<Url> alternatives = New.list();
+    public final List<Url> alternatives = new ArrayList<>();
 
     private final URL url;
 

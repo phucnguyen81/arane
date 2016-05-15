@@ -200,7 +200,7 @@ public final class Util {
             }
         }
         else {
-            return New.emptyStream();
+        	return Stream.empty();
         }
     }
 

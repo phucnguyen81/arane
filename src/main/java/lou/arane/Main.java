@@ -2,22 +2,22 @@ package lou.arane;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import lou.arane.core.Context;
-import lou.arane.core.Command;
-import lou.arane.handlers.BlogTruyenHandler;
-import lou.arane.handlers.EgScansHandler;
-import lou.arane.handlers.IzTruyenTranhHandler;
-import lou.arane.handlers.KissMangaHandler;
-import lou.arane.handlers.MangaGoHandler;
-import lou.arane.handlers.MangaLifeHandler;
-import lou.arane.handlers.MangaSeeHandler;
+import lou.arane.base.Command;
+import lou.arane.base.Context;
+import lou.arane.commands.BlogTruyenHandler;
+import lou.arane.commands.EgScansHandler;
+import lou.arane.commands.IzTruyenTranhHandler;
+import lou.arane.commands.KissMangaHandler;
+import lou.arane.commands.MangaGoHandler;
+import lou.arane.commands.MangaLifeHandler;
+import lou.arane.commands.MangaSeeHandler;
 import lou.arane.util.Log;
-import lou.arane.util.New;
 import lou.arane.util.Url;
 import lou.arane.util.Util;
 
@@ -65,7 +65,7 @@ public class Main {
 
 	/** Create all available handlers */
 	private static List<Command> createHandlers(String name, String url) {
-		List<Command> commands = New.list();
+		List<Command> commands = new ArrayList<>();
 		Context ctx;
 
 		ctx = new Context(name, new Url(url), mangaDir("blogtruyen", name));
