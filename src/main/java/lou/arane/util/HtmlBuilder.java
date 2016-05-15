@@ -1,9 +1,7 @@
-package lou.arane.html;
+package lou.arane.util;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-
-import lou.arane.util.TreeBuilder;
 
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Attributes;

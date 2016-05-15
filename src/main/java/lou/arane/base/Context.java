@@ -2,7 +2,6 @@ package lou.arane.base;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +95,6 @@ public class Context {
      * This is needed because if the url is embedded in javascript
      * elemements then we cannot search for it in html tags. */
 	public List<String> findSourceUrls(String str) {
-		if (str == null) return Collections.emptyList();
 		List<String> urls = new ArrayList<>();
         Matcher matcher = srcPattern.matcher(str);
         while (matcher.find()) {

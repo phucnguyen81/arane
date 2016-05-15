@@ -3,7 +3,7 @@ package lou.arane;
 import org.jsoup.nodes.Element;
 import org.junit.Test;
 
-import lou.arane.html.HtmlBuilder;
+import lou.arane.util.HtmlBuilder;
 
 /**
  * Show how to use Jsoup selector to search for elements in an html document.

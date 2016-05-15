@@ -71,7 +71,7 @@ public class BlogTruyen implements Command {
             String href = chapterAddr.absUrl("href");
 			Url chapterUri = new Url(href);
             String path = chapterUri.filePath();
-            if (path != null && path.contains(ctx.sourceName)) {
+            if (path.contains(ctx.sourceName)) {
             	String chapterName = chapterUri.fileName().toString();
             	if (!chapterName.endsWith(".html")) {
             		chapterName += ".html";

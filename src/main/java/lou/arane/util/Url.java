@@ -66,7 +66,8 @@ public class Url {
     }
 
     public String filePath() {
-    	return url.getPath();
+    	String p = url.getPath();
+    	return p == null ? "" : p;
     }
 
 	public static URL url(String url) {

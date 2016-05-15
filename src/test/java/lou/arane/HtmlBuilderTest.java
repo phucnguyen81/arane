@@ -3,7 +3,7 @@ package lou.arane;
 import org.jsoup.nodes.Element;
 import org.junit.Test;
 
-import lou.arane.html.HtmlBuilder;
+import lou.arane.util.HtmlBuilder;
 
 public class HtmlBuilderTest extends TestBase {
 

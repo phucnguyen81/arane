@@ -3,6 +3,7 @@ package lou.arane.scripts;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,7 +39,7 @@ public class CopyFiles {
     private Function<String, String> dirResolver;
 
     /* padded-length of numeric sequences found in filenames */
-    private Integer padToLength;
+    private Optional<Integer> padToLength = Optional.empty();
 
     /**
      * Specify a source directory and a target directory to copy files to.
@@ -58,7 +59,7 @@ public class CopyFiles {
         Check.notNull(dirPattern, "Null pattern");
         setDirResolver(fileName -> {
             Matcher matcher = dirPattern.matcher(fileName);
-            return matcher.find() ? matcher.group() : null;
+            return matcher.find() ? matcher.group() : "";
         });
         return this;
     }
@@ -72,7 +73,7 @@ public class CopyFiles {
     /** @see #padToLength */
     public CopyFiles padNumericSequences(int padToLength) {
         Check.require(padToLength > 0, "Padding must be positive");
-        this.padToLength = padToLength;
+        this.padToLength = Optional.of(padToLength);
         return this;
     }
 
@@ -94,8 +95,8 @@ public class CopyFiles {
      */
     private String targetFileName(Path sourcePath) {
         String targetName = sourcePath.getFileName().toString();
-        if (padToLength != null) {
-            targetName = Util.padNumericSequences(targetName, padToLength);
+        if (padToLength.isPresent()) {
+        	targetName = Util.padNumericSequences(targetName, padToLength.get());
         }
         return targetName;
     }
@@ -107,19 +108,16 @@ public class CopyFiles {
     private Path targetPath(String targetFileName) {
         Path targetPath = Paths.get(targetFileName);
         String dirName = dirResolver.apply(targetFileName);
-        if (dirName != null) {
-            targetPath = Paths.get(dirName, targetFileName);
-        }
+        targetPath = Paths.get(dirName, targetFileName);
         return targetDir.resolve(targetPath);
     }
 
     /** Copy a file to a directory; the target file-name is preserved */
     private static void copyFile(Path source, Path target) {
-        if (Util.exists(target)) {
-            return;
+        if (Util.notExists(target)) {
+            Util.createDirectories(target.getParent());
+            Util.copy(source, target);
         }
-        Util.createDirectories(target.getParent());
-        Util.copy(source, target);
     }
 
 }
