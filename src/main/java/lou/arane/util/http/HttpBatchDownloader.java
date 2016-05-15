@@ -8,7 +8,7 @@ import lou.arane.core.RetryCommand;
 import lou.arane.util.Check;
 import lou.arane.util.Log;
 import lou.arane.util.New;
-import lou.arane.util.Uri;
+import lou.arane.util.Url;
 import lou.arane.util.Util;
 
 /**
@@ -29,8 +29,8 @@ public class HttpBatchDownloader implements Command {
     }
 
     /** Add a pair of source-target to download */
-    public void add(Uri uri, Path path) {
-    	HttpDownloader d = new HttpDownloader(uri, path);
+    public void add(Url url, Path path) {
+    	HttpDownloader d = new HttpDownloader(url, path);
         RetryCommand rd = new RetryCommand(d);
         rd.runLimit = maxDownloadAttempts;
 		downloaders.add(rd);

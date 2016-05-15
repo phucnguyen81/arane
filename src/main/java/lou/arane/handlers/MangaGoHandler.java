@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 import lou.arane.core.Context;
 import lou.arane.core.Command;
-import lou.arane.util.Uri;
+import lou.arane.util.Url;
 import lou.arane.util.Util;
 import lou.arane.util.script.CopyFiles;
 
@@ -49,8 +49,8 @@ public class MangaGoHandler implements Command {
     private void downloadChapters() {
         Document rootFile = Util.parseHtml(ctx.chapterList);
         for (Element chapterAddr : rootFile.select("table[id=chapter_table] a[href]")) {
-            Uri chapterUri = Uri.of(chapterAddr.attr("href"));
-            String chapterName = chapterUri.getFileName().toString();
+            Url chapterUri = new Url(chapterAddr.attr("href"));
+            String chapterName = chapterUri.fileName().toString();
             Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
             ctx.add(chapterUri, chapterPath);
         }
@@ -74,7 +74,7 @@ public class MangaGoHandler implements Command {
         	String chapterName = Util.removeFileExtension(chapterHtml.getFileName().toString());
             Document chapter = Util.parseHtml(chapterHtml, BASE_URL);
             for (Element addr : chapter.select("ul[id=dropdown-menu-page] a[href]")) {
-                Uri pageUri = Uri.of(addr.absUrl("href"));
+                Url pageUri = new Url(addr.absUrl("href"));
                 String pageName = chapterName + "_" + addr.ownText();
                 if (!pageName.endsWith(".html")) pageName += ".html";
                 Path pagePath = ctx.pagesDir.resolve(pageName);
@@ -88,9 +88,9 @@ public class MangaGoHandler implements Command {
     private void downloadImages() {
         for (Path pageHtml : Util.findHtmlFiles(ctx.pagesDir)) {
             Document page = Util.parseHtml(pageHtml);
-            Uri imageUri = findImageUri(page);
+            Url imageUri = findImageUri(page);
             String pageName = pageHtml.getFileName().toString().replace(".html", "");
-            Path imagePath = ctx.imagesDir.resolve(pageName + "." + imageUri.getFileExtension());
+            Path imagePath = ctx.imagesDir.resolve(pageName + "." + imageUri.fileExtension());
             ctx.add(imageUri, imagePath);
         }
         ctx.download();
@@ -112,13 +112,13 @@ public class MangaGoHandler implements Command {
      * Note that the onerror attribute is an alternative url
      * to download the image in case the original url fails.
      */
-    private Uri findImageUri(Document page) {
+    private Url findImageUri(Document page) {
         Element img = page.select("a[id=pic_container] img[border][src]").first();
-        Uri imageUri = Uri.of(img.attr("src"));
+        Url imageUri = new Url(img.attr("src"));
         if (img.hasAttr("onerror")) {
             String onerror = img.attr("onerror");
             for (String srcUrl : ctx.findSourceUrls(onerror)) {
-            	imageUri.alternatives.add(Uri.of(srcUrl));
+            	imageUri.alternatives.add(new Url(srcUrl));
             }
         }
         return imageUri;

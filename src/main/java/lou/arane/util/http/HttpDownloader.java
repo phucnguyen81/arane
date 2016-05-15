@@ -3,34 +3,34 @@ package lou.arane.util.http;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import lou.arane.core.Command;
 import lou.arane.util.IO;
-import lou.arane.util.New;
-import lou.arane.util.Uri;
+import lou.arane.util.Url;
 import lou.arane.util.Util;
 
 /**
- * Perform a single download operation
+ * Download source url to target file.
  *
  * @author Phuc
  */
 public class HttpDownloader implements Command {
 
-	public final Uri source;
-	public final Path target;
+	private final Url source;
+	private final Path target;
 
-	public final Duration timeout;
+	private final Duration timeout;
 
 	/** Create a downloader with default timeout */
-	public HttpDownloader(Uri source, Path target) {
+	public HttpDownloader(Url source, Path target) {
 		this(source, target, Duration.of(2, ChronoUnit.MINUTES));
 	}
 
 	/** Create a downloader given source, target and timeout */
-	public HttpDownloader(Uri uri, Path path, Duration timeout) {
-		this.source = uri;
+	public HttpDownloader(Url url, Path path, Duration timeout) {
+		this.source = url;
 		this.target = path;
 		this.timeout = timeout;
 	}
@@ -45,17 +45,17 @@ public class HttpDownloader implements Command {
 	 * Throw only the error of the last source being tried. */
 	@Override
 	public void doRun() {
-		List<Uri> uris = New.list();
-		uris.add(source);
-		uris.addAll(source.alternatives);
-		while (!uris.isEmpty()) {
-			Uri aUri = uris.remove(0);
+		List<Url> urls = new ArrayList<>();
+		urls.add(source);
+		urls.addAll(source.alternatives);
+		while (!urls.isEmpty()) {
+			Url url = urls.remove(0);
 			try {
-				IO.download(aUri.toUriString(), target, timeout);
+				IO.download(url.string(), target, timeout);
 				return;
 			}
 			catch (RuntimeException e) {
-				if (uris.isEmpty()) {
+				if (urls.isEmpty()) {
 					throw e;
 				}
 			}

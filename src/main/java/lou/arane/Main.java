@@ -18,7 +18,7 @@ import lou.arane.handlers.MangaLifeHandler;
 import lou.arane.handlers.MangaSeeHandler;
 import lou.arane.util.Log;
 import lou.arane.util.New;
-import lou.arane.util.Uri;
+import lou.arane.util.Url;
 import lou.arane.util.Util;
 
 /**
@@ -68,25 +68,25 @@ public class Main {
 		List<Command> commands = New.list();
 		Context ctx;
 
-		ctx = new Context(name, Uri.of(url), mangaDir("blogtruyen", name));
+		ctx = new Context(name, new Url(url), mangaDir("blogtruyen", name));
 		commands.add(createLogHandler(ctx, new BlogTruyenHandler(ctx)));
 
-		ctx = new Context(name, Uri.of(url), mangaDir("eggscans", name));
+		ctx = new Context(name, new Url(url), mangaDir("eggscans", name));
 		commands.add(createLogHandler(ctx, new EgScansHandler(ctx)));
 
-		ctx = new Context(name, Uri.of(url), mangaDir("izmanga", name));
+		ctx = new Context(name, new Url(url), mangaDir("izmanga", name));
 		commands.add(createLogHandler(ctx, new IzTruyenTranhHandler(ctx)));
 
-		ctx = new Context(name, Uri.of(url), mangaDir("kissmanga", name));
+		ctx = new Context(name, new Url(url), mangaDir("kissmanga", name));
 		commands.add(createLogHandler(ctx, new KissMangaHandler(ctx)));
 
-		ctx = new Context(name, Uri.of(url), mangaDir("mangago", name));
+		ctx = new Context(name, new Url(url), mangaDir("mangago", name));
 		commands.add(createLogHandler(ctx, new MangaGoHandler(ctx)));
 
-		ctx = new Context(name, Uri.of(url), mangaDir("manga.life", name));
+		ctx = new Context(name, new Url(url), mangaDir("manga.life", name));
 		commands.add(createLogHandler(ctx, new MangaLifeHandler(ctx)));
 
-		ctx = new Context(name, Uri.of(url), mangaDir("mangasee", name));
+		ctx = new Context(name, new Url(url), mangaDir("mangasee", name));
 		commands.add(createLogHandler(ctx, new MangaSeeHandler(ctx)));
 
 		return commands;

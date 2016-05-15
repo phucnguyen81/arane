@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 
 import lou.arane.core.Context;
 import lou.arane.core.Command;
-import lou.arane.util.Uri;
+import lou.arane.util.Url;
 import lou.arane.util.Util;
 
 import org.jsoup.nodes.Document;
@@ -68,10 +68,11 @@ public class BlogTruyenHandler implements Command {
         Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URL);
         Elements chapterAddresses = rootFile.select("a[href]");
         for (Element chapterAddr : chapterAddresses) {
-            Uri chapterUri = Uri.fromUrl(chapterAddr.absUrl("href"));
-            String path = chapterUri.getFilePath();
+            String href = chapterAddr.absUrl("href");
+			Url chapterUri = new Url(href);
+            String path = chapterUri.filePath();
             if (path != null && path.contains(ctx.sourceName)) {
-            	String chapterName = chapterUri.getFileName().toString();
+            	String chapterName = chapterUri.fileName().toString();
             	if (!chapterName.endsWith(".html")) {
             		chapterName += ".html";
             	}
@@ -99,8 +100,8 @@ public class BlogTruyenHandler implements Command {
             Document page = Util.parseHtml(chapterHtml);
             Elements images = page.select("article[id=content] img[src]");
             for (Element image : images) {
-                Uri imageUri = Uri.of(image.absUrl("src"));
-                String imageName = imageUri.getFileName().toString();
+                Url imageUri = new Url(image.absUrl("src"));
+                String imageName = imageUri.fileName().toString();
                 Path imagePath = Paths.get(imageDir, imageName);
                 imagePath = ctx.imagesDir.resolve(imagePath);
                 ctx.add(imageUri, imagePath);

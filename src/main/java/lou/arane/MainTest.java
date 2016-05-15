@@ -9,11 +9,11 @@ public class MainTest {
 
 	public static void main(String[] args) {
 		boolean on = true, off = false;
-		if (on) testMangaLife();
+		if (off) testMangaLife();
 		if (off) testIzTruyenTranh();
 		if (off) testMangaGo();
 		if (off) testKissManga();
-		if (off) testBlogTruyen();
+		if (on) testBlogTruyen();
 		if (off) testMangaSee();
 	}
 
@@ -26,8 +26,8 @@ public class MainTest {
 
 	static void testBlogTruyen() {
 		Main.main(new String[] {
-			"chu-thoong-11820"
-			, "http://blogtruyen.com/truyen/chu-thoong-11820"
+			"saiki-kusuo-no-sainan"
+			, "http://blogtruyen.com/truyen/saiki-kusuo-no-sainan"
 		});
 	}
 

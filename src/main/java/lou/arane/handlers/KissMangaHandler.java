@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import lou.arane.core.Context;
 import lou.arane.core.Command;
-import lou.arane.util.Uri;
+import lou.arane.util.Url;
 import lou.arane.util.Util;
 
 import org.jsoup.nodes.Document;
@@ -63,8 +63,8 @@ public class KissMangaHandler implements Command {
     private void downloadChapters() {
         Document chapters = Util.parseHtml(ctx.chapterList, BASE_URI);
         for (Element chapterAddr : chapters.select("table[class=listing] a[href]")) {
-            Uri chapterUri = Uri.of(chapterAddr.absUrl("href"));
-            String chapterName = Util.join(Paths.get(chapterUri.getFilePath()), "_");
+            Url chapterUri = new Url(chapterAddr.absUrl("href"));
+            String chapterName = Util.join(Paths.get(chapterUri.filePath()), "_");
             if (!chapterName.endsWith(".html")) chapterName += ".html";
             Path chapterPath = ctx.chaptersDir.resolve(chapterName);
             ctx.add(chapterUri, chapterPath);
@@ -84,8 +84,8 @@ public class KissMangaHandler implements Command {
             for (Element script : chapter.select("script[type=text/javascript]")) {
                 Matcher matcher = IMAGE_PATTERN.matcher(script.html());
                 while (matcher.find()) {
-                    Uri imageUri = Uri.of(matcher.group(1));
-                    String imageName = chapterName + "_" + imageUri.getFileName();
+                    Url imageUri = new Url(matcher.group(1));
+                    String imageName = chapterName + "_" + imageUri.fileName();
                     imageName = Util.padNumericSequences(imageName, 3);
                     Path imagePath = ctx.imagesDir.resolve(imageName);
                     ctx.add(imageUri, imagePath);

@@ -295,7 +295,7 @@ public final class Util {
     }
 
     /** @see Util#parseHtml(Path, String) */
-    public static Document parseHtml(Path path, Uri baseUri) {
+    public static Document parseHtml(Path path, Url baseUri) {
     	return parseHtml(path, baseUri.toString());
     }
 

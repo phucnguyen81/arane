@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lou.arane.util.Check;
-import lou.arane.util.Uri;
+import lou.arane.util.Url;
 import lou.arane.util.Util;
 import lou.arane.util.http.HttpBatchDownloader;
 
@@ -26,7 +26,7 @@ public class Context {
 	public final String sourceName;
 
 	/* initial location to download from */
-	public final Uri source;
+	public final Url source;
 
 	/* base location to download to */
 	public final Path target;
@@ -46,9 +46,9 @@ public class Context {
      * src="mangas/Feng Shen Ji/Chapter 001/Feng_Shen_Ji_ch01_p00.jpg" */
     public Pattern srcPattern = Pattern.compile("src=['\"]([^'\"]+)['\"]");
 
-    private final Map<Uri, Path> items = new LinkedHashMap<>();
+    private final Map<Url, Path> items = new LinkedHashMap<>();
 
-	public Context(String sourceName, Uri source, Path baseDir) {
+	public Context(String sourceName, Url source, Path baseDir) {
 		this.source = source;
 		this.target = baseDir;
 		this.sourceName = sourceName;
@@ -71,7 +71,7 @@ public class Context {
 	}
 
 	/** Add a pair of source-target to download later */
-	public void add(Uri fromUri, Path toPath) {
+	public void add(Url fromUri, Path toPath) {
 		items.put(fromUri, toPath);
 	}
 
@@ -79,15 +79,15 @@ public class Context {
 	public void download() {
 		HttpBatchDownloader downloader = new HttpBatchDownloader();
 		downloader.setMaxDownloadAttempts(maxDownloadAttempts);
-		for (Entry<Uri, Path> i: getSortedItems()) {
+		for (Entry<Url, Path> i: getSortedItems()) {
 			downloader.add(i.getKey(), i.getValue());
 		}
 		downloader.run();
 	}
 
 	/** Sort by the target path */
-	private List<Entry<Uri, Path>> getSortedItems() {
-		List<Entry<Uri, Path>> itemList = new ArrayList<>(items.entrySet());
+	private List<Entry<Url, Path>> getSortedItems() {
+		List<Entry<Url, Path>> itemList = new ArrayList<>(items.entrySet());
 		itemList.sort((e1, e2) -> e1.getValue().compareTo(e2.getValue()));
 		return itemList;
 	}

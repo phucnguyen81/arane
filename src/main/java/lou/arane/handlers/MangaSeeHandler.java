@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import lou.arane.core.Context;
 import lou.arane.core.Command;
-import lou.arane.util.Uri;
+import lou.arane.util.Url;
 import lou.arane.util.Util;
 import lou.arane.util.script.CopyFiles;
 
@@ -55,7 +55,7 @@ public class MangaSeeHandler implements Command {
         for (Element chapterAddr : indexDoc.getElementsByClass("chapter_link")) {
             String chapterName = chapterAddr.text().trim();
             String href = chapterAddr.absUrl("href");
-            Uri chapterUri = Uri.of(href);
+            Url chapterUri = new Url(href);
             Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
             ctx.add(chapterUri, chapterPath);
         }
@@ -76,7 +76,7 @@ public class MangaSeeHandler implements Command {
             Element pageForm = chapter.getElementById("pages");
             int pageNo = pageForm.getElementsByTag("option").size();
             for (String pageIdx : Util.rangeClosed(1, pageNo)) {
-                Uri pageUri = Uri.of(
+                Url pageUri = new Url(
                     baseUri + String.format(
                         "?series=%s&chapter=%s&index=1&page=%s",
                         ctx.sourceName, chapterIdx, pageIdx));
@@ -101,8 +101,8 @@ public class MangaSeeHandler implements Command {
             Document page = Util.parseHtml(pageHtml);
             page.setBaseUri(baseUri);
             for (Element img : page.select("a[href] img[src]")) {
-                Uri imageUri = Uri.of(img.absUrl("src"));
-                String pageName = imageUri.getFileName();
+                Url imageUri = new Url(img.absUrl("src"));
+                String pageName = imageUri.fileName();
                 Path imagePath = ctx.imagesDir.resolve(pageName);
                 ctx.add(imageUri, imagePath);
             }
