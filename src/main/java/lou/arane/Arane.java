@@ -26,7 +26,7 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class Main {
+public class Arane {
 
 	public static void main(String[] args) {
 		if (args.length < 2) {

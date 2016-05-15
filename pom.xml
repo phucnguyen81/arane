@@ -77,7 +77,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>lib/</classpathPrefix>
-              <mainClass>lou.arane.Main</mainClass>
+              <mainClass>lou.arane.Arane</mainClass>
             </manifest>
           </archive>
         </configuration>

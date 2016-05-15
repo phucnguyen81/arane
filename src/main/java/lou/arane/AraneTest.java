@@ -5,7 +5,7 @@ package lou.arane;
  *
  * @author Phuc
  */
-public class MainTest {
+public class AraneTest {
 
 	public static void main(String[] args) {
 		boolean on = true, off = false;
@@ -18,49 +18,49 @@ public class MainTest {
 	}
 
 	static void testMangaLife() {
-		Main.main(new String[] {
+		Arane.main(new String[] {
 			"Guarding"
 			, "http://manga.life/read-online/Guarding"
 		});
 	}
 
 	static void testBlogTruyen() {
-		Main.main(new String[] {
+		Arane.main(new String[] {
 			"saiki-kusuo-no-sainan"
 			, "http://blogtruyen.com/truyen/saiki-kusuo-no-sainan"
 		});
 	}
 
 	static void testMangaGo() {
-		Main.main(new String[] {
+		Arane.main(new String[] {
 			"2001_nights"
 			, "http://www.mangago.me/read-manga/2001_nights/"
 		});
 	}
 
 	static void testMangaSee() {
-		Main.main(new String[] {
+		Arane.main(new String[] {
 			"DrSlump"
 			, "http://mangasee.co/manga/?series=DrSlump"
 		});
 	}
 
 	static void testKissManga() {
-		Main.main(new String[] {
+		Arane.main(new String[] {
 			"Lighter"
 			, "http://kissmanga.com/Manga/Lighter"
 		});
 	}
 
 	static void testEgScans() {
-		Main.main(new String[] {
+		Arane.main(new String[] {
 			"Paladin"
 			, "http://read.egscans.com/Paladin"
 		});
 	}
 
 	static void testIzTruyenTranh() {
-		Main.main(new String[] {
+		Arane.main(new String[] {
 			"trinity_wonder"
 			, "http://iztruyentranh.com/truyen-tranh/trinity_wonder"
 		});
