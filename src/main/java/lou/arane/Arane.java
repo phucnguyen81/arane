@@ -17,6 +17,7 @@ import lou.arane.commands.KissManga;
 import lou.arane.commands.MangaGo;
 import lou.arane.commands.MangaLife;
 import lou.arane.commands.MangaSee;
+import lou.arane.commands.decor.PrePostCommand;
 import lou.arane.util.Log;
 import lou.arane.util.Url;
 import lou.arane.util.Util;
@@ -42,19 +43,22 @@ public class Arane {
 	}
 
 	private static void printHelp(String[] args) {
-		System.err.println("*****************************************");
+		System.err.println("------------------------------------------");
 		System.err.println("Failed to handle arguments: " + Arrays.asList(args));
-		System.err.println("*****************************************");
+		System.err.println("------------------------------------------");
 		System.err.println("Usage: arane name url");
 		System.err.println("name = name to identify the content");
 		System.err.println("url = the url you want to download from");
 		System.err.println("e.g. arane WorldTrigger http://manga.life/read-online/WorldTrigger");
-		System.err.println("*****************************************");
+		System.err.println("------------------------------------------");
+		System.err.println("Current supported sites are:");
+		System.err.println("blogtruyen, egscans, iztruyentranh, kissmanga, mangago, manga.life, mangasee");
+		System.err.println("------------------------------------------");
 	}
 
-	/** Run the first handler that can handle the given name and url */
+	/** Run the first command that can handle the given name and url */
 	private static void run(String name, String url) {
-		List<Command> commands = createHandlers(name, url);
+		List<Command> commands = createCommands(name, url);
 		Optional<Command> h = findFirstRunnable(commands);
 		if (h.isPresent()) {
 			h.get().doRun();
@@ -64,49 +68,43 @@ public class Arane {
 	}
 
 	/** Create all available handlers */
-	private static List<Command> createHandlers(String name, String url) {
+	private static List<Command> createCommands(String name, String url) {
 		List<Command> commands = new ArrayList<>();
 		Context ctx;
 
 		ctx = new Context(name, new Url(url), mangaDir("blogtruyen", name));
-		commands.add(createLogHandler(ctx, new BlogTruyen(ctx)));
+		commands.add(createCommand(ctx, new BlogTruyen(ctx)));
 
-		ctx = new Context(name, new Url(url), mangaDir("eggscans", name));
-		commands.add(createLogHandler(ctx, new EgScans(ctx)));
+		ctx = new Context(name, new Url(url), mangaDir("egscans", name));
+		commands.add(createCommand(ctx, new EgScans(ctx)));
 
 		ctx = new Context(name, new Url(url), mangaDir("izmanga", name));
-		commands.add(createLogHandler(ctx, new IzTruyenTranh(ctx)));
+		commands.add(createCommand(ctx, new IzTruyenTranh(ctx)));
 
 		ctx = new Context(name, new Url(url), mangaDir("kissmanga", name));
-		commands.add(createLogHandler(ctx, new KissManga(ctx)));
+		commands.add(createCommand(ctx, new KissManga(ctx)));
 
 		ctx = new Context(name, new Url(url), mangaDir("mangago", name));
-		commands.add(createLogHandler(ctx, new MangaGo(ctx)));
+		commands.add(createCommand(ctx, new MangaGo(ctx)));
 
 		ctx = new Context(name, new Url(url), mangaDir("manga.life", name));
-		commands.add(createLogHandler(ctx, new MangaLife(ctx)));
+		commands.add(createCommand(ctx, new MangaLife(ctx)));
 
 		ctx = new Context(name, new Url(url), mangaDir("mangasee", name));
-		commands.add(createLogHandler(ctx, new MangaSee(ctx)));
+		commands.add(createCommand(ctx, new MangaSee(ctx)));
 
 		return commands;
 	}
 
-	/** Decorate a handler to log a message after complete a run */
-	private static Command createLogHandler(Context ctx, Command command) {
-		return new Command() {
-			@Override
-			public boolean canRun() {
-				return command.canRun();
-			}
-			@Override
-			public void doRun() {
-				command.doRun();
-				String msg = String.format(
-					"Finished downloading %s into %s", ctx.sourceName, ctx.target);
-				Log.info(msg);
-			}
-		};
+	/** Decorate a command to log messages before and after a run */
+	private static Command createCommand(Context ctx, Command command) {
+		return new PrePostCommand(
+			() -> Log.info(String.format(
+					"Start downloading %s into %s", ctx.sourceName, ctx.target))
+			, command
+			, () -> Log.info(String.format(
+					"Finished downloading %s into %s", ctx.sourceName, ctx.target))
+		);
 	}
 
 	private static Optional<Command> findFirstRunnable(Collection<Command> commands) {
