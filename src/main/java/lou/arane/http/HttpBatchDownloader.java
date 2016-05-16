@@ -1,9 +1,14 @@
 package lou.arane.http;
 
 import java.nio.file.Path;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import lou.arane.base.Command;
+import lou.arane.commands.decor.ReplaceCommand;
 import lou.arane.commands.decor.RetryCommand;
 import lou.arane.util.Check;
 import lou.arane.util.Log;
@@ -12,12 +17,15 @@ import lou.arane.util.Util;
 
 /**
  * Download a batch of urls to files
+ * <p>
+ * TODO without using Url and Path this has nothing specific about http or downloader.
+ * Move Url and Path outside to make a more general component.
  *
  * @author LOU
  */
 public class HttpBatchDownloader implements Command {
 
-	private final LinkedList<RetryCommand> downloaders = new LinkedList<>();
+	private final List<Command> commands = new ArrayList<>();
 
     private int maxDownloadAttempts = 1;
 
@@ -29,41 +37,50 @@ public class HttpBatchDownloader implements Command {
 
     /** Add a pair of source-target to download */
     public void add(Url url, Path path) {
-    	HttpDownloader d = new HttpDownloader(url, path);
-        RetryCommand rd = new RetryCommand(d);
-        rd.runLimit = maxDownloadAttempts;
-		downloaders.add(rd);
+		commands.add(new HttpDownloader(url, path));
     }
 
     @Override
 	public boolean canRun() {
-    	return downloaders.stream().anyMatch(d -> d.canRun());
+    	return commands.stream().anyMatch(d -> d.canRun());
     }
 
-    /** Download the pairs of source-target that were added */
+    /** Download everything that were added */
     @Override
 	public void doRun() {
-        while (!downloaders.isEmpty()) {
-            RetryCommand item = downloaders.removeFirst();
+    	Deque<Command> cmds = createDecoratedCommands();
+    	//NOTE: without limitting retries, this can loop forever
+        while (!cmds.isEmpty()) {
+            Command c = cmds.removeFirst();
             try {
-        		Log.info("Start: " + item);
-        		item.run();
-        		Log.info("End: " + item);
+        		c.run();
         	}
         	catch (RuntimeException e) {
         		Log.error(e);
         		// re-try later
-        		if (item.canRun()) {
-        			downloaders.addLast(item);
+        		if (c.canRun()) {
+        			cmds.addLast(c);
         		}
         	}
         }
     }
 
+    /** Attach retry and logging to the commands */
+	private Deque<Command> createDecoratedCommands() {
+		return new ArrayDeque<>(commands.stream()
+			.map(c -> new ReplaceCommand(c, () -> {
+				Log.info("Start: " + c);
+				c.doRun();
+				Log.info("End: " + c);
+			}))
+			.map(c -> new RetryCommand(c, maxDownloadAttempts))
+			.collect(Collectors.toList()));
+	}
+
 	@Override
     public String toString() {
     	String className = getClass().getSimpleName();
-		String joinedItems = Util.join(downloaders, Util.LINE_BREAK);
+		String joinedItems = Util.join(commands, Util.LINE_BREAK);
 		return String.format("%s[%n%s%n]", className, joinedItems);
     }
 }

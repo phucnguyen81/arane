@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.AbstractMap;
+import java.util.Map.Entry;
 
 import javax.xml.ws.Holder;
 
@@ -15,6 +17,10 @@ import javax.xml.ws.Holder;
  * @author LOU
  */
 public class New {
+
+	public static <K, V> Entry<K, V> entry(K key, V value) {
+		return new AbstractMap.SimpleImmutableEntry<>(key, value);
+	}
 
     public static <T> Holder<T> holder() {
         return new Holder<>();

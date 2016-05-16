@@ -11,10 +11,11 @@ public class RetryCommand implements Command {
 
 	private final Command command;
 
-	public int runLimit = 1;
+	private int runLimit;
 
-	public RetryCommand(Command command) {
+	public RetryCommand(Command command, int runLimit) {
 		this.command = command;
+		this.runLimit = runLimit;
 	}
 
 	/** Whether {@link #doRun()} should be called */
@@ -31,9 +32,6 @@ public class RetryCommand implements Command {
 		} catch (RuntimeException e) {
 			runLimit -= 1;
 			throw e;
-		}
-		else {
-			throw new RuntimeException("Run limit exceeded for " + this);
 		}
 	}
 

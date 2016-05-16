@@ -17,7 +17,7 @@ import lou.arane.commands.KissManga;
 import lou.arane.commands.MangaGo;
 import lou.arane.commands.MangaLife;
 import lou.arane.commands.MangaSee;
-import lou.arane.commands.decor.PrePostCommand;
+import lou.arane.commands.decor.ReplaceCommand;
 import lou.arane.util.Log;
 import lou.arane.util.Url;
 import lou.arane.util.Util;
@@ -73,38 +73,36 @@ public class Arane {
 		Context ctx;
 
 		ctx = new Context(name, new Url(url), mangaDir("blogtruyen", name));
-		commands.add(createCommand(ctx, new BlogTruyen(ctx)));
+		commands.add(attachLog(new BlogTruyen(ctx), ctx));
 
 		ctx = new Context(name, new Url(url), mangaDir("egscans", name));
-		commands.add(createCommand(ctx, new EgScans(ctx)));
+		commands.add(attachLog(new EgScans(ctx), ctx));
 
 		ctx = new Context(name, new Url(url), mangaDir("izmanga", name));
-		commands.add(createCommand(ctx, new IzTruyenTranh(ctx)));
+		commands.add(attachLog(new IzTruyenTranh(ctx), ctx));
 
 		ctx = new Context(name, new Url(url), mangaDir("kissmanga", name));
-		commands.add(createCommand(ctx, new KissManga(ctx)));
+		commands.add(attachLog(new KissManga(ctx), ctx));
 
 		ctx = new Context(name, new Url(url), mangaDir("mangago", name));
-		commands.add(createCommand(ctx, new MangaGo(ctx)));
+		commands.add(attachLog(new MangaGo(ctx), ctx));
 
 		ctx = new Context(name, new Url(url), mangaDir("manga.life", name));
-		commands.add(createCommand(ctx, new MangaLife(ctx)));
+		commands.add(attachLog(new MangaLife(ctx), ctx));
 
 		ctx = new Context(name, new Url(url), mangaDir("mangasee", name));
-		commands.add(createCommand(ctx, new MangaSee(ctx)));
+		commands.add(attachLog(new MangaSee(ctx), ctx));
 
 		return commands;
 	}
 
-	/** Decorate a command to log messages before and after a run */
-	private static Command createCommand(Context ctx, Command command) {
-		return new PrePostCommand(
-			() -> Log.info(String.format(
-					"Start downloading %s into %s", ctx.sourceName, ctx.target))
-			, command
-			, () -> Log.info(String.format(
-					"Finished downloading %s into %s", ctx.sourceName, ctx.target))
-		);
+	/** Attach logging before and after a run */
+	private static Command attachLog(Command cmd, Context ctx) {
+		return new ReplaceCommand(cmd, () -> {
+			Log.info(String.format("Start downloading %s into %s", ctx.sourceName, ctx.target));
+			cmd.doRun();
+			Log.info(String.format("Finished downloading %s into %s", ctx.sourceName, ctx.target));
+		});
 	}
 
 	private static Optional<Command> findFirstRunnable(Collection<Command> commands) {
