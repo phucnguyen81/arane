@@ -3,8 +3,8 @@ package lou.arane.http;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import lou.arane.base.Command;
 import lou.arane.util.IO;
@@ -45,11 +45,10 @@ public class HttpDownloader implements Command {
 	 * Throw only the error of the last source being tried. */
 	@Override
 	public void doRun() {
-		List<Url> urls = new ArrayList<>();
-		urls.add(source);
-		urls.addAll(source.alternatives);
+		Deque<Url> urls = new ArrayDeque<>(source.alternatives);
+		urls.addFirst(source);
 		while (!urls.isEmpty()) {
-			Url url = urls.remove(0);
+			Url url = urls.removeFirst();
 			try {
 				IO.download(url.string(), target, timeout);
 				return;

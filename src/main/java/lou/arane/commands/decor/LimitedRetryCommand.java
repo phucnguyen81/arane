@@ -7,36 +7,36 @@ import lou.arane.base.Command;
  *
  * @author Phuc
  */
-public class RetryCommand implements Command {
+public class LimitedRetryCommand implements Command {
 
 	private final Command command;
 
-	private int runLimit;
+	private int limit;
 
-	public RetryCommand(Command command, int runLimit) {
+	public LimitedRetryCommand(Command command, int limit) {
 		this.command = command;
-		this.runLimit = runLimit;
+		this.limit = limit;
 	}
 
 	/** Whether {@link #doRun()} should be called */
 	@Override
 	public boolean canRun() {
-		return command.canRun() && runLimit > 0;
+		return command.canRun() && limit > 0;
 	}
 
 	/** Perform the download */
 	@Override
 	public void doRun() {
-		if (runLimit > 0) try {
+		if (limit > 0) try {
 			command.doRun();
 		} catch (RuntimeException e) {
-			runLimit -= 1;
+			limit -= 1;
 			throw e;
 		}
 	}
 
     @Override
 	public String toString() {
-		return String.format("[%s%n  limit=%s]", command, runLimit);
+		return String.format("[%s%n  limit=%s]", command, limit);
 	}
 }
