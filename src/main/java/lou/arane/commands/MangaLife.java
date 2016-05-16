@@ -3,14 +3,16 @@ package lou.arane.commands;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import lou.arane.base.Command;
 import lou.arane.base.Context;
+import lou.arane.base.URLResource;
 import lou.arane.scripts.CopyFiles;
-import lou.arane.util.Url;
 import lou.arane.util.Util;
 
 /**
@@ -61,7 +63,7 @@ public class MangaLife implements Command {
         .stream()
         .map(addr -> addr.absUrl("href"))
         .filter(href -> href.contains(ctx.sourceName))
-        .map(href -> new Url(href))
+        .map(href -> new URLResource(href))
         .forEach(chapterUri -> {
             String chapterPath = Util.join(Paths.get(chapterUri.filePath()), "_");
             ctx.add(chapterUri, ctx.chaptersDir.resolve(chapterPath + ".html"));
@@ -108,7 +110,7 @@ public class MangaLife implements Command {
         String base = ctx.source.toString();
         base = Util.removeEnding(base, "/");
         String pageUriStr = Util.join(Arrays.asList(base, chapter, index, page), "/");
-        Url pageUri = new Url(pageUriStr);
+        URLResource pageUri = new URLResource(pageUriStr);
         Path pagePath = ctx.pagesDir.resolve(chapter + "_" + page + ".html");
         ctx.add(pageUri, pagePath);
     }
@@ -130,18 +132,17 @@ public class MangaLife implements Command {
 
     private void addImageToDownload(Document page) {
         for (Element img : page.select("a[href] img[src]")) {
-            Url imgUri = new Url(img.absUrl("src"));
-            addOnErrorUri(imgUri, img.attr("onerror"));
-            Path imgPath = ctx.imagesDir.resolve(imgUri.fileName());
-            ctx.add(imgUri, imgPath);
+            URLResource imgUrl = new URLResource(
+            	new URLResource(img.absUrl("src"))
+            	, onErrorUrls(img.attr("onerror")));
+            Path imgPath = ctx.imagesDir.resolve(imgUrl.fileName());
+            ctx.add(imgUrl, imgPath);
         }
     }
 
-    private void addOnErrorUri(Url imgUri, String onerrorAttr) {
-        for (String onerrorUrl : ctx.findSourceUrls(onerrorAttr)) {
-        	Url onerrorUri = new Url(onerrorUrl);
-        	imgUri.alternatives.add(onerrorUri);
-        }
+    private List<URLResource> onErrorUrls(String onerrorAttr) {
+    	return ctx.findSourceUrls(onerrorAttr).stream()
+    			.map(URLResource::new).collect(Collectors.toList());
     }
 
     /** Organize the downloaded images into sub-directories.

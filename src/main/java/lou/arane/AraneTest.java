@@ -9,9 +9,9 @@ public class AraneTest {
 
 	public static void main(String[] args) {
 		boolean on = true, off = false;
-		if (on) testMangaLife();
+		if (off) testMangaLife();
 		if (off) testIzTruyenTranh();
-		if (off) testMangaGo();
+		if (on) testMangaGo();
 		if (off) testKissManga();
 		if (off) testBlogTruyen();
 		if (off) testMangaSee();
@@ -33,8 +33,8 @@ public class AraneTest {
 
 	static void testMangaGo() {
 		Arane.main(new String[] {
-			"2001_nights"
-			, "http://www.mangago.me/read-manga/2001_nights/"
+			"saber_tiger"
+			, "http://www.mangago.me/read-manga/saber_tiger/"
 		});
 	}
 

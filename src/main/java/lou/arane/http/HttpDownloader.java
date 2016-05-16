@@ -7,8 +7,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import lou.arane.base.Command;
+import lou.arane.base.URLResource;
 import lou.arane.util.IO;
-import lou.arane.util.Url;
 import lou.arane.util.Util;
 
 /**
@@ -18,18 +18,18 @@ import lou.arane.util.Util;
  */
 public class HttpDownloader implements Command {
 
-	private final Url source;
+	private final URLResource source;
 	private final Path target;
 
 	private final Duration timeout;
 
 	/** Create a downloader with default timeout */
-	public HttpDownloader(Url source, Path target) {
+	public HttpDownloader(URLResource source, Path target) {
 		this(source, target, Duration.of(2, ChronoUnit.MINUTES));
 	}
 
 	/** Create a downloader given source, target and timeout */
-	public HttpDownloader(Url url, Path path, Duration timeout) {
+	public HttpDownloader(URLResource url, Path path, Duration timeout) {
 		this.source = url;
 		this.target = path;
 		this.timeout = timeout;
@@ -45,10 +45,10 @@ public class HttpDownloader implements Command {
 	 * Throw only the error of the last source being tried. */
 	@Override
 	public void doRun() {
-		Deque<Url> urls = new ArrayDeque<>(source.alternatives);
+		Deque<URLResource> urls = new ArrayDeque<>(source.alternatives());
 		urls.addFirst(source);
 		while (!urls.isEmpty()) {
-			Url url = urls.removeFirst();
+			URLResource url = urls.removeFirst();
 			try {
 				IO.download(url.string(), target, timeout);
 				return;

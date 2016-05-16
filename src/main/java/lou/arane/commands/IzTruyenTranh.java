@@ -10,7 +10,7 @@ import org.jsoup.select.Elements;
 
 import lou.arane.base.Command;
 import lou.arane.base.Context;
-import lou.arane.util.Url;
+import lou.arane.base.URLResource;
 import lou.arane.util.Util;
 
 /**
@@ -69,7 +69,7 @@ public class IzTruyenTranh implements Command {
         Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URI);
         Elements chapterAddresses = rootFile.select("div[class=chapter-list] a[href]");
         for (Element chapterAddr : chapterAddresses) {
-            Url chapterUri = new Url(chapterAddr.absUrl("href"));
+            URLResource chapterUri = new URLResource(chapterAddr.absUrl("href"));
             String chapterName = chapterAddr.ownText();
             if (!chapterName.endsWith(".html")) {
                 chapterName += ".html";
@@ -99,7 +99,7 @@ public class IzTruyenTranh implements Command {
                 int idx = 0;
                 for (String img : imagesMatcher.group("imgs").split("\\|")) {
                     idx += 1;
-                    Url imageUri = new Url(img.trim());
+                    URLResource imageUri = new URLResource(img.trim());
                     String imageName = idx + "_" + imageUri.fileName();
                     imageName = Util.padNumericSequences(imageName, 3);
                     Path imagePath = chapterPath.resolve(imageName);

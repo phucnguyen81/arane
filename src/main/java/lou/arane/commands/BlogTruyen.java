@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 
 import lou.arane.base.Command;
 import lou.arane.base.Context;
-import lou.arane.util.Url;
+import lou.arane.base.URLResource;
 import lou.arane.util.Util;
 
 import org.jsoup.nodes.Document;
@@ -69,7 +69,7 @@ public class BlogTruyen implements Command {
         Elements chapterAddresses = rootFile.select("a[href]");
         for (Element chapterAddr : chapterAddresses) {
             String href = chapterAddr.absUrl("href");
-			Url chapterUri = new Url(href);
+			URLResource chapterUri = new URLResource(href);
             String path = chapterUri.filePath();
             if (path.contains(ctx.sourceName)) {
             	String chapterName = chapterUri.fileName().toString();
@@ -100,7 +100,7 @@ public class BlogTruyen implements Command {
             Document page = Util.parseHtml(chapterHtml);
             Elements images = page.select("article[id=content] img[src]");
             for (Element image : images) {
-                Url imageUri = new Url(image.absUrl("src"));
+                URLResource imageUri = new URLResource(image.absUrl("src"));
                 String imageName = imageUri.fileName().toString();
                 Path imagePath = Paths.get(imageDir, imageName);
                 imagePath = ctx.imagesDir.resolve(imagePath);

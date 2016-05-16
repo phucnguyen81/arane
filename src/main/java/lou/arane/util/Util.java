@@ -31,6 +31,8 @@ import java.util.stream.Stream;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import lou.arane.base.URLResource;
+
 /**
  * Facade over the standard library
  *
@@ -295,7 +297,7 @@ public final class Util {
     }
 
     /** @see Util#parseHtml(Path, String) */
-    public static Document parseHtml(Path path, Url baseUri) {
+    public static Document parseHtml(Path path, URLResource baseUri) {
     	return parseHtml(path, baseUri.toString());
     }
 

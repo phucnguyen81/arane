@@ -6,19 +6,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lou.arane.base.Command;
+import lou.arane.base.URLResource;
 import lou.arane.commands.decor.ReplaceCommand;
 import lou.arane.commands.decor.LimitedRetryCommand;
 import lou.arane.commands.decor.RetryUntilSuccessCommand;
 import lou.arane.util.Check;
 import lou.arane.util.Log;
-import lou.arane.util.Url;
 import lou.arane.util.Util;
 
 /**
  * Download a batch of urls to files
  * <p>
- * TODO without using Url and Path this has nothing specific about http or downloader.
- * Move Url and Path outside to make a more general component.
+ * TODO without using URLResource and Path this has nothing specific about http or downloader.
+ * Move URLResource and Path outside to make a more general component.
  * Also, would want this one immutable.
  *
  * @author LOU
@@ -36,7 +36,7 @@ public class HttpBatchDownloader implements Command {
     }
 
     /** Add a pair of source-target to download */
-    public void add(Url url, Path path) {
+    public void add(URLResource url, Path path) {
 		commands.add(new HttpDownloader(url, path));
     }
 

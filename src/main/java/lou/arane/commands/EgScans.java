@@ -8,8 +8,8 @@ import org.jsoup.nodes.Element;
 
 import lou.arane.base.Command;
 import lou.arane.base.Context;
+import lou.arane.base.URLResource;
 import lou.arane.scripts.CopyFiles;
-import lou.arane.util.Url;
 import lou.arane.util.Util;
 
 /**
@@ -60,7 +60,7 @@ public class EgScans implements Command {
         Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URL);
         for (Element chapterOption : rootFile.select("select[name=chapter] option[value]")) {
             String chapterName = chapterOption.attr("value");
-            Url chapterUri = new Url(BASE_URL + ctx.sourceName + "/" + chapterName);
+            URLResource chapterUri = new URLResource(BASE_URL + ctx.sourceName + "/" + chapterName);
             Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
             ctx.add(chapterUri, chapterPath);
         }
@@ -97,7 +97,7 @@ public class EgScans implements Command {
     /** Find images from text of a script element */
     private void addImages(Element script, String chapterName) {
     	for (String srcUrl : ctx.findSourceUrls(script.html())) {
-            Url imageUri = new Url(BASE_URL + srcUrl);
+            URLResource imageUri = new URLResource(BASE_URL + srcUrl);
             String imageName = chapterName + "_" + imageUri.fileName();
             imageName = Util.padNumericSequences(imageName.toLowerCase(), 3);
             Path imagePath = ctx.imagesDir.resolve(imageName);

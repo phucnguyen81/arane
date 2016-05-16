@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import lou.arane.base.Command;
 import lou.arane.base.Context;
+import lou.arane.base.URLResource;
 import lou.arane.commands.BlogTruyen;
 import lou.arane.commands.EgScans;
 import lou.arane.commands.IzTruyenTranh;
@@ -19,7 +20,6 @@ import lou.arane.commands.MangaLife;
 import lou.arane.commands.MangaSee;
 import lou.arane.commands.decor.ReplaceCommand;
 import lou.arane.util.Log;
-import lou.arane.util.Url;
 import lou.arane.util.Util;
 
 /**
@@ -72,25 +72,25 @@ public class Arane {
 		List<Command> commands = new ArrayList<>();
 		Context ctx;
 
-		ctx = new Context(name, new Url(url), mangaDir("blogtruyen", name));
+		ctx = new Context(name, new URLResource(url), mangaDir("blogtruyen", name));
 		commands.add(attachLog(new BlogTruyen(ctx), ctx));
 
-		ctx = new Context(name, new Url(url), mangaDir("egscans", name));
+		ctx = new Context(name, new URLResource(url), mangaDir("egscans", name));
 		commands.add(attachLog(new EgScans(ctx), ctx));
 
-		ctx = new Context(name, new Url(url), mangaDir("izmanga", name));
+		ctx = new Context(name, new URLResource(url), mangaDir("izmanga", name));
 		commands.add(attachLog(new IzTruyenTranh(ctx), ctx));
 
-		ctx = new Context(name, new Url(url), mangaDir("kissmanga", name));
+		ctx = new Context(name, new URLResource(url), mangaDir("kissmanga", name));
 		commands.add(attachLog(new KissManga(ctx), ctx));
 
-		ctx = new Context(name, new Url(url), mangaDir("mangago", name));
+		ctx = new Context(name, new URLResource(url), mangaDir("mangago", name));
 		commands.add(attachLog(new MangaGo(ctx), ctx));
 
-		ctx = new Context(name, new Url(url), mangaDir("manga.life", name));
+		ctx = new Context(name, new URLResource(url), mangaDir("manga.life", name));
 		commands.add(attachLog(new MangaLife(ctx), ctx));
 
-		ctx = new Context(name, new Url(url), mangaDir("mangasee", name));
+		ctx = new Context(name, new URLResource(url), mangaDir("mangasee", name));
 		commands.add(attachLog(new MangaSee(ctx), ctx));
 
 		return commands;

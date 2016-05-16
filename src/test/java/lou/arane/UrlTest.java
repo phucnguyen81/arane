@@ -4,7 +4,7 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import lou.arane.util.Url;
+import lou.arane.base.URLResource;
 
 /**
  * See how to handle urls normally found on the net.
@@ -14,7 +14,7 @@ import lou.arane.util.Url;
 public class UrlTest extends TestBase {
 
     /* source example that contains illegal spaces in its target */
-    private final Url url = new Url(Url.encode((
+    private final URLResource url = new URLResource(URLResource.encode((
     	"http://ex2.unixmanga.net/onlinereading/Break Blade/?image=Break Blade/0001.jpg&server=nas")));
 
     @Test
