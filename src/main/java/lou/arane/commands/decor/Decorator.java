@@ -7,12 +7,12 @@ import lou.arane.base.Command;
  *
  * @author Phuc
  */
-public class ReplaceCommand implements Command {
+public final class Decorator implements Command {
 
 	private final Command origin;
 	private final Runnable replacement;
 
-	public ReplaceCommand(Command origin, Runnable replacement) {
+	public Decorator(Command origin, Runnable replacement) {
 		this.origin = origin;
 		this.replacement = replacement;
 	}
@@ -25,5 +25,12 @@ public class ReplaceCommand implements Command {
 	@Override
 	public void doRun() {
 		replacement.run();
+	}
+
+	@Override
+	public String toString() {
+		return String.format(
+			"{origin: %s%n  replacement: %s%n}"
+			, origin, replacement);
 	}
 }

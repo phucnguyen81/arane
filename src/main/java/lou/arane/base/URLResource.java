@@ -47,18 +47,14 @@ public class URLResource {
 
     @Override
     public boolean equals(Object other) {
-    	if (other instanceof URLResource) {
-    		return url.equals(((URLResource) other).url);
-    	}
-    	else {
-    		return false;
-    	}
+    	return url.equals(((URLResource) other).url);
     }
 
     @Override
     public String toString() {
-    	return url.toString() +
-    			(alternatives.isEmpty() ? "" : " " + alternatives.toString());
+    	return String.format("%s%n  alternatives=%s"
+    			, url
+    			, Util.join(alternatives, Util.LINE_BREAK));
     }
 
     public List<URLResource> alternatives() {

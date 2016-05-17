@@ -4,9 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import lou.arane.base.Command;
 import lou.arane.base.Context;
@@ -18,7 +16,8 @@ import lou.arane.commands.KissManga;
 import lou.arane.commands.MangaGo;
 import lou.arane.commands.MangaLife;
 import lou.arane.commands.MangaSee;
-import lou.arane.commands.decor.ReplaceCommand;
+import lou.arane.commands.decor.Assembled;
+import lou.arane.commands.decor.Decorator;
 import lou.arane.util.Log;
 import lou.arane.util.Util;
 
@@ -27,14 +26,14 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class Arane {
+public class Arane implements Command {
 
 	public static void main(String[] args) {
 		if (args.length < 2) {
 			printHelp(args);
 		}
 		else try {
-			run(args[0], args[1]);
+			new Arane(args[0], args[1]).run();
 		}
 		catch (Throwable t) {
 			printHelp(args);
@@ -56,19 +55,28 @@ public class Arane {
 		System.err.println("------------------------------------------");
 	}
 
+	private final String name;
+	private final String url;
+
+	public Arane(String name, String url) {
+		this.name = name;
+		this.url = url;
+	}
+
 	/** Run the first command that can handle the given name and url */
-	private static void run(String name, String url) {
-		List<Command> commands = createCommands(name, url);
-		Optional<Command> h = findFirstRunnable(commands);
-		if (h.isPresent()) {
-			h.get().doRun();
-		} else {
-			Log.info("No supports for: " + name + ", " + url);
-		}
+	@Override
+	public void doRun() {
+		createCommands()
+		.stream()
+		.filter(Command::canRun)
+		.findFirst()
+		.orElse(new Assembled(() ->
+			Log.info("No supports for: " + name + ", " + url)))
+		.doRun();
 	}
 
 	/** Create all available handlers */
-	private static List<Command> createCommands(String name, String url) {
+	private List<Command> createCommands() {
 		List<Command> commands = new ArrayList<>();
 		Context ctx;
 
@@ -98,19 +106,15 @@ public class Arane {
 
 	/** Attach logging before and after a run */
 	private static Command attachLog(Command cmd, Context ctx) {
-		return new ReplaceCommand(cmd, () -> {
+		return new Decorator(cmd, () -> {
 			Log.info(String.format("Start downloading %s into %s", ctx.sourceName, ctx.target));
 			cmd.doRun();
 			Log.info(String.format("Finished downloading %s into %s", ctx.sourceName, ctx.target));
 		});
 	}
 
-	private static Optional<Command> findFirstRunnable(Collection<Command> commands) {
-		return commands.stream().filter(Command::canRun).findFirst();
-	}
-
 	/** Common way to get a base directory for downloading a manga. */
-	public static Path mangaDir(String first, String... more) {
+	private static Path mangaDir(String first, String... more) {
 	    Path mangasDir = Util.userHomeDir().resolve("mangas");
 	    Path baseDir = mangasDir.resolve(Paths.get(first, more));
 	    return baseDir;

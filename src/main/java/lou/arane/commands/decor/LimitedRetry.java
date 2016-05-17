@@ -7,13 +7,13 @@ import lou.arane.base.Command;
  *
  * @author Phuc
  */
-public class LimitedRetryCommand implements Command {
+public final class LimitedRetry implements Command {
 
 	private final Command command;
 
 	private int limit;
 
-	public LimitedRetryCommand(Command command, int limit) {
+	public LimitedRetry(Command command, int limit) {
 		this.command = command;
 		this.limit = limit;
 	}

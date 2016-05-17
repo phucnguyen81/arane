@@ -15,16 +15,16 @@ import lou.arane.base.Command;
  *
  * @author Phuc
  */
-public class RetryUntilSuccessCommand implements Command {
+public final class RetryUntilSuccess implements Command {
 
 	private final List<Command> commands;
 	private final Consumer<RuntimeException> errorHandler;
 
-	public RetryUntilSuccessCommand(Iterable<Command> cmds) {
+	public RetryUntilSuccess(Iterable<Command> cmds) {
 		this(cmds, e -> {});
 	}
 
-	public RetryUntilSuccessCommand(Iterable<Command> cmds, Consumer<RuntimeException> errorHandler) {
+	public RetryUntilSuccess(Iterable<Command> cmds, Consumer<RuntimeException> errorHandler) {
 		this.commands = StreamSupport
 				.stream(cmds.spliterator(), false)
 				.collect(Collectors.toList());

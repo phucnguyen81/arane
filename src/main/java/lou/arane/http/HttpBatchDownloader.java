@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 
 import lou.arane.base.Command;
 import lou.arane.base.URLResource;
-import lou.arane.commands.decor.ReplaceCommand;
-import lou.arane.commands.decor.LimitedRetryCommand;
-import lou.arane.commands.decor.RetryUntilSuccessCommand;
+import lou.arane.commands.decor.Decorator;
+import lou.arane.commands.decor.LimitedRetry;
+import lou.arane.commands.decor.RetryUntilSuccess;
 import lou.arane.util.Check;
 import lou.arane.util.Log;
 import lou.arane.util.Util;
@@ -48,7 +48,7 @@ public class HttpBatchDownloader implements Command {
     /** Download everything that were added */
     @Override
 	public void doRun() {
-    	new RetryUntilSuccessCommand(
+    	new RetryUntilSuccess(
     		withLoggingAndRetries()
     		, e -> Log.error(e)
     	).doRun();
@@ -57,8 +57,8 @@ public class HttpBatchDownloader implements Command {
     /** Enhance commands with retry and logging */
 	private List<Command> withLoggingAndRetries() {
 		return commands.stream()
-			.map(c -> new LimitedRetryCommand(c, maxDownloadAttempts))
-			.map(c -> new ReplaceCommand(c, () -> {
+			.map(c -> new LimitedRetry(c, maxDownloadAttempts))
+			.map(c -> new Decorator(c, () -> {
 				Log.info("Start: " + c);
 				c.doRun();
 				Log.info("End: " + c);
