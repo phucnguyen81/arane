@@ -1,24 +1,24 @@
-package lou.arane.commands.decor;
+package lou.arane.cmds;
 
 import java.util.function.BooleanSupplier;
 
-import lou.arane.base.Command;
+import lou.arane.base.Cmd;
 
 /**
  * Make command out of Runnable and BooleanSupplier.
  *
  * @author Phuc
  */
-public final class Assembled implements Command {
+public final class CmdAssembled implements Cmd {
 
 	private final BooleanSupplier b;
 	private final Runnable r;
 
-	public Assembled(Runnable r) {
+	public CmdAssembled(Runnable r) {
 		this(() -> true, r);
 	}
 
-	public Assembled(BooleanSupplier b, Runnable r) {
+	public CmdAssembled(BooleanSupplier b, Runnable r) {
 		this.b = b;
 		this.r = r;
 	}
@@ -42,7 +42,7 @@ public final class Assembled implements Command {
 
 	@Override
 	public String toString() {
-		return String.format("Yoke(canRun=%s%n  doRun=%s%n", b, r);
+		return String.format("CmdAssembled(canRun=%s%n  doRun=%s%n", b, r);
 	}
 
 }

@@ -5,7 +5,7 @@ package lou.arane.base;
  *
  * @author Phuc
  */
-public interface Command extends Runnable {
+public interface Cmd extends Runnable {
 
 	/** Check {@link #canRun()} before running */
 	@Override

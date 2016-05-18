@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lou.arane.base.Command;
+import lou.arane.base.Cmd;
 import lou.arane.base.URLResource;
-import lou.arane.commands.decor.Decorator;
-import lou.arane.commands.decor.LimitedRetry;
-import lou.arane.commands.decor.RetryUntilSuccess;
+import lou.arane.cmds.CmdDecorator;
+import lou.arane.cmds.CmdLimitedRetry;
+import lou.arane.cmds.CmdRetryUntilSuccess;
 import lou.arane.util.Check;
 import lou.arane.util.Log;
 import lou.arane.util.Util;
@@ -23,9 +23,9 @@ import lou.arane.util.Util;
  *
  * @author LOU
  */
-public class HttpBatchDownloader implements Command {
+public class HttpBatchDownloader implements Cmd {
 
-	private final List<Command> commands = new ArrayList<>();
+	private final List<Cmd> cmds = new ArrayList<>();
 
     private int maxDownloadAttempts = 1;
 
@@ -37,28 +37,28 @@ public class HttpBatchDownloader implements Command {
 
     /** Add a pair of source-target to download */
     public void add(URLResource url, Path path) {
-		commands.add(new HttpDownloader(url, path));
+		cmds.add(new HttpDownloader(url, path));
     }
 
     @Override
 	public boolean canRun() {
-    	return commands.stream().anyMatch(d -> d.canRun());
+    	return cmds.stream().anyMatch(d -> d.canRun());
     }
 
     /** Download everything that were added */
     @Override
 	public void doRun() {
-    	new RetryUntilSuccess(
+    	new CmdRetryUntilSuccess(
     		withLoggingAndRetries()
     		, e -> Log.error(e)
     	).doRun();
     }
 
-    /** Enhance commands with retry and logging */
-	private List<Command> withLoggingAndRetries() {
-		return commands.stream()
-			.map(c -> new LimitedRetry(c, maxDownloadAttempts))
-			.map(c -> new Decorator(c, () -> {
+    /** Enhance cmds with retry and logging */
+	private List<Cmd> withLoggingAndRetries() {
+		return cmds.stream()
+			.map(c -> new CmdLimitedRetry(c, maxDownloadAttempts))
+			.map(c -> new CmdDecorator(c, () -> {
 				Log.info("Start: " + c);
 				c.doRun();
 				Log.info("End: " + c);
@@ -69,7 +69,7 @@ public class HttpBatchDownloader implements Command {
 	@Override
     public String toString() {
     	String className = getClass().getSimpleName();
-		String joinedItems = Util.join(commands, Util.LINE_BREAK);
+		String joinedItems = Util.join(cmds, Util.LINE_BREAK);
 		return String.format("%s[%n%s%n]", className, joinedItems);
     }
 }

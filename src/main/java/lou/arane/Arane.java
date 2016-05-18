@@ -6,18 +6,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import lou.arane.base.Command;
+import lou.arane.base.Cmd;
 import lou.arane.base.Context;
 import lou.arane.base.URLResource;
-import lou.arane.commands.BlogTruyen;
-import lou.arane.commands.EgScans;
-import lou.arane.commands.IzTruyenTranh;
-import lou.arane.commands.KissManga;
-import lou.arane.commands.MangaGo;
-import lou.arane.commands.MangaLife;
-import lou.arane.commands.MangaSee;
-import lou.arane.commands.decor.Assembled;
-import lou.arane.commands.decor.Decorator;
+import lou.arane.cmds.CmdAssembled;
+import lou.arane.cmds.CmdDecorator;
+import lou.arane.usecases.BlogTruyen;
+import lou.arane.usecases.EgScans;
+import lou.arane.usecases.IzTruyenTranh;
+import lou.arane.usecases.KissManga;
+import lou.arane.usecases.MangaGo;
+import lou.arane.usecases.MangaLife;
+import lou.arane.usecases.MangaSee;
 import lou.arane.util.Log;
 import lou.arane.util.Util;
 
@@ -26,7 +26,7 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class Arane implements Command {
+public class Arane {
 
 	public static void main(String[] args) {
 		if (args.length < 2) {
@@ -63,50 +63,48 @@ public class Arane implements Command {
 		this.url = url;
 	}
 
-	/** Run the first command that can handle the given name and url */
-	@Override
-	public void doRun() {
+	public void run() {
 		createCommands()
 		.stream()
-		.filter(Command::canRun)
+		.filter(Cmd::canRun)
 		.findFirst()
-		.orElse(new Assembled(() ->
-			Log.info("No supports for: " + name + ", " + url)))
+		.orElse(new CmdAssembled(() ->
+			Log.info("Found no supports for downloading: " + name + ", " + url)))
 		.doRun();
 	}
 
-	/** Create all available handlers */
-	private List<Command> createCommands() {
-		List<Command> commands = new ArrayList<>();
+	/** Create all available commands to handle the args */
+	private List<Cmd> createCommands() {
+		List<Cmd> cmds = new ArrayList<>();
 		Context ctx;
 
 		ctx = new Context(name, new URLResource(url), mangaDir("blogtruyen", name));
-		commands.add(attachLog(new BlogTruyen(ctx), ctx));
+		cmds.add(attachLog(new BlogTruyen(ctx), ctx));
 
 		ctx = new Context(name, new URLResource(url), mangaDir("egscans", name));
-		commands.add(attachLog(new EgScans(ctx), ctx));
+		cmds.add(attachLog(new EgScans(ctx), ctx));
 
 		ctx = new Context(name, new URLResource(url), mangaDir("izmanga", name));
-		commands.add(attachLog(new IzTruyenTranh(ctx), ctx));
+		cmds.add(attachLog(new IzTruyenTranh(ctx), ctx));
 
 		ctx = new Context(name, new URLResource(url), mangaDir("kissmanga", name));
-		commands.add(attachLog(new KissManga(ctx), ctx));
+		cmds.add(attachLog(new KissManga(ctx), ctx));
 
 		ctx = new Context(name, new URLResource(url), mangaDir("mangago", name));
-		commands.add(attachLog(new MangaGo(ctx), ctx));
+		cmds.add(attachLog(new MangaGo(ctx), ctx));
 
 		ctx = new Context(name, new URLResource(url), mangaDir("manga.life", name));
-		commands.add(attachLog(new MangaLife(ctx), ctx));
+		cmds.add(attachLog(new MangaLife(ctx), ctx));
 
 		ctx = new Context(name, new URLResource(url), mangaDir("mangasee", name));
-		commands.add(attachLog(new MangaSee(ctx), ctx));
+		cmds.add(attachLog(new MangaSee(ctx), ctx));
 
-		return commands;
+		return cmds;
 	}
 
 	/** Attach logging before and after a run */
-	private static Command attachLog(Command cmd, Context ctx) {
-		return new Decorator(cmd, () -> {
+	private static Cmd attachLog(Cmd cmd, Context ctx) {
+		return new CmdDecorator(cmd, () -> {
 			Log.info(String.format("Start downloading %s into %s", ctx.sourceName, ctx.target));
 			cmd.doRun();
 			Log.info(String.format("Finished downloading %s into %s", ctx.sourceName, ctx.target));

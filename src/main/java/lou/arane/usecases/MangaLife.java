@@ -1,4 +1,4 @@
-package lou.arane.commands;
+package lou.arane.usecases;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import lou.arane.base.Command;
+import lou.arane.base.Cmd;
 import lou.arane.base.Context;
 import lou.arane.base.URLResource;
 import lou.arane.scripts.CopyFiles;
@@ -20,7 +20,7 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class MangaLife implements Command {
+public class MangaLife implements Cmd {
 
     /** base location of all mangas for this site */
     private static final String BASE_URI = "http://manga.life/";
@@ -34,7 +34,7 @@ public class MangaLife implements Command {
 	@Override
 	public boolean canRun() {
 		//domain must match
-		String url = ctx.source.toString();
+		String url = ctx.source.urlString();
 		return url.startsWith(BASE_URI);
 	}
 
@@ -107,7 +107,7 @@ public class MangaLife implements Command {
 
     /** TODO do source.resolve(chapter, index, page) here, not doing strings */
     private void addPage(String chapter, String index, String page) {
-        String base = ctx.source.toString();
+        String base = ctx.source.urlString();
         base = Util.removeEnding(base, "/");
         String pageUriStr = Util.join(Arrays.asList(base, chapter, index, page), "/");
         URLResource pageUri = new URLResource(pageUriStr);

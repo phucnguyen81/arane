@@ -1,10 +1,10 @@
-package lou.arane.commands;
+package lou.arane.usecases;
 
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lou.arane.base.Command;
+import lou.arane.base.Cmd;
 import lou.arane.base.Context;
 import lou.arane.base.URLResource;
 import lou.arane.scripts.CopyFiles;
@@ -18,7 +18,7 @@ import org.jsoup.nodes.Element;
  *
  * @author LOU
  */
-public class MangaSee implements Command {
+public class MangaSee implements Cmd {
 
     private static final Pattern numberPattern = Pattern.compile("\\d+(\\.\\d+)?");
 
@@ -35,7 +35,7 @@ public class MangaSee implements Command {
 	@Override
 	public boolean canRun() {
 		//domain must match
-		String url = ctx.source.toString();
+		String url = ctx.source.urlString();
 		return url.startsWith(baseUri);
 	}
 

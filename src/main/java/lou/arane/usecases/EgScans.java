@@ -1,4 +1,4 @@
-package lou.arane.commands;
+package lou.arane.usecases;
 
 import java.nio.file.Path;
 import java.util.regex.Pattern;
@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import lou.arane.base.Command;
+import lou.arane.base.Cmd;
 import lou.arane.base.Context;
 import lou.arane.base.URLResource;
 import lou.arane.scripts.CopyFiles;
@@ -17,7 +17,7 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class EgScans implements Command {
+public class EgScans implements Cmd {
 
     private static final String BASE_URL = "http://read.egscans.com/";
 
@@ -32,7 +32,7 @@ public class EgScans implements Command {
 	@Override
 	public boolean canRun() {
 		//domain must match
-		String url = ctx.source.toString();
+		String url = ctx.source.urlString();
 		return url.startsWith(BASE_URL);
 	}
 

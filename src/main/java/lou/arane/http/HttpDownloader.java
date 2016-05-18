@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import lou.arane.base.Command;
+import lou.arane.base.Cmd;
 import lou.arane.base.URLResource;
 import lou.arane.util.IO;
 import lou.arane.util.Util;
@@ -16,7 +16,7 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class HttpDownloader implements Command {
+public class HttpDownloader implements Cmd {
 
 	private final URLResource source;
 	private final Path target;
@@ -50,7 +50,7 @@ public class HttpDownloader implements Command {
 		while (!urls.isEmpty()) {
 			URLResource url = urls.removeFirst();
 			try {
-				IO.download(url.string(), target, timeout);
+				IO.download(url.urlString(), target, timeout);
 				return;
 			}
 			catch (RuntimeException e) {

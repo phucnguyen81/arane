@@ -1,9 +1,9 @@
-package lou.arane.commands;
+package lou.arane.usecases;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import lou.arane.base.Command;
+import lou.arane.base.Cmd;
 import lou.arane.base.Context;
 import lou.arane.base.URLResource;
 import lou.arane.util.Util;
@@ -21,7 +21,7 @@ import org.jsoup.select.Elements;
  *
  * @author LOU
  */
-public class BlogTruyen implements Command {
+public class BlogTruyen implements Cmd {
 
     /** Scheme of this site */
     private static final String BASE_URL = "http://blogtruyen.com/";
@@ -41,7 +41,7 @@ public class BlogTruyen implements Command {
 	@Override
 	public boolean canRun() {
 		//domain must match
-		String url = ctx.source.toString();
+		String url = ctx.source.urlString();
 		return url.startsWith(BASE_URL);
 	}
 

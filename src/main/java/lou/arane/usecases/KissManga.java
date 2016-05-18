@@ -1,11 +1,11 @@
-package lou.arane.commands;
+package lou.arane.usecases;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lou.arane.base.Command;
+import lou.arane.base.Cmd;
 import lou.arane.base.Context;
 import lou.arane.base.URLResource;
 import lou.arane.util.Util;
@@ -28,7 +28,7 @@ import org.jsoup.nodes.Element;
  *
  * @author LOU
  */
-public class KissManga implements Command {
+public class KissManga implements Cmd {
 
     private static final String BASE_URI = "http://kissmanga.com/";
 
@@ -46,7 +46,7 @@ public class KissManga implements Command {
 	@Override
 	public boolean canRun() {
 		//domain must match
-		String url = ctx.source.toString();
+		String url = ctx.source.urlString();
 		return url.startsWith(BASE_URI);
 	}
 

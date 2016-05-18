@@ -1,4 +1,4 @@
-package lou.arane.commands;
+package lou.arane.usecases;
 
 import java.nio.file.Path;
 import java.util.regex.Matcher;
@@ -8,7 +8,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import lou.arane.base.Command;
+import lou.arane.base.Cmd;
 import lou.arane.base.Context;
 import lou.arane.base.URLResource;
 import lou.arane.util.Util;
@@ -18,7 +18,7 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class IzTruyenTranh implements Command {
+public class IzTruyenTranh implements Cmd {
 
     /* domain */
     private static final String BASE_URI = "http://iztruyentranh.com/";
@@ -41,7 +41,7 @@ public class IzTruyenTranh implements Command {
     @Override
 	public boolean canRun() {
     	// domain must match
-    	String url = ctx.source.toString();
+    	String url = ctx.source.urlString();
     	return url.startsWith(BASE_URI);
     }
 

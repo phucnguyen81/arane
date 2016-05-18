@@ -34,7 +34,7 @@ public class AraneTest {
 	static void testMangaGo() {
 		Arane.main(new String[] {
 			"saber_tiger"
-			, "http://www.mangago.me/read-manga/saber_tiger/"
+			, "http://www.mangago.me/read-manga/saber_tiger"
 		});
 	}
 

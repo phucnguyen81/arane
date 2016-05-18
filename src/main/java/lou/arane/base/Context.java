@@ -14,7 +14,7 @@ import lou.arane.util.Check;
 import lou.arane.util.Util;
 
 /**
- * Common data/methods for all {@link Command}.
+ * Common data/methods for all {@link Cmd}.
  * There are no static elements, everything is found on the instance.
  *
  * @author Phuc

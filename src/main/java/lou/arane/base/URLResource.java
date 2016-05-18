@@ -61,7 +61,7 @@ public class URLResource {
     	return alternatives;
     }
 
-    public String string() {
+    public String urlString() {
     	return url.toString();
     }
 
