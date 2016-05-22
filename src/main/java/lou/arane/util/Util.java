@@ -34,14 +34,14 @@ import org.jsoup.nodes.Document;
 import lou.arane.base.URLResource;
 
 /**
- * Facade over the standard library
+ * Operations that cannot be placed on the objects themselves.
  *
  * @author LOU
  */
 public final class Util {
 
     /** system-dependent line separator */
-    public static final String LINE_BREAK = System.lineSeparator();
+    public static final String NEWLINE = System.lineSeparator();
 
     public static void println(Object message) {
         System.out.println(message);
@@ -58,16 +58,15 @@ public final class Util {
 
 	/** Convert all newlines to platform-specific newlines.
 	 * Not good on performance, just need to be simple enough. */
-    public static String normalizeNewlines(String text) {
-    	if (text == null) return null;
-        StringBuilder buffer = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new StringReader(text))) {
-        	reader.lines().forEach(line -> buffer.append(line).append(LINE_BREAK));
+    public static String normalizeNewlines(String s) {
+        StringBuilder b = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new StringReader(s))) {
+        	reader.lines().forEach(line -> b.append(line).append(NEWLINE));
         }
         catch (IOException e) {
             throw new AssertionError("Should never happen!", e);
         }
-        return buffer.toString();
+        return b.toString();
     }
 
 	/** Remove a part of a string if it ends with that part */
@@ -81,7 +80,6 @@ public final class Util {
 
     /** Assume a string is a target, remove its file extension if there is one */
     public static String removeFileExtension(String str) {
-    	if (str == null) return null;
         int extensionIdx = str.lastIndexOf('.');
         if (extensionIdx >= 0) {
             return str.substring(0, extensionIdx);
@@ -91,7 +89,6 @@ public final class Util {
 
     /** Assume a string is a target, get its file extension (without the dot) */
     public static String getFileExtension(String str) {
-        if (str == null) return null;
         int extensionIdx = str.lastIndexOf('.');
         if (extensionIdx >= 0) {
             return str.substring(extensionIdx + 1);
@@ -187,7 +184,7 @@ public final class Util {
             return Files.move(source, target, options);
         }
         catch (IOException e) {
-            throw new AssertionError(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -198,7 +195,7 @@ public final class Util {
                 return Files.list(path);
             }
             catch (IOException e) {
-                throw new AssertionError(e);
+                throw new RuntimeException(e);
             }
         }
         else {
@@ -212,7 +209,7 @@ public final class Util {
             return Files.walk(start, options);
         }
         catch (IOException e) {
-            throw new AssertionError(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -225,7 +222,7 @@ public final class Util {
         try {
             Files.copy(source, target, options);
         } catch (IOException e) {
-            throw new AssertionError(e);
+            throw new RuntimeException(e);
         }
 
         //recursively copy sub-files/dirs

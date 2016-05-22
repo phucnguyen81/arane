@@ -5,11 +5,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import lou.arane.util.IO;
 import lou.arane.util.Util;
@@ -21,12 +21,6 @@ import lou.arane.util.Util;
  */
 public class URLResource {
 
-    /** Alternate urls meant to locate the same resource as this url.
-     * Not clean code but works for now */
-    private final List<URLResource> alternatives;
-
-    private final URL url;
-
     /** Make instance or empty if url is malformed */
     public static Optional<URLResource> of(String url) {
     	try {
@@ -35,20 +29,24 @@ public class URLResource {
 			return Optional.empty();
 		}
     }
+
+    /** Alternate urls meant to locate the same resource as this url.
+     * Not clean code but works for now */
+    private final List<URLResource> alternatives;
+
+    private final URL url;
     
     public URLResource(URL url) {
         this(url, Collections.emptyList());
     }
 
-    public URLResource(URLResource url, Iterable<URLResource> alternatives) {
+    public URLResource(URLResource url, Collection<URLResource> alternatives) {
     	this(url.url, alternatives);
     }
 
-    public URLResource(URL url, Iterable<URLResource> alternatives) {
+    public URLResource(URL url, Collection<URLResource> alternatives) {
         this.url = url;
-        this.alternatives = StreamSupport
-        		.stream(alternatives.spliterator(), false)
-        		.collect(Collectors.toList());
+        this.alternatives = new ArrayList<>(alternatives);
     }
 
     @Override
@@ -60,7 +58,7 @@ public class URLResource {
     public String toString() {
     	return String.format("%s%n  alternatives=%s"
     			, url
-    			, Util.join(alternatives, Util.LINE_BREAK));
+    			, Util.join(alternatives, Util.NEWLINE));
     }
 
     public List<URLResource> alternatives() {

@@ -69,7 +69,7 @@ public class HttpBatchDownloader implements Cmd {
 	@Override
     public String toString() {
     	String className = getClass().getSimpleName();
-		String joinedItems = Util.join(cmds, Util.LINE_BREAK);
+		String joinedItems = Util.join(cmds, Util.NEWLINE);
 		return String.format("%s[%n%s%n]", className, joinedItems);
     }
 }

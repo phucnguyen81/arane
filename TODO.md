@@ -1,7 +1,10 @@
 # Move static methods into objects
 
+## Make FileResource
+Move operations on File/Path into FileResource
+
 # Fake http get request to go through sites that check requests
 
-# Make sure there is no inheritance (principles?)
+# No inheritance (principles?)
 
-# There are only immutable objects reflecting my understanding 
+# There are only immutable objects reflecting my understanding (principles?) 
