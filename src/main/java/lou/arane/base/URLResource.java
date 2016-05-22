@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -26,10 +27,15 @@ public class URLResource {
 
     private final URL url;
 
-    public URLResource(String url) {
-    	this(url(url));
+    /** Make instance or empty if url is malformed */
+    public static Optional<URLResource> of(String url) {
+    	try {
+			return Optional.of(new URLResource(new URL(url)));
+		} catch (MalformedURLException e) {
+			return Optional.empty();
+		}
     }
-
+    
     public URLResource(URL url) {
         this(url, Collections.emptyList());
     }
@@ -84,32 +90,6 @@ public class URLResource {
     public String filePath() {
     	String p = url.getPath();
     	return p == null ? "" : p;
-    }
-
-	public static URL url(String url) {
-		try {
-			return new URL(url);
-		} catch (MalformedURLException e) {
-			return nullURL();
-		}
-	}
-
-	public static URL nullURL() {
-		String url = "http:";
-		try {
-			return new URL(url);
-		} catch (MalformedURLException e) {
-			throw new AssertionError(url + " should be accepted as url", e);
-		}
-	}
-
-    public static boolean isWellFormed(String url) {
-		try {
-			new URL(url);
-			return true;
-		} catch (MalformedURLException e) {
-			return false;
-		}
     }
 
 	/** A url needs to be encoded if it constains

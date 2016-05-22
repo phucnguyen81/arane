@@ -33,7 +33,11 @@ public class Arane {
 			printHelp(args);
 		}
 		else try {
-			new Arane(args[0], args[1]).run();
+			String name = args[0];
+			URLResource url = URLResource.of(args[1])
+				.orElseThrow(() -> new IllegalArgumentException(
+					"Illegal url: " + args[1])); 
+			new Arane(name, url).run();
 		}
 		catch (Throwable t) {
 			printHelp(args);
@@ -56,9 +60,9 @@ public class Arane {
 	}
 
 	private final String name;
-	private final String url;
+	private final URLResource url;
 
-	public Arane(String name, String url) {
+	public Arane(String name, URLResource url) {
 		this.name = name;
 		this.url = url;
 	}
@@ -78,25 +82,25 @@ public class Arane {
 		List<Cmd> cmds = new ArrayList<>();
 		Context ctx;
 
-		ctx = new Context(name, new URLResource(url), mangaDir("blogtruyen", name));
+		ctx = new Context(name, url, mangaDir("blogtruyen", name));
 		cmds.add(attachLog(new BlogTruyen(ctx), ctx));
 
-		ctx = new Context(name, new URLResource(url), mangaDir("egscans", name));
+		ctx = new Context(name, url, mangaDir("egscans", name));
 		cmds.add(attachLog(new EgScans(ctx), ctx));
 
-		ctx = new Context(name, new URLResource(url), mangaDir("izmanga", name));
+		ctx = new Context(name, url, mangaDir("izmanga", name));
 		cmds.add(attachLog(new IzTruyenTranh(ctx), ctx));
 
-		ctx = new Context(name, new URLResource(url), mangaDir("kissmanga", name));
+		ctx = new Context(name, url, mangaDir("kissmanga", name));
 		cmds.add(attachLog(new KissManga(ctx), ctx));
 
-		ctx = new Context(name, new URLResource(url), mangaDir("mangago", name));
+		ctx = new Context(name, url, mangaDir("mangago", name));
 		cmds.add(attachLog(new MangaGo(ctx), ctx));
 
-		ctx = new Context(name, new URLResource(url), mangaDir("manga.life", name));
+		ctx = new Context(name, url, mangaDir("manga.life", name));
 		cmds.add(attachLog(new MangaLife(ctx), ctx));
 
-		ctx = new Context(name, new URLResource(url), mangaDir("mangasee", name));
+		ctx = new Context(name, url, mangaDir("mangasee", name));
 		cmds.add(attachLog(new MangaSee(ctx), ctx));
 
 		return cmds;

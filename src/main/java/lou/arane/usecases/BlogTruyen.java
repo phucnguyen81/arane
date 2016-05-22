@@ -2,6 +2,7 @@ package lou.arane.usecases;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import lou.arane.base.Cmd;
 import lou.arane.base.Context;
@@ -69,15 +70,17 @@ public class BlogTruyen implements Cmd {
         Elements chapterAddresses = rootFile.select("a[href]");
         for (Element chapterAddr : chapterAddresses) {
             String href = chapterAddr.absUrl("href");
-			URLResource chapterUri = new URLResource(href);
-            String path = chapterUri.filePath();
-            if (path.contains(ctx.sourceName)) {
-            	String chapterName = chapterUri.fileName().toString();
-            	if (!chapterName.endsWith(".html")) {
-            		chapterName += ".html";
-            	}
-            	Path chapterPath = ctx.chaptersDir.resolve(chapterName);
-            	ctx.add(chapterUri, chapterPath);
+			Optional<URLResource> chapterUri = URLResource.of(href);
+            if (chapterUri.isPresent()) {
+	            String path = chapterUri.get().filePath();
+	            if (path.contains(ctx.sourceName)) {
+	            	String chapterName = chapterUri.get().fileName().toString();
+	            	if (!chapterName.endsWith(".html")) {
+	            		chapterName += ".html";
+	            	}
+	            	Path chapterPath = ctx.chaptersDir.resolve(chapterName);
+	            	ctx.add(chapterUri.get(), chapterPath);
+	            }
             }
         }
         ctx.download();
@@ -95,16 +98,16 @@ public class BlogTruyen implements Cmd {
      */
     private void downloadImages() {
         for (Path chapterHtml : Util.findHtmlFiles(ctx.chaptersDir)) {
-            String imageDir = chapterHtml.getFileName().toString();
-            imageDir = Util.removeFileExtension(imageDir);
+            String imageDir = Util.removeFileExtension(chapterHtml.getFileName().toString());
             Document page = Util.parseHtml(chapterHtml);
             Elements images = page.select("article[id=content] img[src]");
             for (Element image : images) {
-                URLResource imageUri = new URLResource(image.absUrl("src"));
-                String imageName = imageUri.fileName().toString();
-                Path imagePath = Paths.get(imageDir, imageName);
-                imagePath = ctx.imagesDir.resolve(imagePath);
-                ctx.add(imageUri, imagePath);
+            	URLResource.of(image.absUrl("src")).ifPresent(imageUri -> {
+            		String imageName = imageUri.fileName().toString();
+            		Path imagePath = Paths.get(imageDir, imageName);
+            		imagePath = ctx.imagesDir.resolve(imagePath);
+            		ctx.add(imageUri, imagePath);
+            	});
             }
             ctx.download();
         }

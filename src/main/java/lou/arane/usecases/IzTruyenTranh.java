@@ -1,6 +1,7 @@
 package lou.arane.usecases;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,13 +70,15 @@ public class IzTruyenTranh implements Cmd {
         Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URI);
         Elements chapterAddresses = rootFile.select("div[class=chapter-list] a[href]");
         for (Element chapterAddr : chapterAddresses) {
-            URLResource chapterUri = new URLResource(chapterAddr.absUrl("href"));
-            String chapterName = chapterAddr.ownText();
-            if (!chapterName.endsWith(".html")) {
-                chapterName += ".html";
+            Optional<URLResource> chapterUrl = URLResource.of(chapterAddr.absUrl("href"));
+            if (chapterUrl.isPresent()) {
+	            String chapterName = chapterAddr.ownText();
+	            if (!chapterName.endsWith(".html")) {
+	                chapterName += ".html";
+	            }
+	            Path chapterPath = ctx.chaptersDir.resolve(chapterName);
+	            ctx.add(chapterUrl.get(), chapterPath);
             }
-            Path chapterPath = ctx.chaptersDir.resolve(chapterName);
-            ctx.add(chapterUri, chapterPath);
         }
         ctx.download();
     }
@@ -86,7 +89,6 @@ public class IzTruyenTranh implements Cmd {
      * <pre>
      *  data = 'http://2.bp.blogspot.com/-A9scOkmQ61Q/UP_zXu7qUbI/AAAAAAAAFFc/exlxGRoLYuw/0%252520copy.jpg?imgmax=2000|http://2.bp.blogspot.com/-8iv32sR7N2k/UP_zZDw3_yI/AAAAAAAAFFg/jXUNe3dRca0/0%252520Credit-ban-long.jpg?imgmax=2000|...
      * </pre>
-     * So we have to parse the string to get the image links.
      */
     private void downloadImages() {
         for (Path chapterHtml : Util.findHtmlFiles(ctx.chaptersDir)) {
@@ -99,11 +101,13 @@ public class IzTruyenTranh implements Cmd {
                 int idx = 0;
                 for (String img : imagesMatcher.group("imgs").split("\\|")) {
                     idx += 1;
-                    URLResource imageUri = new URLResource(img.trim());
-                    String imageName = idx + "_" + imageUri.fileName();
-                    imageName = Util.padNumericSequences(imageName, 3);
-                    Path imagePath = chapterPath.resolve(imageName);
-                    ctx.add(imageUri, imagePath);
+                    Optional<URLResource> imageUrl = URLResource.of(img.trim());
+                    if (imageUrl.isPresent()) {
+	                    String imageName = idx + "_" + imageUrl.get().fileName();
+	                    imageName = Util.padNumericSequences(imageName, 3);
+	                    Path imagePath = chapterPath.resolve(imageName);
+	                    ctx.add(imageUrl.get(), imagePath);
+                    }
                 }
             }
             ctx.download();

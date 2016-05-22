@@ -1,6 +1,7 @@
 package lou.arane.usecases;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,9 +56,10 @@ public class MangaSee implements Cmd {
         for (Element chapterAddr : indexDoc.getElementsByClass("chapter_link")) {
             String chapterName = chapterAddr.text().trim();
             String href = chapterAddr.absUrl("href");
-            URLResource chapterUri = new URLResource(href);
-            Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
-            ctx.add(chapterUri, chapterPath);
+            URLResource.of(href).ifPresent(chapterUrl -> {
+            	Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
+            	ctx.add(chapterUrl, chapterPath);
+            });
         }
         ctx.download();
     }
@@ -76,15 +78,19 @@ public class MangaSee implements Cmd {
             Element pageForm = chapter.getElementById("pages");
             int pageNo = pageForm.getElementsByTag("option").size();
             for (String pageIdx : Util.rangeClosed(1, pageNo)) {
-                URLResource pageUri = new URLResource(
+                Optional<URLResource> pageUrl = URLResource.of(
                     baseUri + String.format(
-                        "?series=%s&chapter=%s&index=1&page=%s",
-                        ctx.sourceName, chapterIdx, pageIdx));
-                Path pagePath = ctx.pagesDir.resolve(
-                    String.format("c%s_p%s.html",
-                    Util.padStart(chapterIdx, 3, '0'),
-                    Util.padStart(pageIdx, 3, '0')));
-                ctx.add(pageUri, pagePath);
+                    	"?series=%s&chapter=%s&index=1&page=%s"
+                    	, ctx.sourceName
+                    	, chapterIdx
+                    	, pageIdx));
+                if (pageUrl.isPresent()) {
+	                Path pagePath = ctx.pagesDir.resolve(
+	                    String.format("c%s_p%s.html",
+	                    Util.padStart(chapterIdx, 3, '0'),
+	                    Util.padStart(pageIdx, 3, '0')));
+	                ctx.add(pageUrl.get(), pagePath);
+                }
             }
         }
         ctx.download();
@@ -97,18 +103,28 @@ public class MangaSee implements Cmd {
         </a>
      */
     private void downloadImages() {
-        for (Path pageHtml : Util.findHtmlFiles(ctx.pagesDir)) {
-            Document page = Util.parseHtml(pageHtml);
-            page.setBaseUri(baseUri);
-            for (Element img : page.select("a[href] img[src]")) {
-                URLResource imageUri = new URLResource(img.absUrl("src"));
-                String pageName = imageUri.fileName();
-                Path imagePath = ctx.imagesDir.resolve(pageName);
-                ctx.add(imageUri, imagePath);
-            }
-        }
+    	Util
+    	.findHtmlFiles(ctx.pagesDir)
+    	.stream()
+    	.map(pages -> Util.parseHtml(pages, baseUri))
+    	.forEach(this::downloadImages);
         ctx.download();
     }
+
+	private void downloadImages(Document pages) {
+		pages
+		.select("a[href] img[src]")
+		.stream()
+        .map(img -> img.absUrl("src"))
+        .map(URLResource::of)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .forEach(imageUrl -> {
+        	String pageName = imageUrl.fileName();
+        	Path imagePath = ctx.imagesDir.resolve(pageName);
+        	ctx.add(imageUrl, imagePath);
+        });
+	}
 
     /** Organize the downloaded images into chapters */
     private void collectImagesIntoChapters() {

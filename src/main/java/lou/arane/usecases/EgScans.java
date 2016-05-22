@@ -1,6 +1,7 @@
 package lou.arane.usecases;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Document;
@@ -59,10 +60,13 @@ public class EgScans implements Cmd {
     private void downloadChapters() {
         Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URL);
         for (Element chapterOption : rootFile.select("select[name=chapter] option[value]")) {
-            String chapterName = chapterOption.attr("value");
-            URLResource chapterUri = new URLResource(BASE_URL + ctx.sourceName + "/" + chapterName);
-            Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
-            ctx.add(chapterUri, chapterPath);
+            String chapterName = chapterOption.attr("value");            
+            Optional<URLResource> chapterUrl = URLResource.of(
+            	BASE_URL + ctx.sourceName + "/" + chapterName);
+            if (chapterUrl.isPresent()) {
+            	Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
+            	ctx.add(chapterUrl.get(), chapterPath);
+            }
         }
         ctx.download();
     }
@@ -97,11 +101,13 @@ public class EgScans implements Cmd {
     /** Find images from text of a script element */
     private void addImages(Element script, String chapterName) {
     	for (String srcUrl : ctx.findSourceUrls(script.html())) {
-            URLResource imageUri = new URLResource(BASE_URL + srcUrl);
-            String imageName = chapterName + "_" + imageUri.fileName();
-            imageName = Util.padNumericSequences(imageName.toLowerCase(), 3);
-            Path imagePath = ctx.imagesDir.resolve(imageName);
-            ctx.add(imageUri, imagePath);
+            Optional<URLResource> imageUrl = URLResource.of(BASE_URL + srcUrl);
+            if (imageUrl.isPresent()) {
+	            String imageName = chapterName + "_" + imageUrl.get().fileName();
+	            imageName = Util.padNumericSequences(imageName.toLowerCase(), 3);
+	            Path imagePath = ctx.imagesDir.resolve(imageName);
+	            ctx.add(imageUrl.get(), imagePath);
+            }
     	}
     }
 

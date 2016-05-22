@@ -13,14 +13,16 @@ import lou.arane.base.URLResource;
  */
 public class UrlTest extends TestBase {
 
-    /* source example that contains illegal spaces in its target */
-    private final URLResource url = new URLResource(URLResource.encode((
-    	"http://ex2.unixmanga.net/onlinereading/Break Blade/?image=Break Blade/0001.jpg&server=nas")));
-
     @Test
     public void getPathAndFileName() {
-        assertEquals("/onlinereading/Break+Blade/", url.filePath());
-        assertEquals("Break+Blade", url.fileName());
+    	/* source example that contains illegal spaces in its target */
+    	URLResource.of(
+    		URLResource.encode(
+    			"http://ex2.unixmanga.net/onlinereading/Break Blade/?image=Break Blade/0001.jpg&server=nas"))
+    	.ifPresent(url -> {
+			assertEquals("/onlinereading/Break+Blade/", url.filePath());
+			assertEquals("Break+Blade", url.fileName());
+		});
     }
 
     /** Can create URL from any string as long as protocol is specified */

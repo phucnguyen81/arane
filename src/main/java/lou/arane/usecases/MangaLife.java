@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jsoup.nodes.Document;
@@ -57,17 +58,15 @@ public class MangaLife implements Cmd {
      * </pre>
      */
     private void downloadChapters() {
-        Document chapters = Util.parseHtml(ctx.chapterList, BASE_URI);
-        chapters
-        .select("a[href]")
-        .stream()
-        .map(addr -> addr.absUrl("href"))
-        .filter(href -> href.contains(ctx.sourceName))
-        .map(href -> new URLResource(href))
-        .forEach(chapterUri -> {
-            String chapterPath = Util.join(Paths.get(chapterUri.filePath()), "_");
-            ctx.add(chapterUri, ctx.chaptersDir.resolve(chapterPath + ".html"));
-        });
+        Util.parseHtml(ctx.chapterList, BASE_URI)
+	        .select("a[href]")
+	        .stream()
+	        .map(a -> a.absUrl("href"))
+	        .filter(href -> href.contains(ctx.sourceName))
+	        .forEach(href -> URLResource.of(href).ifPresent(chapterUrl -> {
+	            String chapterPath = Util.join(Paths.get(chapterUrl.filePath()), "_");
+	            ctx.add(chapterUrl, ctx.chaptersDir.resolve(chapterPath + ".html"));
+	        }));
         ctx.download();
     }
 
@@ -110,9 +109,10 @@ public class MangaLife implements Cmd {
         String base = ctx.source.urlString();
         base = Util.removeEnding(base, "/");
         String pageUriStr = Util.join(Arrays.asList(base, chapter, index, page), "/");
-        URLResource pageUri = new URLResource(pageUriStr);
-        Path pagePath = ctx.pagesDir.resolve(chapter + "_" + page + ".html");
-        ctx.add(pageUri, pagePath);
+        URLResource.of(pageUriStr).ifPresent(pageUrl -> {
+            Path pagePath = ctx.pagesDir.resolve(chapter + "_" + page + ".html");
+            ctx.add(pageUrl, pagePath);
+        });
     }
 
 	/**
@@ -132,17 +132,21 @@ public class MangaLife implements Cmd {
 
     private void addImageToDownload(Document page) {
         for (Element img : page.select("a[href] img[src]")) {
-            URLResource imgUrl = new URLResource(
-            	new URLResource(img.absUrl("src"))
-            	, onErrorUrls(img.attr("onerror")));
-            Path imgPath = ctx.imagesDir.resolve(imgUrl.fileName());
-            ctx.add(imgUrl, imgPath);
+        	URLResource.of(img.absUrl("src")).ifPresent(imgUrl -> {
+        		imgUrl = new URLResource(imgUrl, onErrorUrls(img.attr("onerror")));
+        		Path imgPath = ctx.imagesDir.resolve(imgUrl.fileName());
+        		ctx.add(imgUrl, imgPath);
+        	});
         }
     }
 
     private List<URLResource> onErrorUrls(String onerrorAttr) {
-    	return ctx.findSourceUrls(onerrorAttr).stream()
-    			.map(URLResource::new).collect(Collectors.toList());
+    	return ctx.findSourceUrls(onerrorAttr)
+			.stream()
+			.map(URLResource::of)
+			.filter(Optional::isPresent)
+			.map(Optional::get)
+			.collect(Collectors.toList());
     }
 
     /** Organize the downloaded images into sub-directories.

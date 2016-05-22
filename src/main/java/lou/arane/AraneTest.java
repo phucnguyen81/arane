@@ -9,9 +9,9 @@ public class AraneTest {
 
 	public static void main(String[] args) {
 		boolean on = true, off = false;
-		if (off) testMangaLife();
+		if (on) testMangaLife();
 		if (off) testIzTruyenTranh();
-		if (on) testMangaGo();
+		if (off) testMangaGo();
 		if (off) testKissManga();
 		if (off) testBlogTruyen();
 		if (off) testMangaSee();

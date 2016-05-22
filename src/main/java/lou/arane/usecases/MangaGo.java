@@ -1,6 +1,7 @@
 package lou.arane.usecases;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -50,10 +51,12 @@ public class MangaGo implements Cmd {
     private void downloadChapters() {
         Document rootFile = Util.parseHtml(ctx.chapterList);
         for (Element chapterAddr : rootFile.select("table[id=chapter_table] a[href]")) {
-            URLResource chapterUri = new URLResource(chapterAddr.attr("href"));
-            String chapterName = chapterUri.fileName().toString();
-            Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
-            ctx.add(chapterUri, chapterPath);
+            Optional<URLResource> chapterUrl = URLResource.of(chapterAddr.attr("href"));
+            if (chapterUrl.isPresent())	{
+	            String chapterName = chapterUrl.get().fileName().toString();
+	            Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
+	            ctx.add(chapterUrl.get(), chapterPath);
+            }
         }
         ctx.download();
     }
@@ -75,11 +78,13 @@ public class MangaGo implements Cmd {
         	String chapterName = Util.removeFileExtension(chapterHtml.getFileName().toString());
             Document chapter = Util.parseHtml(chapterHtml, BASE_URL);
             for (Element addr : chapter.select("ul[id=dropdown-menu-page] a[href]")) {
-                URLResource pageUri = new URLResource(addr.absUrl("href"));
-                String pageName = chapterName + "_" + addr.ownText();
-                if (!pageName.endsWith(".html")) pageName += ".html";
-                Path pagePath = ctx.pagesDir.resolve(pageName);
-                ctx.add(pageUri, pagePath);
+                Optional<URLResource> pageUrl = URLResource.of(addr.absUrl("href"));
+                if (pageUrl.isPresent()) {
+	                String pageName = chapterName + "_" + addr.ownText();
+	                if (!pageName.endsWith(".html")) pageName += ".html";
+	                Path pagePath = ctx.pagesDir.resolve(pageName);
+	                ctx.add(pageUrl.get(), pagePath);
+                }
             }
         }
         ctx.download();
@@ -89,10 +94,12 @@ public class MangaGo implements Cmd {
     private void downloadImages() {
         for (Path pageHtml : Util.findHtmlFiles(ctx.pagesDir)) {
             Document page = Util.parseHtml(pageHtml);
-            URLResource imageUri = findImageUri(page);
-            String pageName = pageHtml.getFileName().toString().replace(".html", "");
-            Path imagePath = ctx.imagesDir.resolve(pageName + "." + imageUri.fileExtension());
-            ctx.add(imageUri, imagePath);
+            Optional<URLResource> imageUri = findImageUri(page);
+            if (imageUri.isPresent()) {
+	            String pageName = pageHtml.getFileName().toString().replace(".html", "");
+	            Path imagePath = ctx.imagesDir.resolve(pageName + "." + imageUri.get().fileExtension());
+	            ctx.add(imageUri.get(), imagePath);
+            }
         }
         ctx.download();
     }
@@ -113,18 +120,25 @@ public class MangaGo implements Cmd {
      * Note that the onerror attribute is an alternative url
      * to download the image in case the original url fails.
      */
-    private URLResource findImageUri(Document page) {
+    private Optional<URLResource> findImageUri(Document page) {
         Element img = page.select("a[id=pic_container] img[border][src]").first();
-        URLResource imageUrl = new URLResource(img.attr("src"));
-        if (img.hasAttr("onerror")) {
-            return new URLResource(
-            	imageUrl
-            	, ctx.findSourceUrls(img.attr("onerror")).stream()
-            	.map(URLResource::new).collect(Collectors.toList()));
+        Optional<URLResource> imageUrl = URLResource.of(img.attr("src"));
+        if (!imageUrl.isPresent()) {
+        	return Optional.empty();
+        }
+        else if (img.hasAttr("onerror")) {
+        	return ctx.findSourceUrls(img.attr("onerror"))
+				.stream()
+				.map(URLResource::of)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.collect(Collectors.collectingAndThen(
+					Collectors.toList()
+					, onerrorUrls -> Optional.of(
+						new URLResource(imageUrl.get(), onerrorUrls))));
         } else {
         	return imageUrl;
         }
-
     }
 
     /** Copy the downloaded images to output directories */

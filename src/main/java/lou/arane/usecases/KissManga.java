@@ -2,6 +2,7 @@ package lou.arane.usecases;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,11 +64,13 @@ public class KissManga implements Cmd {
     private void downloadChapters() {
         Document chapters = Util.parseHtml(ctx.chapterList, BASE_URI);
         for (Element chapterAddr : chapters.select("table[class=listing] a[href]")) {
-            URLResource chapterUri = new URLResource(chapterAddr.absUrl("href"));
-            String chapterName = Util.join(Paths.get(chapterUri.filePath()), "_");
-            if (!chapterName.endsWith(".html")) chapterName += ".html";
-            Path chapterPath = ctx.chaptersDir.resolve(chapterName);
-            ctx.add(chapterUri, chapterPath);
+            Optional<URLResource> chapterUrl = URLResource.of(chapterAddr.absUrl("href"));
+            if (chapterUrl.isPresent()) {
+	            String chapterName = Util.join(Paths.get(chapterUrl.get().filePath()), "_");
+	            if (!chapterName.endsWith(".html")) chapterName += ".html";
+	            Path chapterPath = ctx.chaptersDir.resolve(chapterName);
+	            ctx.add(chapterUrl.get(), chapterPath);
+            }
         }
         ctx.download();
     }
@@ -84,11 +87,13 @@ public class KissManga implements Cmd {
             for (Element script : chapter.select("script[type=text/javascript]")) {
                 Matcher matcher = IMAGE_PATTERN.matcher(script.html());
                 while (matcher.find()) {
-                    URLResource imageUri = new URLResource(matcher.group(1));
-                    String imageName = chapterName + "_" + imageUri.fileName();
-                    imageName = Util.padNumericSequences(imageName, 3);
-                    Path imagePath = ctx.imagesDir.resolve(imageName);
-                    ctx.add(imageUri, imagePath);
+                    Optional<URLResource> imageUrl = URLResource.of(matcher.group(1));
+                    if (imageUrl.isPresent()) {
+	                    String imageName = chapterName + "_" + imageUrl.get().fileName();
+	                    imageName = Util.padNumericSequences(imageName, 3);
+	                    Path imagePath = ctx.imagesDir.resolve(imageName);
+	                    ctx.add(imageUrl.get(), imagePath);
+                    }
                 }
             }
         }
