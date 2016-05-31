@@ -1,6 +1,7 @@
 package lou.arane.util;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 
 /** Results from making http connection */
@@ -30,6 +31,11 @@ public class HttpResponse implements AutoCloseable {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/** Write content to output */
+	public void copyTo(OutputStream output) {
+		IO.copy(input, output);
 	}
 
 	@Override

@@ -1,11 +1,12 @@
 package lou.arane.url;
 
 import static java.util.Collections.unmodifiableCollection;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import lou.arane.cmds.CmdAllSuccess;
 import lou.arane.cmds.CmdLimitedRetry;
@@ -29,24 +30,27 @@ public class URLDownloads extends CmdWrap {
 
     public URLDownloads(Collection<Entry<URLResource, Path>> items, int maxRetries) {
     	super(
-    		new CmdAllSuccess(
-        		items.stream()
-				.map(e1 -> new URLDownload(e1.getKey(), e1.getValue()))
-				.map(c -> new CmdLimitedRetry(c, maxRetries))
-				.map(c -> new CmdWrap(c, () -> {
-					Log.info("Start: " + c);
-					c.doRun();
-					Log.info("End: " + c);}))
-				.collect(Collectors.toList())
-        		, e -> Log.error(e)));
+        	items.stream()
+			.map(i -> new URLDownload(i))
+			.map(c -> new CmdLimitedRetry(c, maxRetries))
+			.map(c -> new CmdWrap(c, () -> {
+				Log.info("Start: " + c);
+				c.doRun();
+				Log.info("End: " + c);}))
+			.collect(collectingAndThen(
+				toList()
+				, cmds -> new CmdAllSuccess(
+					cmds
+					, e -> Log.error(e))))
+		);
     	Check.require(maxRetries > 0, "Retries must be positive");
     	this.items = unmodifiableCollection(items);
     }
 
     @Override
     public String toString() {
-    	String className = getClass().getSimpleName();
-		String joinedItems = Util.join(items, Util.NEWLINE);
-		return String.format("%s(%n%s%n)", className, joinedItems);
+    	return String.format("%s(%n%s%n)"
+    		, getClass().getSimpleName()
+    		, Util.join(items, Util.newline()));
     }
 }

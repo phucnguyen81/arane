@@ -18,13 +18,13 @@ import lou.arane.base.Cmd;
 public final class CmdAllSuccess implements Cmd {
 
 	private final List<Cmd> cmds;
-	private final Consumer<RuntimeException> errorHandler;
+	private final Consumer<Exception> errorHandler;
 
-	public CmdAllSuccess(Collection<Cmd> cmds) {
+	public CmdAllSuccess(Collection<? extends Cmd> cmds) {
 		this(cmds, e -> {});
 	}
 
-	public CmdAllSuccess(Collection<Cmd> cmds, Consumer<RuntimeException> errorHandler) {
+	public CmdAllSuccess(Collection<? extends Cmd> cmds, Consumer<Exception> errorHandler) {
 		this.cmds = new ArrayList<>(cmds);
 		this.errorHandler = errorHandler;
 	}
@@ -45,7 +45,7 @@ public final class CmdAllSuccess implements Cmd {
             if (c.canRun()) try {
         		c.doRun();
         	}
-        	catch (RuntimeException e) {
+        	catch (Exception e) {
         		errorHandler.accept(e);
         		if (c.canRun()) {
         			// re-try later

@@ -8,11 +8,11 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import lou.arane.cmds.CmdFirstSuccess;
 import lou.arane.cmds.CmdWrap;
-import lou.arane.util.IO;
 import lou.arane.util.Util;
 
 /**
@@ -26,18 +26,22 @@ public class URLDownload extends CmdWrap {
 	private final Path target;
 
 	/** Instantiate with default timeout */
-	public URLDownload(URLResource source, Path target) {
-		this(source, target, Duration.of(1, MINUTES));
+	public URLDownload(Entry<URLResource, Path> item) {
+		this(item, Duration.of(1, MINUTES));
+	}
+
+	/** Instantiate given download item and timeout */
+	public URLDownload(Entry<URLResource, Path> item, Duration timeout) {
+		this(item.getKey(), item.getValue(), timeout);
 	}
 
 	/** Instantiate given source, target and timeout */
-	public URLDownload(URLResource source, Path target, Duration timeout) {
+	private URLDownload(URLResource source, Path target, Duration timeout) {
 		super(
 			allSources(source)
-			.map(url -> url.string())
 			.map(url -> new CmdWrap(
 				() -> Util.notExists(target)
-				, () -> IO.download(url, target, timeout)))
+				, () -> url.httpDownload(target, timeout)))
 			.collect(collectingAndThen(
 				toList()
 				, cmds -> new CmdFirstSuccess(cmds)))

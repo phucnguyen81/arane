@@ -84,7 +84,7 @@ public class GenerateImageViewer {
 
     private void generateStoryIndex(Story storyModel) {
         STGroup templates = new STGroupFile("StoryHtml.stg");
-        templates.encoding = IO.defaultEncoding();
+        templates.encoding = IO.encoding();
         ST template = templates.getInstanceOf("story");
         template.add("story", storyModel);
         String story = template.render();

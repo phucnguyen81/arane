@@ -40,8 +40,10 @@ import lou.arane.url.URLResource;
  */
 public final class Util {
 
-    /** system-dependent line separator */
-    public static final String NEWLINE = System.lineSeparator();
+	/** Default line separator */
+    public static String newline() {
+    	return System.lineSeparator();
+    }
 
     public static void println(Object message) {
         System.out.println(message);
@@ -61,7 +63,7 @@ public final class Util {
     public static String normalizeNewlines(String s) {
         StringBuilder b = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new StringReader(s))) {
-        	reader.lines().forEach(line -> b.append(line).append(NEWLINE));
+        	reader.lines().forEach(line -> b.append(line).append(newline()));
         }
         catch (IOException e) {
             throw new AssertionError("Should never happen!", e);
@@ -275,9 +277,9 @@ public final class Util {
         ByteArrayOutputStream stackTrace = new ByteArrayOutputStream();
         boolean autoFlushFlag = false;
         try {
-            PrintStream printer = new PrintStream(stackTrace, autoFlushFlag, IO.defaultEncoding());
+            PrintStream printer = new PrintStream(stackTrace, autoFlushFlag, IO.encoding());
             error.printStackTrace(printer);
-            return stackTrace.toString(IO.defaultEncoding());
+            return stackTrace.toString(IO.encoding());
         }
         catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("Should never happen!", e);

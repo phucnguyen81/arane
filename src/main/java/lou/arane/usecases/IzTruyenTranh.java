@@ -42,7 +42,7 @@ public class IzTruyenTranh implements Cmd {
     @Override
 	public boolean canRun() {
     	// domain must match
-    	String url = ctx.source.string();
+    	String url = ctx.source.externalForm();
     	return url.startsWith(BASE_URI);
     }
 
