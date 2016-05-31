@@ -73,7 +73,8 @@ public class CmdWrap implements Cmd {
 
 	@Override
 	public String toString() {
-		return origin.map(c -> String.format("CmdWrap(%s)", c))
-				.orElse(String.format("CmdWrap(%ncondition=%s%n, action=%s%n)", condition, action));
+		String className = getClass().getSimpleName();
+		return origin.map(c -> String.format("%s(%n%s%n)", className, c))
+				.orElse(String.format("%s(%ncondition=%s%n, action=%s%n)", className, condition, action));
 	}
 }

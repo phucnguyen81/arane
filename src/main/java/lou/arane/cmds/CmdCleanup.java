@@ -1,20 +1,18 @@
 package lou.arane.cmds;
 
-import java.io.Closeable;
-
 import lou.arane.base.Cmd;
 
 /**
- * Wrap a command to indicate it needs cleanup.
+ * Make sure a cleanup action is done for a command.
  *
  * @author Phuc
  */
-public class CmdCloseable implements Cmd, Closeable {
+public class CmdCleanup implements Cmd {
 
 	private final Cmd origin;
 	private final Runnable cleanup;
 
-	public CmdCloseable(Cmd origin, Runnable cleanup) {
+	public CmdCleanup(Cmd origin, Runnable cleanup) {
 		this.origin = origin;
 		this.cleanup = cleanup;
 	}
@@ -26,12 +24,12 @@ public class CmdCloseable implements Cmd, Closeable {
 
 	@Override
 	public void doRun() {
-		origin.doRun();
-	}
-
-	@Override
-	public void close() {
-		cleanup.run();
+		try {
+			origin.doRun();
+		}
+		finally {
+			cleanup.run();
+		}
 	}
 
 	@Override

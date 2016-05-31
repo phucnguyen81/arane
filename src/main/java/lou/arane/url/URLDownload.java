@@ -1,4 +1,4 @@
-package lou.arane.http;
+package lou.arane.url;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import lou.arane.base.URLResource;
 import lou.arane.cmds.CmdFirstSuccess;
 import lou.arane.cmds.CmdWrap;
 import lou.arane.util.IO;
@@ -21,27 +20,27 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class HttpDownloader extends CmdWrap {
+public class URLDownload extends CmdWrap {
 
 	private final URLResource source;
 	private final Path target;
 
 	/** Instantiate with default timeout */
-	public HttpDownloader(URLResource source, Path target) {
-		this(source, target, Duration.of(2, MINUTES));
+	public URLDownload(URLResource source, Path target) {
+		this(source, target, Duration.of(1, MINUTES));
 	}
 
 	/** Instantiate given source, target and timeout */
-	public HttpDownloader(URLResource source, Path target, Duration timeout) {
+	public URLDownload(URLResource source, Path target, Duration timeout) {
 		super(
 			allSources(source)
 			.map(url -> url.string())
 			.map(url -> new CmdWrap(
-				() -> Util.notExists(target),
-				() -> IO.download(url, target, timeout)))
+				() -> Util.notExists(target)
+				, () -> IO.download(url, target, timeout)))
 			.collect(collectingAndThen(
-				toList(),
-				cmds -> new CmdFirstSuccess(cmds)))
+				toList()
+				, cmds -> new CmdFirstSuccess(cmds)))
 		);
 		this.source = source;
 		this.target = target;

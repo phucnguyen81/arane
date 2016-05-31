@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import lou.arane.base.Cmd;
 import lou.arane.base.Context;
-import lou.arane.base.URLResource;
+import lou.arane.url.URLResource;
 import lou.arane.util.Util;
 
 import org.jsoup.nodes.Document;

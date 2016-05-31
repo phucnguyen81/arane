@@ -4,7 +4,7 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import lou.arane.base.URLResource;
+import lou.arane.url.URLResource;
 
 /**
  * See how to handle urls normally found on the net.

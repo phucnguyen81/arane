@@ -19,8 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 
-import lou.arane.http.HttpResponse;
-
 /**
  * I/O operations for this app.
  *

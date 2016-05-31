@@ -2,15 +2,16 @@ package lou.arane.base;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lou.arane.http.HttpBatchDownloader;
+import lou.arane.cmds.CmdCleanup;
+import lou.arane.url.URLDownloads;
+import lou.arane.url.URLResource;
 import lou.arane.util.Check;
+import lou.arane.util.New;
 import lou.arane.util.Util;
 
 /**
@@ -44,7 +45,7 @@ public class Context {
      * src="mangas/Feng Shen Ji/Chapter 001/Feng_Shen_Ji_ch01_p00.jpg" */
     public Pattern srcPattern = Pattern.compile("src=['\"]([^'\"]+)['\"]");
 
-    private final Map<URLResource, Path> items = new LinkedHashMap<>();
+    private final List<Entry<URLResource, Path>> items = new ArrayList<>();
 
 	public Context(String sourceName, URLResource source, Path baseDir) {
 		this.source = source;
@@ -70,34 +71,25 @@ public class Context {
 
 	/** Add a pair of source-target to download later */
 	public void add(URLResource fromUri, Path toPath) {
-		items.put(fromUri, toPath);
+		items.add(New.entry(fromUri, toPath));
 	}
 
 	/** Download items added so far.
 	 * All items are cleared after this returns. */
 	public void download() {
-		try {
-			doDownload();
-		}
-		finally {
-			items.clear();
-		}
-	}
-
-	private void doDownload() {
-		HttpBatchDownloader downloader = new HttpBatchDownloader();
-		downloader.setMaxDownloadAttempts(maxDownloadAttempts);
-		for (Entry<URLResource, Path> i: getSortedItems()) {
-			downloader.add(i.getKey(), i.getValue());
-		}
-		downloader.run();
+		 new CmdCleanup(
+			new URLDownloads(
+				itemsSorted(),
+				maxDownloadAttempts),
+			() -> items.clear()
+		).run();
 	}
 
 	/** Sort by the target path */
-	private List<Entry<URLResource, Path>> getSortedItems() {
-		List<Entry<URLResource, Path>> itemList = new ArrayList<>(items.entrySet());
-		itemList.sort((e1, e2) -> e1.getValue().compareTo(e2.getValue()));
-		return itemList;
+	private List<Entry<URLResource, Path>> itemsSorted() {
+		List<Entry<URLResource, Path>> sorted = new ArrayList<>(items);
+		sorted.sort((e1, e2) -> e1.getValue().compareTo(e2.getValue()));
+		return sorted;
 	}
 
     /** Find urls enclosed in text pattern "src='url'".

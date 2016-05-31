@@ -1,4 +1,4 @@
-package lou.arane.http;
+package lou.arane.util;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;

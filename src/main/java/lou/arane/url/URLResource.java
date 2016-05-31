@@ -1,4 +1,4 @@
-package lou.arane.base;
+package lou.arane.url;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
