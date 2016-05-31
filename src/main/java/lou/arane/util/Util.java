@@ -132,7 +132,7 @@ public final class Util {
             return Files.createDirectories(dir, attrs);
         }
         catch (IOException e) {
-            throw new AssertionError(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -140,7 +140,7 @@ public final class Util {
         try {
             Files.delete(path);
         } catch (IOException e) {
-            throw new AssertionError(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -153,7 +153,7 @@ public final class Util {
             return Files.deleteIfExists(path);
         }
         catch (IOException e) {
-            throw new AssertionError(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -316,7 +316,7 @@ public final class Util {
     	try {
     		return Jsoup.parse(path.toFile(), defaultCharsetName);
     	} catch (IOException e) {
-    		throw new AssertionError("Failed to parse html file " + path, e);
+    		throw new RuntimeException("Failed to parse html file " + path, e);
     	}
     }
 

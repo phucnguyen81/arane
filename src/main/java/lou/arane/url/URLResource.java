@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import lou.arane.util.HttpResponse;
 import lou.arane.util.IO;
@@ -39,22 +40,20 @@ public class URLResource {
 	/** A url needs to be encoded if it constains
 	 * illegal source characters (e.g. spaces) */
 	public static String encode(String url) {
-		StringBuilder encoded = new StringBuilder();
-		for (int codepoint : url.codePoints().toArray()) {
-			String chars = new String(Character.toChars(codepoint));
-			if (   codepoint == ':'
-				|| codepoint == '/'
-				|| codepoint == '?'
-				|| codepoint == '#'
-				|| codepoint == '&'
-			) {
-				encoded.append(chars);
-			} else {
-				String charsEncoded = encodeWithEncoder(chars);
-				encoded.append(charsEncoded);
-			}
-		}
-		return encoded.toString();
+		return url.codePoints()
+			.mapToObj(Character::toChars)
+			.map(String::new)
+			.map(c ->
+				(  c.equals(":")
+				|| c.equals("/")
+				|| c.equals("?")
+				|| c.equals("#")
+				|| c.equals("&")
+				)
+				? c
+				: encodeWithEncoder(c)
+			)
+			.collect(Collectors.joining());
 	}
 
 	/** Encode url using default encoding and unchecked exception */

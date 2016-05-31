@@ -1,5 +1,10 @@
 package lou.arane.util;
 
+/**
+ * Check conditions/violations
+ *
+ * @author Phuc
+ */
 public class Check {
 
     public static <T> T notNull(T reference) {
