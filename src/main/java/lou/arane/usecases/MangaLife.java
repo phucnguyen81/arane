@@ -35,7 +35,7 @@ public class MangaLife implements Cmd {
 	@Override
 	public boolean canRun() {
 		//domain must match
-		String url = ctx.source.urlString();
+		String url = ctx.source.string();
 		return url.startsWith(BASE_URI);
 	}
 
@@ -106,7 +106,7 @@ public class MangaLife implements Cmd {
 
     /** TODO do source.resolve(chapter, index, page) here, not doing strings */
     private void addPage(String chapter, String index, String page) {
-        String base = ctx.source.urlString();
+        String base = ctx.source.string();
         base = Util.removeEnding(base, "/");
         String pageUriStr = Util.join(Arrays.asList(base, chapter, index, page), "/");
         URLResource.of(pageUriStr).ifPresent(pageUrl -> {

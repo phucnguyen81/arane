@@ -1,13 +1,18 @@
 package lou.arane.http;
 
+import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
+
 import java.nio.file.Path;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
-import lou.arane.base.Cmd;
 import lou.arane.base.URLResource;
+import lou.arane.cmds.CmdFirstSuccess;
+import lou.arane.cmds.CmdWrap;
 import lou.arane.util.IO;
 import lou.arane.util.Util;
 
@@ -16,54 +21,41 @@ import lou.arane.util.Util;
  *
  * @author Phuc
  */
-public class HttpDownloader implements Cmd {
+public class HttpDownloader extends CmdWrap {
 
 	private final URLResource source;
 	private final Path target;
 
-	private final Duration timeout;
-
-	/** Create a downloader with default timeout */
+	/** Instantiate with default timeout */
 	public HttpDownloader(URLResource source, Path target) {
-		this(source, target, Duration.of(2, ChronoUnit.MINUTES));
+		this(source, target, Duration.of(2, MINUTES));
 	}
 
-	/** Create a downloader given source, target and timeout */
-	public HttpDownloader(URLResource url, Path path, Duration timeout) {
-		this.source = url;
-		this.target = path;
-		this.timeout = timeout;
+	/** Instantiate given source, target and timeout */
+	public HttpDownloader(URLResource source, Path target, Duration timeout) {
+		super(
+			allSources(source)
+			.map(url -> url.string())
+			.map(url -> new CmdWrap(
+				() -> Util.notExists(target),
+				() -> IO.download(url, target, timeout)))
+			.collect(collectingAndThen(
+				toList(),
+				cmds -> new CmdFirstSuccess(cmds)))
+		);
+		this.source = source;
+		this.target = target;
+	}
+
+	private static Stream<URLResource> allSources(URLResource source) {
+		List<URLResource> urls = new ArrayList<>();
+		urls.add(source);
+		urls.addAll(source.alternatives());
+		return urls.stream();
 	}
 
 	@Override
-	public boolean canRun() {
-		return Util.notExists(target);
-	}
-
-	/** Download from source to target.
-	 * Try alternate sources if the original one fails.
-	 * Throw only the error of the last source being tried. */
-	@Override
-	public void doRun() {
-		Deque<URLResource> urls = new ArrayDeque<>(source.alternatives());
-		urls.addFirst(source);
-		while (!urls.isEmpty()) {
-			URLResource url = urls.removeFirst();
-			try {
-				IO.download(url.urlString(), target, timeout);
-				return;
-			}
-			catch (RuntimeException e) {
-				if (urls.isEmpty()) {
-					throw e;
-				}
-			}
-		}
-		throw new AssertionError("This error should be unreachable!");
-	}
-
-    @Override
 	public String toString() {
-		return String.format("Download[%n  source:%s%n  target:%s%n]", source, target);
+		return String.format("Download[%n source:%s%n target:%s%n]", source, target);
 	}
 }

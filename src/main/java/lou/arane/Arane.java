@@ -9,8 +9,7 @@ import java.util.List;
 import lou.arane.base.Cmd;
 import lou.arane.base.Context;
 import lou.arane.base.URLResource;
-import lou.arane.cmds.CmdAssembled;
-import lou.arane.cmds.CmdDecorator;
+import lou.arane.cmds.CmdWrap;
 import lou.arane.usecases.BlogTruyen;
 import lou.arane.usecases.EgScans;
 import lou.arane.usecases.IzTruyenTranh;
@@ -36,7 +35,7 @@ public class Arane {
 			String name = args[0];
 			URLResource url = URLResource.of(args[1])
 				.orElseThrow(() -> new IllegalArgumentException(
-					"Illegal url: " + args[1])); 
+					"Illegal url: " + args[1]));
 			new Arane(name, url).run();
 		}
 		catch (Throwable t) {
@@ -72,7 +71,7 @@ public class Arane {
 		.stream()
 		.filter(Cmd::canRun)
 		.findFirst()
-		.orElse(new CmdAssembled(() ->
+		.orElse(new CmdWrap(() ->
 			Log.info("Found no supports for downloading: " + name + ", " + url)))
 		.doRun();
 	}
@@ -108,7 +107,7 @@ public class Arane {
 
 	/** Attach logging before and after a run */
 	private static Cmd attachLog(Cmd cmd, Context ctx) {
-		return new CmdDecorator(cmd, () -> {
+		return new CmdWrap(cmd, () -> {
 			Log.info(String.format("Start downloading %s into %s", ctx.sourceName, ctx.target));
 			cmd.doRun();
 			Log.info(String.format("Finished downloading %s into %s", ctx.sourceName, ctx.target));

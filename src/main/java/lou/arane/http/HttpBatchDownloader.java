@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 
 import lou.arane.base.Cmd;
 import lou.arane.base.URLResource;
-import lou.arane.cmds.CmdDecorator;
+import lou.arane.cmds.CmdAllSuccess;
 import lou.arane.cmds.CmdLimitedRetry;
-import lou.arane.cmds.CmdRetryUntilSuccess;
+import lou.arane.cmds.CmdWrap;
 import lou.arane.util.Check;
 import lou.arane.util.Log;
 import lou.arane.util.Util;
@@ -48,17 +48,17 @@ public class HttpBatchDownloader implements Cmd {
     /** Download everything that were added */
     @Override
 	public void doRun() {
-    	new CmdRetryUntilSuccess(
+    	new CmdAllSuccess(
     		withLoggingAndRetries()
     		, e -> Log.error(e)
     	).doRun();
     }
 
-    /** Enhance cmds with retry and logging */
+    /** Add retry and logging */
 	private List<Cmd> withLoggingAndRetries() {
 		return cmds.stream()
 			.map(c -> new CmdLimitedRetry(c, maxDownloadAttempts))
-			.map(c -> new CmdDecorator(c, () -> {
+			.map(c -> new CmdWrap(c, () -> {
 				Log.info("Start: " + c);
 				c.doRun();
 				Log.info("End: " + c);

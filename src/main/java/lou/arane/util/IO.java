@@ -28,14 +28,18 @@ import lou.arane.http.HttpResponse;
  */
 public class IO {
 
-	/** default charset for I/O operations */
-	public static final Charset CHARSET = StandardCharsets.UTF_8;
+	/** buffer size used for I/O operations */
+	private static final int BUFFER_SIZE = 1024 * 8;
 
 	/** default encoding for I/O operation */
-	public static final String ENCODING = CHARSET.name();
+	public static String defaultEncoding() {
+		return defaultCharset().name();
+	}
 
-	/** buffer size used for I/O operations */
-	public static final int BUFFER_SIZE = 1024 * 8;
+	/** default charset for I/O operations */
+	public static Charset defaultCharset() {
+		return StandardCharsets.UTF_8;
+	}
 
 	/** Download from a url to a file.
 	 * If there is no exception, the right content should be downloaded to the file. */
@@ -80,7 +84,7 @@ public class IO {
 		} catch (ProtocolException e) {
 			throw new RuntimeException(e);
 		}
-		conn.setRequestProperty("Accept-Charset", ENCODING);
+		conn.setRequestProperty("Accept-Charset", defaultEncoding());
 		// pretend to be Mozilla since some server might check it
 		conn.setRequestProperty("User-Agent",
 			"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1");
@@ -117,7 +121,7 @@ public class IO {
 	 * The file is created if not exists.
 	 * Encoding is set to {@link #CHARSET}. */
 	public static void write(Object o, Path file) {
-		write(o, file, CHARSET);
+		write(o, file, defaultCharset());
 	}
 
 	/** Extended version of {@link #write(Object, Path)} with explicit charset */

@@ -1,10 +1,6 @@
 # Move static methods into objects
-
-## Make FileResource
+## Make File/Dir Resource
 Move operations on File/Path into FileResource
 
-# Fake http get request to go through sites that check requests
+# Find in html similar to BeautifulSoup
 
-# No inheritance (principles?)
-
-# There are only immutable objects reflecting my understanding (principles?) 

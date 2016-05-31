@@ -5,10 +5,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import lou.arane.util.IO;
@@ -32,10 +30,10 @@ public class URLResource {
 
     /** Alternate urls meant to locate the same resource as this url.
      * Not clean code but works for now */
-    private final List<URLResource> alternatives;
+    private final Collection<URLResource> alternatives;
 
     private final URL url;
-    
+
     public URLResource(URL url) {
         this(url, Collections.emptyList());
     }
@@ -46,7 +44,7 @@ public class URLResource {
 
     public URLResource(URL url, Collection<URLResource> alternatives) {
         this.url = url;
-        this.alternatives = new ArrayList<>(alternatives);
+        this.alternatives = Collections.unmodifiableCollection(alternatives);
     }
 
     @Override
@@ -61,12 +59,12 @@ public class URLResource {
     			, Util.join(alternatives, Util.NEWLINE));
     }
 
-    public List<URLResource> alternatives() {
+    public Collection<URLResource> alternatives() {
     	return alternatives;
     }
 
-    public String urlString() {
-    	return url.toString();
+    public String string() {
+    	return url.toExternalForm();
     }
 
     /** Return the query part of empty string */
@@ -114,9 +112,9 @@ public class URLResource {
 	/** Encode url using default encoding and unchecked exception */
 	private static String encodeWithEncoder(String url) {
 		try {
-			return URLEncoder.encode(url, IO.ENCODING);
+			return URLEncoder.encode(url, IO.defaultEncoding());
 		} catch (UnsupportedEncodingException e) {
-			throw new AssertionError(IO.ENCODING + " should be supported!", e);
+			throw new AssertionError(IO.defaultEncoding() + " should be supported!", e);
 		}
 	}
 }

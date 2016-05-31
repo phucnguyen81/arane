@@ -275,9 +275,9 @@ public final class Util {
         ByteArrayOutputStream stackTrace = new ByteArrayOutputStream();
         boolean autoFlushFlag = false;
         try {
-            PrintStream printer = new PrintStream(stackTrace, autoFlushFlag, IO.ENCODING);
+            PrintStream printer = new PrintStream(stackTrace, autoFlushFlag, IO.defaultEncoding());
             error.printStackTrace(printer);
-            return stackTrace.toString(IO.ENCODING);
+            return stackTrace.toString(IO.defaultEncoding());
         }
         catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("Should never happen!", e);

@@ -27,12 +27,12 @@ public class New {
     }
 
     public static BufferedReader reader(InputStream stream) {
-        return new BufferedReader(new InputStreamReader(stream, IO.CHARSET));
+        return new BufferedReader(new InputStreamReader(stream, IO.defaultCharset()));
     }
 
     public static BufferedReader reader(Path path) {
         try {
-            return Files.newBufferedReader(path, IO.CHARSET);
+            return Files.newBufferedReader(path, IO.defaultCharset());
         }
         catch (IOException e) {
             throw new RuntimeException(e);

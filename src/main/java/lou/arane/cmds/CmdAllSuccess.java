@@ -15,16 +15,16 @@ import lou.arane.base.Cmd;
  *
  * @author Phuc
  */
-public final class CmdRetryUntilSuccess implements Cmd {
+public final class CmdAllSuccess implements Cmd {
 
 	private final List<Cmd> cmds;
 	private final Consumer<RuntimeException> errorHandler;
 
-	public CmdRetryUntilSuccess(Collection<Cmd> cmds) {
+	public CmdAllSuccess(Collection<Cmd> cmds) {
 		this(cmds, e -> {});
 	}
 
-	public CmdRetryUntilSuccess(Collection<Cmd> cmds, Consumer<RuntimeException> errorHandler) {
+	public CmdAllSuccess(Collection<Cmd> cmds, Consumer<RuntimeException> errorHandler) {
 		this.cmds = new ArrayList<>(cmds);
 		this.errorHandler = errorHandler;
 	}

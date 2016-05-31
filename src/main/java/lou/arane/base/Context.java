@@ -73,8 +73,18 @@ public class Context {
 		items.put(fromUri, toPath);
 	}
 
-	/** Download what been added so far */
+	/** Download items added so far.
+	 * All items are cleared after this returns. */
 	public void download() {
+		try {
+			doDownload();
+		}
+		finally {
+			items.clear();
+		}
+	}
+
+	private void doDownload() {
 		HttpBatchDownloader downloader = new HttpBatchDownloader();
 		downloader.setMaxDownloadAttempts(maxDownloadAttempts);
 		for (Entry<URLResource, Path> i: getSortedItems()) {

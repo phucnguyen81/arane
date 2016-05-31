@@ -20,19 +20,21 @@ public class FileResource {
 		this.file = path;
 	}
 
-	public void create() {
+	public FileResource create() {
 		Try.toDo(() -> Files.createFile(file));
+		return this;
 	}
 
 	public boolean notExists() {
 		return Files.notExists(file);
 	}
 
-	public void createIfNotExists() {
+	public FileResource createIfNotExists() {
 		if (notExists()) {
 			dir.create();
 			create();
 		}
+		return this;
 	}
 
 }

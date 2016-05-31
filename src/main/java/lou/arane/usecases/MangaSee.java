@@ -36,7 +36,7 @@ public class MangaSee implements Cmd {
 	@Override
 	public boolean canRun() {
 		//domain must match
-		String url = ctx.source.urlString();
+		String url = ctx.source.string();
 		return url.startsWith(baseUri);
 	}
 

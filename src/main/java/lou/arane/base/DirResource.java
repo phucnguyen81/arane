@@ -18,7 +18,8 @@ public class DirResource {
 		this.dir = path;
 	}
 
-	public void create() {
+	public DirResource create() {
 		Try.toDo(() -> Files.createDirectories(dir));
+		return this;
 	}
 }
