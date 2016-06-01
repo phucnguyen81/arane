@@ -1,4 +1,4 @@
-package lou.arane.cmds;
+package lou.arane.base.cmds;
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;

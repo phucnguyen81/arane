@@ -8,7 +8,7 @@ import java.util.List;
 
 import lou.arane.base.Cmd;
 import lou.arane.base.Context;
-import lou.arane.cmds.CmdWrap;
+import lou.arane.base.cmds.CmdWrap;
 import lou.arane.url.URLResource;
 import lou.arane.usecases.BlogTruyen;
 import lou.arane.usecases.EgScans;

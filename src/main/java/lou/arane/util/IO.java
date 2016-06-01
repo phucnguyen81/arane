@@ -21,10 +21,10 @@ import java.nio.file.Path;
  */
 public class IO {
 
-	/** buffer size used for I/O operations */
+	/** default buffer size for I/O operations */
 	private static final int BUFFER_SIZE = 1024 * 8;
 
-	/** default encoding for I/O operation */
+	/** default encoding for I/O operations */
 	public static String encoding() {
 		return charset().name();
 	}
@@ -37,17 +37,15 @@ public class IO {
 	/** Copy all bytes from input to output.
 	 * @return the number of bytes copied */
 	public static long copy(InputStream source, OutputStream sink) {
-		source = new BufferedInputStream(source);
-		sink = new BufferedOutputStream(sink);
-		try {
-			return tryCopy(source, sink);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		return Try.toGet(() -> tryCopy(
+			new BufferedInputStream(source)
+			, new BufferedOutputStream(sink)));
 	}
 
 	/** @see Files#copy(InputStream, OutputStream) */
-	public static long tryCopy(InputStream source, OutputStream sink) throws Exception {
+	public static long tryCopy(InputStream source, OutputStream sink)
+		throws Exception
+	{
 		long nread = 0L;
 		byte[] buf = new byte[BUFFER_SIZE];
 		int n;
@@ -58,40 +56,37 @@ public class IO {
 		return nread;
 	}
 
-	/** Write string reprentation of an object to file.
-	 * The file is created if not exists.
-	 * Encoding is set to {@link #CHARSET}. */
+	/** Limited version of {@link #write(Object, Path, Charset).
+	 * Encoding defaults to {@link #charset()} */
 	public static void write(Object o, Path file) {
 		write(o, file, charset());
 	}
 
-	/** Extended version of {@link #write(Object, Path)} with explicit charset */
+	/** Write string reprentation of an object to file.
+	 * The file is created if not exists. */
 	public static void write(Object o, Path file, Charset charset) {
 		Util.createFileIfNotExists(file);
-	    try ( Reader reader = new StringReader(o.toString())
-	    	; Writer writer = Files.newBufferedWriter(file, charset)
-	    ){
-	    	copy(reader, writer);
-	    }
-	    catch (Exception e) {
-	    	throw new RuntimeException(e);
-	    }
+	    Try.toDo(() -> {
+	    	try ( Reader reader = new StringReader(o.toString())
+	    		; Writer writer = Files.newBufferedWriter(file, charset)
+	    	){
+	    		copy(reader, writer);
+	    	}
+	    });
 	}
 
 	/** Copy all chars from a reader to a writer.
-	 * @return the number of chars copied
-	 * @see #copy(InputStream, OutputStream) */
+	 * @return the number of chars copied */
 	public static long copy(Reader reader, Writer writer) {
-		reader = new BufferedReader(reader);
-		writer = new BufferedWriter(writer);
-		try {
-			return tryCopy(reader, writer);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		return Try.toGet(() -> tryCopy(
+			new BufferedReader(reader)
+			, new BufferedWriter(writer)));
 	}
 
-	public static long tryCopy(Reader reader, Writer writer) throws Exception {
+	/** @see Files#copy(InputStream, OutputStream) */
+	public static long tryCopy(Reader reader, Writer writer)
+		throws Exception
+	{
 		long nread = 0L;
 		char[] buf = new char[BUFFER_SIZE];
 		int n;

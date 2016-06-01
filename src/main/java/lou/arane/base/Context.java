@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lou.arane.cmds.CmdCleanup;
+import lou.arane.base.cmds.CmdCleanup;
 import lou.arane.url.URLDownloads;
 import lou.arane.url.URLResource;
 import lou.arane.util.Check;

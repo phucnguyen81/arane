@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import lou.arane.cmds.CmdFirstSuccess;
-import lou.arane.cmds.CmdWrap;
+import lou.arane.base.cmds.CmdFirstSuccess;
+import lou.arane.base.cmds.CmdWrap;
 import lou.arane.util.Util;
 
 /**
