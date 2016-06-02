@@ -11,7 +11,7 @@ import org.jsoup.select.Elements;
 
 import lou.arane.base.Cmd;
 import lou.arane.base.Context;
-import lou.arane.url.URLResource;
+import lou.arane.io.URLResource;
 import lou.arane.util.Util;
 
 /**

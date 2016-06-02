@@ -15,7 +15,7 @@ import lou.arane.base.Cmd;
  *
  * @author Phuc
  */
-public final class CmdAllSuccess implements Cmd {
+public class CmdAllSuccess implements Cmd {
 
 	private final List<Cmd> cmds;
 	private final Consumer<Exception> errorHandler;
@@ -30,7 +30,7 @@ public final class CmdAllSuccess implements Cmd {
 	}
 
 	@Override
-	public boolean canRun() {
+	public final boolean canRun() {
 		return cmds.stream().anyMatch(Cmd::canRun);
 	}
 
@@ -38,7 +38,7 @@ public final class CmdAllSuccess implements Cmd {
 	 * A command that raises exception is re-run later.
 	 * This might run forever if commands always want to run but keep failing. */
 	@Override
-	public void doRun() {
+	public final void doRun() {
     	Deque<Cmd> queue = new ArrayDeque<>(cmds);
         while (!queue.isEmpty()) {
             Cmd c = queue.removeFirst();

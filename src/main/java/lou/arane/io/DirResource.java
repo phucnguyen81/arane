@@ -1,9 +1,9 @@
-package lou.arane.base;
+package lou.arane.io;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import lou.arane.util.Try;
+import lou.arane.util.Unchecked;
 
 /**
  * Represent a directory
@@ -19,7 +19,7 @@ public class DirResource {
 	}
 
 	public DirResource create() {
-		Try.toDo(() -> Files.createDirectories(dir));
+		Unchecked.tryGet(() -> Files.createDirectories(dir));
 		return this;
 	}
 }

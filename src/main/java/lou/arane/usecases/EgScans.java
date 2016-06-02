@@ -9,8 +9,8 @@ import org.jsoup.nodes.Element;
 
 import lou.arane.base.Cmd;
 import lou.arane.base.Context;
+import lou.arane.io.URLResource;
 import lou.arane.scripts.CopyFiles;
-import lou.arane.url.URLResource;
 import lou.arane.util.Util;
 
 /**

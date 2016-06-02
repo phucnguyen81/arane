@@ -9,26 +9,26 @@ import lou.arane.base.Cmd;
  */
 public final class CmdLimitedRetry implements Cmd {
 
-	private final Cmd cmd;
+	private final Cmd origin;
 
 	private int limit;
 
 	public CmdLimitedRetry(Cmd cmd, int limit) {
-		this.cmd = cmd;
+		this.origin = cmd;
 		this.limit = limit;
 	}
 
 	/** Whether {@link #doRun()} should be called */
 	@Override
 	public boolean canRun() {
-		return cmd.canRun() && limit > 0;
+		return origin.canRun() && limit > 0;
 	}
 
 	/** Perform the download */
 	@Override
 	public void doRun() {
 		if (limit > 0) try {
-			cmd.doRun();
+			origin.doRun();
 		} catch (RuntimeException e) {
 			limit -= 1;
 			throw e;
@@ -37,6 +37,8 @@ public final class CmdLimitedRetry implements Cmd {
 
     @Override
 	public String toString() {
-		return String.format("[%s%n  limit=%s]", cmd, limit);
+		return String.format("%s:%n  %s%n  limit=%s"
+			, CmdLimitedRetry.class.getSimpleName(), origin, limit
+		);
 	}
 }

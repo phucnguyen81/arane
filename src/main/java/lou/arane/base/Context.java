@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lou.arane.base.cmds.CmdCleanup;
-import lou.arane.url.URLDownloads;
-import lou.arane.url.URLResource;
+import lou.arane.io.URLDownloads;
+import lou.arane.io.URLResource;
 import lou.arane.util.Check;
 import lou.arane.util.New;
 import lou.arane.util.Util;

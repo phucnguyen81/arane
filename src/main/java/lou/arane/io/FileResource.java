@@ -1,9 +1,9 @@
-package lou.arane.base;
+package lou.arane.io;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import lou.arane.util.Try;
+import lou.arane.util.Unchecked;
 
 /**
  * Represent a file
@@ -21,7 +21,7 @@ public class FileResource {
 	}
 
 	public FileResource create() {
-		Try.toDo(() -> Files.createFile(file));
+		Unchecked.tryGet(() -> Files.createFile(file));
 		return this;
 	}
 

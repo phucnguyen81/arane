@@ -1,13 +1,14 @@
-package lou.arane.url;
+package lou.arane.io;
 
-import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 import lou.arane.util.HttpResponse;
 import lou.arane.util.IO;
+import lou.arane.util.Unchecked;
 import lou.arane.util.Util;
 
 /**
@@ -65,8 +67,7 @@ public class URLResource {
 		}
 	}
 
-    /** Alternate urls meant to locate the same resource as this url.
-     * Not clean code but works for now */
+    /** Alternate urls meant to locate the same resource as this url*/
     private final Collection<URLResource> alternatives;
 
     private final URL url;
@@ -80,7 +81,7 @@ public class URLResource {
     }
 
     public URLResource(URL url, Collection<URLResource> alternatives) {
-        this.url = url;
+        this.url = Unchecked.tryGet(() -> new URL(url.toExternalForm()));
         this.alternatives = Collections.unmodifiableCollection(alternatives);
     }
 
@@ -114,52 +115,33 @@ public class URLResource {
     }
 
     /** Download to a file assuming the protocol is http.
-	 * If there is no exception, the right content should be downloaded to the file. */
-    public void httpDownload(Path file, Duration timeout) {
-		Util.createFileIfNotExists(file);
-		try ( HttpResponse response = httpGET(IO.charset(), timeout)
-	    	; OutputStream output = new BufferedOutputStream(
-	    		Files.newOutputStream(file))
+     * If there is no exception, the right content should be downloaded to the file. */
+    public void httpDownload(Path file, Duration timeout) throws IOException {
+    	try (
+			OutputStream out = Files.newOutputStream(file);
+			HttpResponse res = new HttpResponse(
+				IO.httpGET(url, StandardCharsets.UTF_8, timeout));
 	    ){
-			if (response.hasErrorCode()) {
-				throw new RuntimeException(String.format(
-					"Error code is %s for getting %s", response.code, url));
-	    	} else {
-	    		response.copyTo(output);
-	    	}
-	    }
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+    		if (res.hasErrorStatus()) {
+    			throw new RuntimeException(String.format(
+    				"Downloading: %s gives error status: %s", this.url, res));
+    		}
+    		/* copy in 2 phases to reduce the chance of incomplete download */
+    		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    		res.copyTo(buffer);
+    		IO.copy(new ByteArrayInputStream(buffer.toByteArray()), out);
+    	}
     }
 
-    /** Make a GET request assuming the protocol is http */
-    public HttpResponse httpGET(Charset charset, Duration timeout) {
-		try {
-			HttpURLConnection conn;
-			conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("GET");
-			conn.setRequestProperty("Accept-Charset", charset.name());
-			conn.setConnectTimeout((int) timeout.toMillis());
-			conn.setReadTimeout((int) timeout.toMillis());
-			// pretend to be Mozilla since some server might check it
-			conn.setRequestProperty("User-Agent",
-				"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1");
-			return new HttpResponse(conn);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-    }
-
-    @Override
+	@Override
     public boolean equals(Object other) {
     	return url.equals(((URLResource) other).url);
     }
 
     @Override
     public String toString() {
-    	return String.format("%s%n  alternatives=%s"
-    			, url
-    			, Util.join(alternatives, Util.newline()));
+    	return String.format("%s%n  alternatives:%s"
+    		, url, Util.joinLines(alternatives)
+    	);
     }
 }

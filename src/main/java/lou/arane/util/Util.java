@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import lou.arane.url.URLResource;
+import lou.arane.io.URLResource;
 
 /**
  * Operations that cannot be placed on the objects themselves.
@@ -243,6 +243,12 @@ public final class Util {
     		joiner.add(part == null ? "" : part.toString());
     	}
         return joiner.toString();
+    }
+
+    /** Join string representation of given parts.
+     * The parts are separated by newline */
+    public static String joinLines(Iterable<?> parts) {
+    	return join(parts, newline());
     }
 
     /** Given a string, pad numeric sequences shorter

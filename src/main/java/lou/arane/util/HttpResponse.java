@@ -1,50 +1,45 @@
 package lou.arane.util;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 
 /** Results from making http connection */
-public class HttpResponse implements AutoCloseable {
+public class HttpResponse implements Closeable {
 
-	public final HttpURLConnection conn;
+	private final HttpURLConnection conn;
 
-	public final InputStream input;
+	private final InputStream input;
 
-	public final int code;
+	private final int status;
 
 	public HttpResponse(HttpURLConnection conn) {
 		this.conn = conn;
-		try {
-			this.input = conn.getInputStream();
-			this.code = conn.getResponseCode();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		this.input = Unchecked.tryGet(() -> conn.getInputStream());
+		this.status = Unchecked.tryGet(() -> conn.getResponseCode());
 	}
 
 	/** Whether response code indicates error */
-	public boolean hasErrorCode() {
-		try {
-			int code = conn.getResponseCode();
-			return code < 200 || code > 299;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	public boolean hasErrorStatus() {
+		return status < 200 || status > 299;
 	}
 
 	/** Write content to output */
-	public void copyTo(OutputStream output) {
+	public void copyTo(OutputStream output) throws IOException {
 		IO.copy(input, output);
 	}
 
 	@Override
-	public void close() {
-		try {
-			input.close();
-			conn.disconnect();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	public void close() throws IOException {
+		input.close();
+		conn.disconnect();
 	}
+
+	@Override
+	public String toString() {
+		return String.format("Response:%n  conn:%s%n  status:%s", conn, status);
+	}
+
 }

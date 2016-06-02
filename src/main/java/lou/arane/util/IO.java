@@ -4,15 +4,20 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 
 /**
  * I/O operations for this app.
@@ -35,25 +40,33 @@ public class IO {
 	}
 
 	/** Copy all bytes from input to output.
-	 * @return the number of bytes copied */
-	public static long copy(InputStream source, OutputStream sink) {
-		return Try.toGet(() -> tryCopy(
-			new BufferedInputStream(source)
-			, new BufferedOutputStream(sink)));
+	 * The streams are buffered before copying */
+	public static void copy(InputStream source, OutputStream sink) throws IOException {
+		copy(new BufferedInputStream(source), new BufferedOutputStream(sink), BUFFER_SIZE);
 	}
 
 	/** @see Files#copy(InputStream, OutputStream) */
-	public static long tryCopy(InputStream source, OutputStream sink)
-		throws Exception
-	{
-		long nread = 0L;
-		byte[] buf = new byte[BUFFER_SIZE];
+	public static void copy(BufferedInputStream in, BufferedOutputStream out, int bufferSize) throws IOException {
+		byte[] buf = new byte[bufferSize];
 		int n;
-		while ((n = source.read(buf)) > 0) {
-			sink.write(buf, 0, n);
-			nread += n;
+		while ((n = in.read(buf)) > 0) {
+			out.write(buf, 0, n);
 		}
-		return nread;
+	}
+
+	/** Copy all chars from a reader to a writer.
+	 * The reader/writer are buffered before copying */
+	public static void copy(Reader reader, Writer writer) throws IOException {
+		copy(new BufferedReader(reader), new BufferedWriter(writer), BUFFER_SIZE);
+	}
+
+	/** @see Files#copy(InputStream, OutputStream) */
+	public static void copy(BufferedReader reader, BufferedWriter writer, int bufferSize) throws IOException {
+		char[] buf = new char[bufferSize];
+		int n;
+		while ((n = reader.read(buf)) > 0) {
+			writer.write(buf, 0, n);
+		}
 	}
 
 	/** Limited version of {@link #write(Object, Path, Charset).
@@ -66,7 +79,7 @@ public class IO {
 	 * The file is created if not exists. */
 	public static void write(Object o, Path file, Charset charset) {
 		Util.createFileIfNotExists(file);
-	    Try.toDo(() -> {
+	    Unchecked.tryDo(() -> {
 	    	try ( Reader reader = new StringReader(o.toString())
 	    		; Writer writer = Files.newBufferedWriter(file, charset)
 	    	){
@@ -75,26 +88,20 @@ public class IO {
 	    });
 	}
 
-	/** Copy all chars from a reader to a writer.
-	 * @return the number of chars copied */
-	public static long copy(Reader reader, Writer writer) {
-		return Try.toGet(() -> tryCopy(
-			new BufferedReader(reader)
-			, new BufferedWriter(writer)));
-	}
-
-	/** @see Files#copy(InputStream, OutputStream) */
-	public static long tryCopy(Reader reader, Writer writer)
-		throws Exception
-	{
-		long nread = 0L;
-		char[] buf = new char[BUFFER_SIZE];
-		int n;
-		while ((n = reader.read(buf)) > 0) {
-			writer.write(buf, 0, n);
-			nread += n;
-		}
-		return nread;
+	/** Make http GET request
+	 * @return the connection just openned */
+	public static HttpURLConnection httpGET(URL url, Charset charset, Duration timeout)
+			throws IOException, ProtocolException {
+		HttpURLConnection conn;
+		conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("GET");
+		conn.setRequestProperty("Accept-Charset", charset.name());
+		conn.setConnectTimeout((int) timeout.toMillis());
+		conn.setReadTimeout((int) timeout.toMillis());
+		// pretend to be Mozilla
+		conn.setRequestProperty("User-Agent",
+				"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1");
+		return conn;
 	}
 
 }

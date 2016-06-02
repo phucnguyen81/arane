@@ -3,7 +3,7 @@ package lou.arane.base.cmds;
 import lou.arane.base.Cmd;
 
 /**
- * Make sure a cleanup action is done for a command.
+ * Ensurea cleanup action is done.
  *
  * @author Phuc
  */
@@ -34,8 +34,8 @@ public class CmdCleanup implements Cmd {
 
 	@Override
 	public String toString() {
-		return String.format("%s(%n origin:%s%n cleanup:%s%n)",
-			getClass().getSimpleName(), origin, cleanup);
+		return String.format("Cleanup:%n  origin:%s%n  cleanup:%s%n"
+			, origin, cleanup);
 	}
 
 }
