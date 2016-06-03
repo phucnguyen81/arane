@@ -23,7 +23,7 @@ public abstract class TreeBuilder<N> {
      */
     private final TreeMap<Integer, LinkedList<N>> nodes;
 
-    /** Create an html builder with null root node */
+    /** Create an builder with null root node */
     public TreeBuilder() {
         this(null);
     }
@@ -123,7 +123,7 @@ public abstract class TreeBuilder<N> {
 
     @Override
     public String toString() {
-    	return String.format("TreeBuilder(%s)", nodes);
+    	return String.format("%s:%n  %s", TreeBuilder.class.getSimpleName(), nodes);
     }
 
 }
