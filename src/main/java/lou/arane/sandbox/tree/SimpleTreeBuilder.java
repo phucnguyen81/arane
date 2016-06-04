@@ -9,11 +9,11 @@ import java.util.TreeMap;
 import lou.arane.util.Check;
 
 /**
- * Build {@link Node} in a visual manner.
+ * Build {@link SimpleTree} in a visual manner.
  *
  * @author Phuc
  */
-public final class NodeBuilder {
+public final class SimpleTreeBuilder {
 
 	/** Represent indentation/depth */
     public static final Object __ = new Object();
@@ -24,34 +24,34 @@ public final class NodeBuilder {
      * single root node at level 0. Nodes at level 1 are nodes added first by
      * calling {@link #add(Object...)}.
      */
-    private final TreeMap<Integer, LinkedList<Node>> nodes;
+    private final TreeMap<Integer, LinkedList<SimpleTree>> trees;
 
     /** Create an builder with empty root node */
-    public NodeBuilder() {
-        this(new Node());
+    public SimpleTreeBuilder() {
+        this(new SimpleTree());
     }
 
-    public NodeBuilder(Node root) {
-        nodes = new TreeMap<>();
+    public SimpleTreeBuilder(SimpleTree root) {
+        trees = new TreeMap<>();
         reset(root);
     }
 
     /** Reset the builder to build another tree given the new root */
-    public void reset(Node root) {
-        nodes.clear();
+    public void reset(SimpleTree root) {
+        trees.clear();
         registerNode(root, 0);
     }
 
     /** Reset the builder to build another tree with empty root */
     public void reset() {
-        reset(new Node());
+        reset(new SimpleTree());
     }
 
     /** Get the first child of root, which represents the tree being built */
-    public Optional<Node> getTree() {
-        Integer treeKey = nodes.higherKey(0);
-        if (nodes.containsKey(treeKey)) {
-        	return Optional.of(nodes.get(treeKey).peekFirst());
+    public Optional<SimpleTree> getTree() {
+        Integer treeKey = trees.higherKey(0);
+        if (trees.containsKey(treeKey)) {
+        	return Optional.of(trees.get(treeKey).peekFirst());
         }
         return Optional.empty();
     }
@@ -59,22 +59,22 @@ public final class NodeBuilder {
     /** Add the nodes taking identation as node depth */
     public void add(Object... args) {
         int depth = getDepth(args);
-        for (Node node : parseArguments(args)) {
+        for (SimpleTree node : parseArguments(args)) {
             registerNode(node, depth);
         }
     }
 
     @Override
     public String toString() {
-    	return String.format("%s:%n  %s", NodeBuilder.class.getSimpleName(), nodes);
+    	return String.format("%s:%n  %s", SimpleTreeBuilder.class.getSimpleName(), trees);
     }
 
     /** Return the nodes created from processing the arguments */
-    private Iterable<Node> parseArguments(Object[] args) {
+    private Iterable<SimpleTree> parseArguments(Object[] args) {
     	if (args.length == 0) {
     		throw new IllegalArgumentException("No arguments");
     	}
-        Deque<Node> nodes = new ArrayDeque<Node>();
+        Deque<SimpleTree> trees = new ArrayDeque<SimpleTree>();
         for (Object arg : args) {
             if (arg == null) {
                 throw new IllegalArgumentException(args + " contains null");
@@ -82,39 +82,39 @@ public final class NodeBuilder {
             else if (arg == __) {
             	continue;
             }
-            else if (arg instanceof Node) {
-                nodes.addLast(((Node) arg));
+            else if (arg instanceof SimpleTree) {
+                trees.addLast(((SimpleTree) arg));
             }
             else if (arg instanceof Iterable) {
             	for (Object ele : (Iterable<?>) arg) {
                     if (ele == null) {
                         throw new IllegalArgumentException(arg + " contains null");
                     }
-                    else if (ele instanceof Node) {
-            			nodes.addLast((Node) ele);
+                    else if (ele instanceof SimpleTree) {
+            			trees.addLast((SimpleTree) ele);
             		}
                     else {
-                    	throw new IllegalArgumentException(arg + " contains non-Node " + ele);
+                    	throw new IllegalArgumentException(arg + " contains non-Tree " + ele);
                     }
             	}
             }
             else {
-            	if (nodes.isEmpty()) {
-            		nodes.addLast(new Node());
+            	if (trees.isEmpty()) {
+            		trees.addLast(new SimpleTree());
             	}
-            	nodes.getLast().addAttr(arg);
+            	trees.getLast().addAttr(arg);
             }
         }
-        return nodes;
+        return trees;
     }
 
-    /** Link the node just added to to tree being built */
-    private void registerNode(Node node, int depth) {
+    /** Link the node just added to the tree being built */
+    private void registerNode(SimpleTree node, int depth) {
         // keep track of node's depth to find its parent
-        if (!nodes.containsKey(depth)) {
-            nodes.put(depth, new LinkedList<Node>());
+        if (!trees.containsKey(depth)) {
+            trees.put(depth, new LinkedList<SimpleTree>());
         }
-        nodes.get(depth).addLast(node);
+        trees.get(depth).addLast(node);
 
         // link element to its parent
         findParent(depth).ifPresent(parent -> parent.addChild(node));
@@ -125,11 +125,11 @@ public final class NodeBuilder {
      * enough to find its parent: the parent is the last inserted node that has
      * depth smaller than the child depth.
      */
-    private Optional<Node> findParent(Integer childDepth) {
+    private Optional<SimpleTree> findParent(Integer childDepth) {
         Check.require(childDepth >= 0, "Expect non-negative tree depth");
-        Integer parentDepth = nodes.lowerKey(childDepth);
+        Integer parentDepth = trees.lowerKey(childDepth);
         if (parentDepth != null) {
-            LinkedList<Node> parents = nodes.get(parentDepth);
+            LinkedList<SimpleTree> parents = trees.get(parentDepth);
             return Optional.of(parents.peekLast());
         }
         return Optional.empty();

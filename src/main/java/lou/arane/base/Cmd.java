@@ -7,6 +7,12 @@ package lou.arane.base;
  */
 public interface Cmd extends Runnable {
 
+	/** Whether {@link #doRun()} has any chance of success */
+	boolean canRun();
+
+	/** Do the actual work with or without checking {@link #canRun()} */
+	void doRun();
+
 	/** Check {@link #canRun()} before running */
 	@Override
 	default void run() {
@@ -14,13 +20,5 @@ public interface Cmd extends Runnable {
 			doRun();
 		}
 	}
-
-	/** Whether {@link #doRun()} has any chance of success */
-	default boolean canRun() {
-		return true;
-	}
-
-	/** Do the work with or without checking {@link #canRun()} */
-	default void doRun() {}
 
 }
