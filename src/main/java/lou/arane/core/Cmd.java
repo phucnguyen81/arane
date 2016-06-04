@@ -1,4 +1,4 @@
-package lou.arane.base;
+package lou.arane.core;
 
 /**
  * Represent self-contained tasks that run to completion.

@@ -1,6 +1,6 @@
-package lou.arane.base.cmds;
+package lou.arane.core.cmds;
 
-import lou.arane.base.Cmd;
+import lou.arane.core.Cmd;
 
 /**
  * Limit the number of times a cmd can run.

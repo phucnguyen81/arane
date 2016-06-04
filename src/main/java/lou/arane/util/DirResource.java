@@ -1,9 +1,8 @@
-package lou.arane.sandbox;
+package lou.arane.util;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import lou.arane.util.Unchecked;
 
 /**
  * Represent a directory
@@ -19,7 +18,11 @@ public class DirResource {
 	}
 
 	public DirResource create() {
-		Unchecked.tryGet(() -> Files.createDirectories(dir));
+		try {
+			Files.createDirectories(dir);
+		} catch (IOException e) {
+			throw New.unchecked(e);
+		}
 		return this;
 	}
 }

@@ -38,4 +38,13 @@ public class New {
             throw new RuntimeException(e);
         }
     }
+
+	public static RuntimeException unchecked(Exception e) {
+		if (e instanceof RuntimeException) {
+			return (RuntimeException) e;
+		}
+		else {
+			return new RuntimeException(e);
+		}
+	}
 }

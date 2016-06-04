@@ -11,14 +11,18 @@ public class HttpResponse implements Closeable {
 
 	private final HttpURLConnection conn;
 
-	private final InputStream input;
+	private final InputStream content;
 
 	private final int status;
 
 	public HttpResponse(HttpURLConnection conn) {
 		this.conn = conn;
-		this.input = Unchecked.tryGet(() -> conn.getInputStream());
-		this.status = Unchecked.tryGet(() -> conn.getResponseCode());
+		try {
+			this.content = conn.getInputStream();
+			this.status = conn.getResponseCode();
+		} catch (IOException e) {
+			throw New.unchecked(e);
+		}
 	}
 
 	/** Whether response code indicates error */
@@ -27,19 +31,29 @@ public class HttpResponse implements Closeable {
 	}
 
 	/** Write content to output */
-	public void copyTo(OutputStream output) throws IOException {
-		IO.copy(input, output);
+	public void copyTo(OutputStream output) {
+		try {
+			IO.copy(content, output);
+		} catch (IOException e) {
+			throw New.unchecked(e);
+		}
 	}
 
 	@Override
-	public void close() throws IOException {
-		input.close();
-		conn.disconnect();
+	public void close() {
+		try {
+			content.close();
+		} catch (IOException e) {
+			throw New.unchecked(e);
+		} finally {
+			conn.disconnect();
+		}
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Response:%n  conn:%s%n  status:%s", conn, status);
+		return String.format("%s:%n conn:%s%n status:%s"
+			, HttpResponse.class.getSimpleName(), conn, status);
 	}
 
 }

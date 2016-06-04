@@ -1,9 +1,9 @@
-package lou.arane.base.cmds;
+package lou.arane.core.cmds;
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
-import lou.arane.base.Cmd;
+import lou.arane.core.Cmd;
 
 /**
  * Delegate to another command (Decorator Pattern).

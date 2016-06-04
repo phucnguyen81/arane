@@ -1,4 +1,4 @@
-package lou.arane.base;
+package lou.arane;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -7,11 +7,10 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lou.arane.base.cmds.CmdCleanup;
-import lou.arane.io.URLDownloads;
-import lou.arane.io.URLResource;
+import lou.arane.core.Cmd;
 import lou.arane.util.Check;
 import lou.arane.util.New;
+import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
 /**
@@ -77,12 +76,12 @@ public class Context {
 	/** Download items added so far.
 	 * All items are cleared after this returns. */
 	public void download() {
-		 new CmdCleanup(
-			new URLDownloads(
-				itemsSorted(),
-				maxDownloadAttempts),
-			() -> items.clear()
-		).run();
+		try {
+			new Downloads(itemsSorted(), maxDownloadAttempts).run();
+		}
+		finally {
+			items.clear();
+		}
 	}
 
 	/** Sort by the target path */

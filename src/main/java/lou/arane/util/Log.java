@@ -6,7 +6,7 @@ import org.pmw.tinylog.Logger;
 import org.pmw.tinylog.writers.FileWriter;
 
 /**
- * Just enough to hide the logging library, which in this case is tinylog.
+ * Just enough code to hide the logging library, which in this case is tinylog.
  *
  * @author LOU
  */

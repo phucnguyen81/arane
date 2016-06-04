@@ -1,4 +1,4 @@
-package lou.arane.base.cmds;
+package lou.arane.core.cmds;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.function.Consumer;
 
-import lou.arane.base.Cmd;
+import lou.arane.core.Cmd;
 
 /**
  * Keep running command(s) until no command raises exception
@@ -42,8 +42,8 @@ public class CmdAllSuccess implements Cmd {
     	Deque<Cmd> queue = new ArrayDeque<>(cmds);
         while (!queue.isEmpty()) {
             Cmd c = queue.removeFirst();
-            if (c.canRun()) try {
-        		c.doRun();
+            try {
+        		c.run();
         	}
         	catch (Exception e) {
         		errorHandler.accept(e);

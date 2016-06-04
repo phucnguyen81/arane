@@ -9,9 +9,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import lou.arane.base.Cmd;
-import lou.arane.base.Context;
-import lou.arane.io.URLResource;
+import lou.arane.Context;
+import lou.arane.core.Cmd;
+import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
 /**

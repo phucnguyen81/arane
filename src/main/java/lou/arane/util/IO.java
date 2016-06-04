@@ -39,8 +39,10 @@ public class IO {
 		return StandardCharsets.UTF_8;
 	}
 
-	/** Copy all bytes from input to output.
-	 * The streams are buffered before copying */
+	/**
+	 * Copy all bytes from input to output. The streams are buffered before
+	 * copying
+	 */
 	public static void copy(InputStream source, OutputStream sink) throws IOException {
 		copy(new BufferedInputStream(source), new BufferedOutputStream(sink), BUFFER_SIZE);
 	}
@@ -54,8 +56,10 @@ public class IO {
 		}
 	}
 
-	/** Copy all chars from a reader to a writer.
-	 * The reader/writer are buffered before copying */
+	/**
+	 * Copy all chars from a reader to a writer. The reader/writer are buffered
+	 * before copying
+	 */
 	public static void copy(Reader reader, Writer writer) throws IOException {
 		copy(new BufferedReader(reader), new BufferedWriter(writer), BUFFER_SIZE);
 	}
@@ -69,27 +73,31 @@ public class IO {
 		}
 	}
 
-	/** Limited version of {@link #write(Object, Path, Charset).
-	 * Encoding defaults to {@link #charset()} */
-	public static void write(Object o, Path file) {
+	/**
+	 * Limited version of {@link #write(Object, Path, Charset). Encoding
+	 * defaults to {@link #charset()}
+	 */
+	public static void write(Object o, Path file) throws IOException {
 		write(o, file, charset());
 	}
 
-	/** Write string reprentation of an object to file.
-	 * The file is created if not exists. */
-	public static void write(Object o, Path file, Charset charset) {
+	/**
+	 * Write string reprentation of an object to file. The file is created if
+	 * not exists.
+	 */
+	public static void write(Object o, Path file, Charset charset) throws IOException {
 		Util.createFileIfNotExists(file);
-	    Unchecked.tryDo(() -> {
-	    	try ( Reader reader = new StringReader(o.toString())
-	    		; Writer writer = Files.newBufferedWriter(file, charset)
-	    	){
-	    		copy(reader, writer);
-	    	}
-	    });
+		try (Reader reader = new StringReader(o.toString());
+				Writer writer = Files.newBufferedWriter(file, charset)) {
+			copy(reader, writer);
+		}
 	}
 
-	/** Make http GET request
-	 * @return the connection just openned */
+	/**
+	 * Make http GET request
+	 *
+	 * @return the connection just openned
+	 */
 	public static HttpURLConnection httpGET(URL url, Charset charset, Duration timeout)
 			throws IOException, ProtocolException {
 		HttpURLConnection conn;

@@ -6,10 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import lou.arane.base.Cmd;
-import lou.arane.base.Context;
-import lou.arane.base.cmds.CmdWrap;
-import lou.arane.io.URLResource;
+import lou.arane.core.Cmd;
+import lou.arane.core.cmds.CmdWrap;
 import lou.arane.usecases.BlogTruyen;
 import lou.arane.usecases.EgScans;
 import lou.arane.usecases.IzTruyenTranh;
@@ -18,6 +16,7 @@ import lou.arane.usecases.MangaGo;
 import lou.arane.usecases.MangaLife;
 import lou.arane.usecases.MangaSee;
 import lou.arane.util.Log;
+import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
 /**

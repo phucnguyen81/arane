@@ -1,10 +1,10 @@
-package lou.arane.base.cmds;
+package lou.arane.core.cmds;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-import lou.arane.base.Cmd;
+import lou.arane.core.Cmd;
 
 /**
  * Run each command until the first one succeeds.

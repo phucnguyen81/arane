@@ -1,9 +1,8 @@
-package lou.arane.sandbox;
+package lou.arane.util;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import lou.arane.util.Unchecked;
 
 /**
  * Represent a file
@@ -21,7 +20,11 @@ public class FileResource {
 	}
 
 	public FileResource create() {
-		Unchecked.tryGet(() -> Files.createFile(file));
+		try {
+			Files.createFile(file);
+		} catch (IOException e) {
+			throw New.unchecked(e);
+		}
 		return this;
 	}
 

@@ -31,8 +31,6 @@ import java.util.stream.Stream;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import lou.arane.io.URLResource;
-
 /**
  * Operations that cannot be placed on the objects themselves.
  *

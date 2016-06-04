@@ -4,9 +4,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import lou.arane.base.Cmd;
-import lou.arane.base.Context;
-import lou.arane.io.URLResource;
+import lou.arane.Context;
+import lou.arane.core.Cmd;
+import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
 import org.jsoup.nodes.Document;

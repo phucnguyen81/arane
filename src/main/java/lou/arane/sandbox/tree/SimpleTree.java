@@ -7,6 +7,10 @@ import java.util.List;
  * Generic tree with attributes and children.
  * Attributes are external information about the tree.
  * Children are internal parts of the tree.
+ * <p>
+ * This tree is meant to be a temporary structure.
+ * It can be built with {@link SimpleTreeBuilder}
+ * then converted to other tree types.
  *
  * @author Phuc
  */

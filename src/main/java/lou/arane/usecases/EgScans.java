@@ -7,10 +7,10 @@ import java.util.regex.Pattern;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import lou.arane.base.Cmd;
-import lou.arane.base.Context;
-import lou.arane.io.URLResource;
+import lou.arane.Context;
+import lou.arane.core.Cmd;
 import lou.arane.scripts.CopyFiles;
+import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
 /**
