@@ -1,8 +1,9 @@
-package lou.arane;
+package lou.arane.app;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,21 +40,37 @@ public class DownloadUnit implements Cmd {
 
 	@Override
 	public void doRun() {
-		Util.createFileIfNotExists(target);
-    	try (OutputStream output = Files.newOutputStream(target);
-    			HttpResponse res = source.httpGET(timeout);) {
-    		if (res.hasErrorStatus()) {
-    			throw new RuntimeException(String.format(
-    				"Downloading: %s gives error status: %s", source, res));
-    		}
-    		/* copy in 2 phases to reduce the chance of incomplete download */
-    		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-    		res.copyTo(buffer);
-    		IO.copy(new ByteArrayInputStream(buffer.toByteArray()), output);
-    	}
-    	catch (IOException e) {
-    		throw New.unchecked(e);
+		try {
+			getFromUrl();
+		}
+		catch (IOException e) {
+			throw New.unchecked(e);
 		}
 	}
+
+	private void getFromUrl() throws IOException {
+    	try (HttpResponse res = source.httpGET(timeout)) {
+    		if (res.hasErrorStatus()) {
+    			throw new IOException(String.format(
+    				"Downloading: %s gives error status: %s", source, res));
+    		}
+    		/* Copy in 2 stages to reduce the change of incomplete download
+    		 * being written to file */
+    		copyToFile(copyToBuffer(res));
+    	}
+	}
+
+    private InputStream copyToBuffer(HttpResponse r) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        r.copyTo(output);
+        return new ByteArrayInputStream(output.toByteArray());
+    }
+
+    private void copyToFile(InputStream input) throws IOException {
+        try (OutputStream output = Files.newOutputStream(target)) {
+            Util.createFileIfNotExists(target);
+            IO.copy(input, output);
+        }
+    }
 
 }

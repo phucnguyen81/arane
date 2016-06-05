@@ -1,4 +1,4 @@
-package lou.arane;
+package lou.arane.app;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -56,6 +56,13 @@ public class Context {
 		pagesDir = baseDir.resolve("pages");
 		imagesDir = baseDir.resolve("images");
 		outputDir = baseDir.resolve("output").resolve(baseDir.getFileName());
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%s: %s -> %s"
+			, Context.class.getSimpleName(), source, target
+		);
 	}
 
 	/** It is common to many manga sites that the initial source url lists the chapters.

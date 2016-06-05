@@ -7,7 +7,7 @@ import lou.arane.core.Cmd;
  *
  * @author Phuc
  */
-public final class CmdLimitedRetry implements Cmd {
+public class CmdLimitedRetry implements Cmd {
 
 	private final Cmd origin;
 
@@ -20,16 +20,16 @@ public final class CmdLimitedRetry implements Cmd {
 
 	/** Whether {@link #doRun()} should be called */
 	@Override
-	public boolean canRun() {
+	public final boolean canRun() {
 		return origin.canRun() && limit > 0;
 	}
 
 	/** Perform the download */
 	@Override
-	public void doRun() {
+	public final void doRun() {
 		if (limit > 0) try {
 			origin.doRun();
-		} catch (RuntimeException e) {
+		} catch (Exception e) {
 			limit -= 1;
 			throw e;
 		}

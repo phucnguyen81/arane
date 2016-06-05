@@ -1,80 +1,54 @@
 package lou.arane.core.cmds;
 
-import java.util.Optional;
-import java.util.function.BooleanSupplier;
-
 import lou.arane.core.Cmd;
+import lou.arane.util.ToString;
 
 /**
- * Delegate to another command (Decorator Pattern).
- * Can replace the condition and/or the action of the origin command.
+ * Wrap another command (Decorator Pattern) to attach additional logic.
  *
  * @author Phuc
  */
-public class CmdWrap implements Cmd {
+public class CmdWrap<C extends Cmd> implements Cmd {
 
-	private final Optional<Cmd> origin;
+    private final C origin;
 
-	private final BooleanSupplier condition;
+    public CmdWrap(C origin) {
+        this.origin = origin;
+    }
 
-	private final Runnable action;
+    @Override
+    public final boolean canRun() {
+        return canRun(origin);
+    }
 
-	/** Wrap another command to delegate to it */
-	public CmdWrap(Cmd c) {
-		this(c, c::canRun);
-	}
+    @Override
+    public final void doRun() {
+        beforeDoRun(origin);
+        origin.doRun();
+        afterDoRun(origin);
+    }
 
-	/** Wrap another command to change its condition */
-	public CmdWrap(Cmd c, BooleanSupplier b) {
-		this(c, b, c::doRun);
-	}
+    /**
+     * Template Method for eval {@link #canRun()} status
+     */
+    protected boolean canRun(C origin) {
+        return origin.canRun();
+    }
 
-	/** Wrap another command to change its action */
-	public CmdWrap(Cmd c, Runnable r) {
-		this(c, c::canRun, r);
-	}
+    /**
+     * Template Method for what to do before running
+     */
+    protected void beforeDoRun(C origin) {
+    }
 
-	/** Make command from condition and empty action */
-	public CmdWrap(BooleanSupplier b) {
-		this(Optional.empty(), b, () -> {});
-	}
+    /**
+     * Template Method for what to do after running
+     */
+    protected void afterDoRun(C origin) {
+    }
 
-	/** Make command from action only, condition always holds true */
-	public CmdWrap(Runnable r) {
-		this(() -> true, r);
-	}
-
-	/** Make command from conditon and action */
-	public CmdWrap(BooleanSupplier b, Runnable r) {
-		this(Optional.empty(), b, r);
-	}
-
-	/** Wrap a command to change both condition and action */
-	public CmdWrap(Cmd c, BooleanSupplier b, Runnable r) {
-		this(Optional.of(c), b, r);
-	}
-
-	/** Internal constructor given an optional command, a condition and an action */
-	private CmdWrap(Optional<Cmd> c, BooleanSupplier b, Runnable r) {
-		this.origin = c;
-		this.condition = b;
-		this.action = r;
-	}
-
-	@Override
-	public final boolean canRun() {
-		return condition.getAsBoolean();
-	}
-
-	@Override
-	public final void doRun() {
-		action.run();
-	}
-
-	@Override
-	public String toString() {
-		return origin
-			.map(c -> String.format("Wrap:%n%s", c))
-			.orElse(String.format("Wrap:%n condition=%s%n action=%s", condition, action));
-	}
+    @Override
+    public String toString() {
+        return new ToString(CmdWrap.class).join(origin).render();
+    }
 }

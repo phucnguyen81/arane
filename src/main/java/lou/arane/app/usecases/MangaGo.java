@@ -1,11 +1,11 @@
-package lou.arane.usecases;
+package lou.arane.app.usecases;
 
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import lou.arane.Context;
+import lou.arane.app.Context;
 import lou.arane.core.Cmd;
 import lou.arane.scripts.CopyFiles;
 import lou.arane.util.URLResource;

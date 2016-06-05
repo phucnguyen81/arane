@@ -1,4 +1,4 @@
-package lou.arane.usecases;
+package lou.arane.app.usecases;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import lou.arane.Context;
+import lou.arane.app.Context;
 import lou.arane.core.Cmd;
 import lou.arane.scripts.CopyFiles;
 import lou.arane.util.URLResource;

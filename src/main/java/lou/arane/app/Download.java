@@ -1,4 +1,4 @@
-package lou.arane;
+package lou.arane.app;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.stream.Collectors.toList;
@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import lou.arane.core.Cmd;
 import lou.arane.core.cmds.CmdFirstSuccess;
 import lou.arane.core.cmds.CmdWrap;
 import lou.arane.util.URLResource;
@@ -18,7 +19,7 @@ import lou.arane.util.URLResource;
  *
  * @author Phuc
  */
-public class Download extends CmdWrap {
+public class Download extends CmdWrap<Cmd> {
 
 	private final URLResource source;
 	private final Path target;

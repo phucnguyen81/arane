@@ -8,10 +8,12 @@ package lou.arane.core;
 public interface Cmd extends Runnable {
 
 	/** Whether {@link #doRun()} has any chance of success */
-	boolean canRun();
+	default boolean canRun() {
+		return true;
+	}
 
 	/** Do the actual work with or without checking {@link #canRun()} */
-	void doRun();
+	default void doRun() {}
 
 	/** Check {@link #canRun()} before running */
 	@Override

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
-import java.util.function.Consumer;
 
 import lou.arane.core.Cmd;
 
@@ -15,38 +14,38 @@ import lou.arane.core.Cmd;
  *
  * @author Phuc
  */
-public class CmdAllSuccess implements Cmd {
+public class CmdAllSuccess<C extends Cmd> implements Cmd {
 
-	private final List<Cmd> cmds;
-	private final Consumer<Exception> errorHandler;
+	private final List<C> cmds;
 
-	public CmdAllSuccess(Collection<? extends Cmd> cmds) {
-		this(cmds, e -> {});
-	}
-
-	public CmdAllSuccess(Collection<? extends Cmd> cmds, Consumer<Exception> errorHandler) {
+	public CmdAllSuccess(Collection<C> cmds) {
 		this.cmds = new ArrayList<>(cmds);
-		this.errorHandler = errorHandler;
 	}
 
+	/**
+	 * Can run if at least one can run
+	 */
 	@Override
 	public final boolean canRun() {
 		return cmds.stream().anyMatch(Cmd::canRun);
 	}
 
-	/** Run each command until all cmds run without raising exception.
+	/**
+	 * Run each command until all cmds run without raising exception.
 	 * A command that raises exception is re-run later.
-	 * This might run forever if commands always want to run but keep failing. */
+	 * This might run forever if commands always want to run but keep failing.
+	 */
 	@Override
 	public final void doRun() {
-    	Deque<Cmd> queue = new ArrayDeque<>(cmds);
+    	Deque<C> queue = new ArrayDeque<>();
+    	onFilter(cmds).iterator().forEachRemaining(queue::addLast);
         while (!queue.isEmpty()) {
-            Cmd c = queue.removeFirst();
-            try {
-        		c.run();
+            C c = queue.removeFirst();
+            if (c.canRun()) try {
+        		c.doRun();
         	}
         	catch (Exception e) {
-        		errorHandler.accept(e);
+        		onException(c, e);
         		if (c.canRun()) {
         			// re-try later
         			queue.addLast(c);
@@ -54,4 +53,17 @@ public class CmdAllSuccess implements Cmd {
         	}
         }
 	}
+
+	/**
+	 * Template Method for select commands that will get run
+	 */
+	protected Iterable<C> onFilter(Iterable<C> cmds) {
+	    return cmds;
+	}
+
+	/**
+	 * Tempate Method for what to do if a command throws an exception
+	 */
+	protected void onException(C c, Exception e) {}
+
 }

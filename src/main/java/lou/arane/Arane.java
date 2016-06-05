@@ -6,15 +6,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import lou.arane.app.Context;
+import lou.arane.app.usecases.BlogTruyen;
+import lou.arane.app.usecases.EgScans;
+import lou.arane.app.usecases.IzTruyenTranh;
+import lou.arane.app.usecases.KissManga;
+import lou.arane.app.usecases.MangaGo;
+import lou.arane.app.usecases.MangaLife;
+import lou.arane.app.usecases.MangaSee;
 import lou.arane.core.Cmd;
-import lou.arane.core.cmds.CmdWrap;
-import lou.arane.usecases.BlogTruyen;
-import lou.arane.usecases.EgScans;
-import lou.arane.usecases.IzTruyenTranh;
-import lou.arane.usecases.KissManga;
-import lou.arane.usecases.MangaGo;
-import lou.arane.usecases.MangaLife;
-import lou.arane.usecases.MangaSee;
+import lou.arane.core.cmds.CmdLog;
 import lou.arane.util.Log;
 import lou.arane.util.URLResource;
 import lou.arane.util.Util;
@@ -70,47 +71,31 @@ public class Arane {
 		.stream()
 		.filter(Cmd::canRun)
 		.findFirst()
-		.orElse(new CmdWrap(() ->
-			Log.info("Found no supports for downloading: " + name + ", " + url)))
+		.<Cmd>map(CmdLog::new)
+		.orElse(reportNoSupport())
 		.doRun();
 	}
 
 	/** Create all available commands to handle the args */
 	private List<Cmd> createCommands() {
 		List<Cmd> cmds = new ArrayList<>();
-		Context ctx;
-
-		ctx = new Context(name, url, mangaDir("blogtruyen", name));
-		cmds.add(attachLog(new BlogTruyen(ctx), ctx));
-
-		ctx = new Context(name, url, mangaDir("egscans", name));
-		cmds.add(attachLog(new EgScans(ctx), ctx));
-
-		ctx = new Context(name, url, mangaDir("izmanga", name));
-		cmds.add(attachLog(new IzTruyenTranh(ctx), ctx));
-
-		ctx = new Context(name, url, mangaDir("kissmanga", name));
-		cmds.add(attachLog(new KissManga(ctx), ctx));
-
-		ctx = new Context(name, url, mangaDir("mangago", name));
-		cmds.add(attachLog(new MangaGo(ctx), ctx));
-
-		ctx = new Context(name, url, mangaDir("manga.life", name));
-		cmds.add(attachLog(new MangaLife(ctx), ctx));
-
-		ctx = new Context(name, url, mangaDir("mangasee", name));
-		cmds.add(attachLog(new MangaSee(ctx), ctx));
-
+		cmds.add(new BlogTruyen(new Context(name, url, mangaDir("blogtruyen", name))));
+		cmds.add(new EgScans(new Context(name, url, mangaDir("egscans", name))));
+		cmds.add(new IzTruyenTranh(new Context(name, url, mangaDir("izmanga", name))));
+		cmds.add(new KissManga(new Context(name, url, mangaDir("kissmanga", name))));
+		cmds.add(new MangaGo(new Context(name, url, mangaDir("mangago", name))));
+		cmds.add(new MangaLife(new Context(name, url, mangaDir("manga.life", name))));
+		cmds.add(new MangaSee(new Context(name, url, mangaDir("mangasee", name))));
 		return cmds;
 	}
 
-	/** Attach logging before and after a run */
-	private static Cmd attachLog(Cmd cmd, Context ctx) {
-		return new CmdWrap(cmd, () -> {
-			Log.info(String.format("Start downloading %s into %s", ctx.sourceName, ctx.target));
-			cmd.doRun();
-			Log.info(String.format("Finished downloading %s into %s", ctx.sourceName, ctx.target));
-		});
+	private Cmd reportNoSupport() {
+		return new Cmd() {
+			@Override
+			public void doRun() {
+				Log.info("Found no supports for downloading: " + name + ", " + url);
+			}
+		};
 	}
 
 	/** Common way to get a base directory for downloading a manga. */

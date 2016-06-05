@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import lou.arane.core.Cmd;
+import lou.arane.util.New;
 
 /**
  * Run each command until the first one succeeds.
@@ -12,7 +13,7 @@ import lou.arane.core.Cmd;
  *
  * @author Phuc
  */
-public final class CmdFirstSuccess implements Cmd {
+public class CmdFirstSuccess implements Cmd {
 
 	private final Collection<Cmd> coll;
 
@@ -21,22 +22,22 @@ public final class CmdFirstSuccess implements Cmd {
 	}
 
 	@Override
-	public boolean canRun() {
+	public final boolean canRun() {
 		return coll.stream().anyMatch(c -> c.canRun());
 	}
 
 	@Override
-	public void doRun() {
-		Optional<RuntimeException> lastError = Optional.empty();
+	public final void doRun() {
+		Optional<Exception> lastError = Optional.empty();
 		for (Cmd c : coll) {
 			if (c.canRun()) try {
 				c.doRun();
 				return;
-			} catch (RuntimeException e) {
+			} catch (Exception e) {
 				lastError = Optional.of(e);
 			}
 		}
-		lastError.ifPresent(e -> {throw e;});
+		lastError.ifPresent(e -> {throw New.unchecked(e);});
 	}
 
 }

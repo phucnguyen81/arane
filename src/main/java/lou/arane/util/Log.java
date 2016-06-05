@@ -20,7 +20,7 @@ public class Log {
         .activate();
     }
 
-    public static void info(String msg) {
+    public static void info(Object msg) {
         LogEntryForwarder.forward(1, Level.INFO, msg);
     }
 
@@ -32,7 +32,7 @@ public class Log {
         LogEntryForwarder.forward(1, Level.ERROR, err);
     }
 
-    public static void error(String msg) {
+    public static void error(Object msg) {
         LogEntryForwarder.forward(1, Level.ERROR, msg);
     }
 

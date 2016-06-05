@@ -1,4 +1,4 @@
-package lou.arane.usecases;
+package lou.arane.app.usecases;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -9,7 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import lou.arane.Context;
+import lou.arane.app.Context;
 import lou.arane.core.Cmd;
 import lou.arane.util.URLResource;
 import lou.arane.util.Util;
