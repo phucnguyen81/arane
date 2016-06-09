@@ -7,9 +7,12 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.AbstractMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
-
-import javax.xml.ws.Holder;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Create commonly used objects
@@ -18,12 +21,16 @@ import javax.xml.ws.Holder;
  */
 public class New {
 
-	public static <K, V> Entry<K, V> entry(K key, V value) {
-		return new AbstractMap.SimpleImmutableEntry<>(key, value);
-	}
+    public static <K, V> Entry<K, V> entry(K key, V value) {
+        return new AbstractMap.SimpleImmutableEntry<>(key, value);
+    }
 
-    public static <T> Holder<T> holder() {
-        return new Holder<>();
+    public static <T> Stream<T> stream(Iterable<T> iter) {
+        return StreamSupport.stream(iter.spliterator(), false);
+    }
+
+    public static <T> Stream<T> stream(Iterator<T> iter) {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, Spliterator.ORDERED), false);
     }
 
     public static BufferedReader reader(InputStream stream) {
@@ -33,18 +40,16 @@ public class New {
     public static BufferedReader reader(Path path) {
         try {
             return Files.newBufferedReader(path, IO.charset());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-	public static RuntimeException unchecked(Exception e) {
-		if (e instanceof RuntimeException) {
-			return (RuntimeException) e;
-		}
-		else {
-			return new RuntimeException(e);
-		}
-	}
+    public static RuntimeException unchecked(Exception e) {
+        if (e instanceof RuntimeException) {
+            return (RuntimeException) e;
+        } else {
+            return new RuntimeException(e);
+        }
+    }
 }

@@ -301,7 +301,7 @@ public final class Util {
 
     /** @see Util#parseHtml(Path, String) */
     public static Document parseHtml(Path path, URLResource baseUri) {
-    	return parseHtml(path, baseUri.toString());
+    	return parseHtml(path, baseUri.externalForm());
     }
 
     /**

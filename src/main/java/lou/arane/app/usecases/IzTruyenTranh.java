@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 
 import lou.arane.app.Context;
 import lou.arane.core.Cmd;
+import lou.arane.util.FileResource;
 import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
@@ -67,7 +68,7 @@ public class IzTruyenTranh implements Cmd {
      * </pre>
      */
     private void downloadChapters() {
-        Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URI);
+        Document rootFile = ctx.chapterList.parseHtml(BASE_URI);
         Elements chapterAddresses = rootFile.select("div[class=chapter-list] a[href]");
         for (Element chapterAddr : chapterAddresses) {
             Optional<URLResource> chapterUrl = URLResource.of(chapterAddr.absUrl("href"));
@@ -77,7 +78,7 @@ public class IzTruyenTranh implements Cmd {
 	                chapterName += ".html";
 	            }
 	            Path chapterPath = ctx.chaptersDir.resolve(chapterName);
-	            ctx.add(chapterUrl.get(), chapterPath);
+	            ctx.add(chapterUrl.get(), new FileResource(chapterPath));
             }
         }
         ctx.download();
@@ -106,7 +107,7 @@ public class IzTruyenTranh implements Cmd {
 	                    String imageName = idx + "_" + imageUrl.get().fileName();
 	                    imageName = Util.padNumericSequences(imageName, 3);
 	                    Path imagePath = chapterPath.resolve(imageName);
-	                    ctx.add(imageUrl.get(), imagePath);
+	                    ctx.add(imageUrl.get(), new FileResource(imagePath));
                     }
                 }
             }

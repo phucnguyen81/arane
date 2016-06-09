@@ -1,10 +1,13 @@
 package lou.arane.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.time.temporal.ChronoUnit.MINUTES;
+
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Collection;
@@ -110,9 +113,11 @@ public class URLResource {
     /**
      * Make GET request assuming the protocol is http.
      */
-    public HttpResponse httpGET(Duration timeout) {
+    public HttpResponse httpGET() {
     	try {
-			return new HttpResponse(IO.httpGET(url, StandardCharsets.UTF_8, timeout));
+			HttpURLConnection conn;
+			conn = IO.httpGET(url, UTF_8, Duration.of(1, MINUTES));
+            return new HttpResponse(conn);
 		} catch (Exception e) {
 			throw New.unchecked(e);
 		}

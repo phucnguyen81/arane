@@ -2,10 +2,6 @@ package lou.arane.app;
 
 import static java.util.stream.Collectors.toList;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map.Entry;
 
 import lou.arane.core.Cmd;
@@ -13,7 +9,9 @@ import lou.arane.core.cmds.CmdAllSuccess;
 import lou.arane.core.cmds.CmdLimitedRetry;
 import lou.arane.core.cmds.CmdLog;
 import lou.arane.util.Check;
+import lou.arane.util.FileResource;
 import lou.arane.util.Log;
+import lou.arane.util.New;
 import lou.arane.util.ToString;
 import lou.arane.util.URLResource;
 
@@ -24,14 +22,14 @@ import lou.arane.util.URLResource;
  */
 public class Downloads extends CmdAllSuccess<Cmd> {
 
-	public Downloads(Collection<Entry<URLResource, Path>> items) {
+	public Downloads(Iterable<Entry<URLResource, FileResource>> items) {
     	this(items, 1);
     }
 
-    public Downloads(Collection<Entry<URLResource, Path>> items, int maxRetries) {
+    public Downloads(Iterable<Entry<URLResource, FileResource>> items, int maxRetries) {
     	super(
-			items.stream()
-				.map(i -> new Download(i))
+			New.stream(items)
+			    .map(i -> new Download(i))
 				.map(c -> new CmdLimitedRetry(c, maxRetries))
 				.map(CmdLog::new)
 				.collect(toList())
@@ -41,16 +39,15 @@ public class Downloads extends CmdAllSuccess<Cmd> {
 
     @Override
 	protected Iterable<Cmd> onFilter(Iterable<Cmd> cmds) {
-        List<Cmd> filtered = new ArrayList<>();
-        for (Cmd c : cmds) {
+        return New.stream(cmds).filter(c -> {
             if (c.canRun()) {
-                filtered.add(c);
+                return true;
             }
             else {
                 Log.info("Skip over " + c);
+                return false;
             }
-        }
-        return filtered;
+        }).collect(toList());
     }
 
     @Override

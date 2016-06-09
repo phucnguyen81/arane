@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lou.arane.app.Context;
 import lou.arane.core.Cmd;
 import lou.arane.scripts.CopyFiles;
+import lou.arane.util.FileResource;
 import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
@@ -49,13 +50,13 @@ public class MangaGo implements Cmd {
      * Download chapter pages by extracting their urls from the master html file
      */
     private void downloadChapters() {
-        Document rootFile = Util.parseHtml(ctx.chapterList);
+        Document rootFile = ctx.chapterList.parseHtml(BASE_URL);
         for (Element chapterAddr : rootFile.select("table[id=chapter_table] a[href]")) {
             Optional<URLResource> chapterUrl = URLResource.of(chapterAddr.attr("href"));
             if (chapterUrl.isPresent())	{
 	            String chapterName = chapterUrl.get().fileName().toString();
 	            Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
-	            ctx.add(chapterUrl.get(), chapterPath);
+	            ctx.add(chapterUrl.get(), new FileResource(chapterPath));
             }
         }
         ctx.download();
@@ -83,7 +84,7 @@ public class MangaGo implements Cmd {
 	                String pageName = chapterName + "_" + addr.ownText();
 	                if (!pageName.endsWith(".html")) pageName += ".html";
 	                Path pagePath = ctx.pagesDir.resolve(pageName);
-	                ctx.add(pageUrl.get(), pagePath);
+	                ctx.add(pageUrl.get(), new FileResource(pagePath));
                 }
             }
         }
@@ -98,7 +99,7 @@ public class MangaGo implements Cmd {
             if (imageUri.isPresent()) {
 	            String pageName = pageHtml.getFileName().toString().replace(".html", "");
 	            Path imagePath = ctx.imagesDir.resolve(pageName + "." + imageUri.get().fileExtension());
-	            ctx.add(imageUri.get(), imagePath);
+	            ctx.add(imageUri.get(), new FileResource(imagePath));
             }
         }
         ctx.download();

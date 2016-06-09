@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import lou.arane.app.Context;
 import lou.arane.core.Cmd;
+import lou.arane.util.FileResource;
 import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
@@ -34,42 +35,41 @@ public class KissManga implements Cmd {
     private static final String BASE_URI = "http://kissmanga.com/";
 
     /** Patterns of images embeded in javascript element */
-    private static final Pattern IMAGE_PATTERN = Pattern.compile(
-    		"lstImages\\.push\\(\"(.+)\"\\);"
-    		);
+    private static final Pattern IMAGE_PATTERN = Pattern.compile("lstImages\\.push\\(\"(.+)\"\\);");
 
-	private final Context ctx;
+    private final Context ctx;
 
-	public KissManga(Context context) {
-		this.ctx = context;
+    public KissManga(Context context) {
+        this.ctx = context;
     }
 
-	@Override
-	public boolean canRun() {
-		//domain must match
-		String url = ctx.source.externalForm();
-		return url.startsWith(BASE_URI);
-	}
+    @Override
+    public boolean canRun() {
+        // domain must match
+        String url = ctx.source.externalForm();
+        return url.startsWith(BASE_URI);
+    }
 
-	@Override
-	public void doRun() {
-		ctx.downloadChapterList();
-		downloadChapters();
-		downloadImages();
-	}
+    @Override
+    public void doRun() {
+        ctx.downloadChapterList();
+        downloadChapters();
+        downloadImages();
+    }
 
     /**
      * Download chapter pages by extracting their urls from the master html file
      */
     private void downloadChapters() {
-        Document chapters = Util.parseHtml(ctx.chapterList, BASE_URI);
+        Document chapters = ctx.chapterList.parseHtml(BASE_URI);
         for (Element chapterAddr : chapters.select("table[class=listing] a[href]")) {
             Optional<URLResource> chapterUrl = URLResource.of(chapterAddr.absUrl("href"));
             if (chapterUrl.isPresent()) {
-	            String chapterName = Util.join(Paths.get(chapterUrl.get().filePath()), "_");
-	            if (!chapterName.endsWith(".html")) chapterName += ".html";
-	            Path chapterPath = ctx.chaptersDir.resolve(chapterName);
-	            ctx.add(chapterUrl.get(), chapterPath);
+                String chapterName = Util.join(Paths.get(chapterUrl.get().filePath()), "_");
+                if (!chapterName.endsWith(".html"))
+                    chapterName += ".html";
+                Path chapterPath = ctx.chaptersDir.resolve(chapterName);
+                ctx.add(chapterUrl.get(), new FileResource(chapterPath));
             }
         }
         ctx.download();
@@ -89,10 +89,10 @@ public class KissManga implements Cmd {
                 while (matcher.find()) {
                     Optional<URLResource> imageUrl = URLResource.of(matcher.group(1));
                     if (imageUrl.isPresent()) {
-	                    String imageName = chapterName + "_" + imageUrl.get().fileName();
-	                    imageName = Util.padNumericSequences(imageName, 3);
-	                    Path imagePath = ctx.imagesDir.resolve(imageName);
-	                    ctx.add(imageUrl.get(), imagePath);
+                        String imageName = chapterName + "_" + imageUrl.get().fileName();
+                        imageName = Util.padNumericSequences(imageName, 3);
+                        Path imagePath = ctx.imagesDir.resolve(imageName);
+                        ctx.add(imageUrl.get(), new FileResource(imagePath));
                     }
                 }
             }

@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import lou.arane.app.Context;
 import lou.arane.core.Cmd;
 import lou.arane.scripts.CopyFiles;
+import lou.arane.util.FileResource;
 import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
@@ -58,14 +59,14 @@ public class EgScans implements Cmd {
      * </pre>
      */
     private void downloadChapters() {
-        Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URL);
+        Document rootFile = ctx.chapterList.parseHtml(BASE_URL);
         for (Element chapterOption : rootFile.select("select[name=chapter] option[value]")) {
-            String chapterName = chapterOption.attr("value");            
+            String chapterName = chapterOption.attr("value");
             Optional<URLResource> chapterUrl = URLResource.of(
             	BASE_URL + ctx.sourceName + "/" + chapterName);
             if (chapterUrl.isPresent()) {
             	Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
-            	ctx.add(chapterUrl.get(), chapterPath);
+            	ctx.add(chapterUrl.get(), new FileResource(chapterPath));
             }
         }
         ctx.download();
@@ -106,7 +107,7 @@ public class EgScans implements Cmd {
 	            String imageName = chapterName + "_" + imageUrl.get().fileName();
 	            imageName = Util.padNumericSequences(imageName.toLowerCase(), 3);
 	            Path imagePath = ctx.imagesDir.resolve(imageName);
-	            ctx.add(imageUrl.get(), imagePath);
+	            ctx.add(imageUrl.get(), new FileResource(imagePath));
             }
     	}
     }

@@ -62,7 +62,7 @@ public class CmdAllSuccess<C extends Cmd> implements Cmd {
 	}
 
 	/**
-	 * Tempate Method for what to do if a command throws an exception
+	 * Template Method for what to do if a command throws an exception
 	 */
 	protected void onException(C c, Exception e) {}
 

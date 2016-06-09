@@ -19,8 +19,8 @@ public class AraneTest {
 
 	static void testMangaLife() {
 		Arane.main(new String[] {
-			"HinomaruZumou"
-			, "http://manga.life/read-online/HinomaruZumou"
+			"Guarding"
+			, "http://manga.life/read-online/Guarding"
 		});
 	}
 

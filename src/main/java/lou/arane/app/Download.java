@@ -1,10 +1,7 @@
 package lou.arane.app;
 
-import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.stream.Collectors.toList;
 
-import java.nio.file.Path;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -12,6 +9,7 @@ import java.util.Map.Entry;
 import lou.arane.core.Cmd;
 import lou.arane.core.cmds.CmdFirstSuccess;
 import lou.arane.core.cmds.CmdWrap;
+import lou.arane.util.FileResource;
 import lou.arane.util.URLResource;
 
 /**
@@ -22,25 +20,20 @@ import lou.arane.util.URLResource;
 public class Download extends CmdWrap<Cmd> {
 
 	private final URLResource source;
-	private final Path target;
+	private final FileResource target;
 
-	/** Instantiate with default timeout */
-	public Download(Entry<URLResource, Path> item) {
-		this(item, Duration.of(1, MINUTES));
+	/** Instantiate given download item */
+	public Download(Entry<URLResource, FileResource> item) {
+		this(item.getKey(), item.getValue());
 	}
 
-	/** Instantiate given download item and timeout */
-	public Download(Entry<URLResource, Path> item, Duration timeout) {
-		this(item.getKey(), item.getValue(), timeout);
-	}
-
-	/** Instantiate given source, target and timeout */
-	private Download(URLResource source, Path target, Duration timeout) {
+	/** Instantiate given source and target download */
+	private Download(URLResource source, FileResource target) {
 		super(
 			new CmdFirstSuccess(
 				sourceAndAlternatives(source)
 				.stream()
-				.map(url -> new DownloadUnit(url, target, timeout))
+				.map(url -> new DownloadUnit(url, target))
 				.collect(toList())
 			)
 		);

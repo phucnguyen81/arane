@@ -13,6 +13,8 @@ import org.jsoup.nodes.Element;
 import lou.arane.app.Context;
 import lou.arane.core.Cmd;
 import lou.arane.scripts.CopyFiles;
+import lou.arane.util.FileResource;
+import lou.arane.util.ToString;
 import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
@@ -31,6 +33,11 @@ public class MangaLife implements Cmd {
 	public MangaLife(Context context) {
 		this.ctx = context;
     }
+
+	@Override
+    public String toString() {
+	    return ToString.of(MangaLife.class).join(BASE_URI).line(ctx).render();
+	}
 
 	@Override
 	public boolean canRun() {
@@ -58,14 +65,14 @@ public class MangaLife implements Cmd {
      * </pre>
      */
     private void downloadChapters() {
-        Util.parseHtml(ctx.chapterList, BASE_URI)
+        ctx.chapterList.parseHtml(BASE_URI)
 	        .select("a[href]")
 	        .stream()
 	        .map(a -> a.absUrl("href"))
 	        .filter(href -> href.contains(ctx.sourceName))
 	        .forEach(href -> URLResource.of(href).ifPresent(chapterUrl -> {
 	            String chapterPath = Util.join(Paths.get(chapterUrl.filePath()), "_");
-	            ctx.add(chapterUrl, ctx.chaptersDir.resolve(chapterPath + ".html"));
+	            ctx.add(chapterUrl, new FileResource(ctx.chaptersDir.resolve(chapterPath + ".html")));
 	        }));
         ctx.download();
     }
@@ -111,7 +118,7 @@ public class MangaLife implements Cmd {
         String pageUriStr = Util.join(Arrays.asList(base, chapter, index, page), "/");
         URLResource.of(pageUriStr).ifPresent(pageUrl -> {
             Path pagePath = ctx.pagesDir.resolve(chapter + "_" + page + ".html");
-            ctx.add(pageUrl, pagePath);
+            ctx.add(pageUrl, new FileResource(pagePath));
         });
     }
 
@@ -135,7 +142,7 @@ public class MangaLife implements Cmd {
         	URLResource.of(img.absUrl("src")).ifPresent(imgUrl -> {
         		imgUrl = new URLResource(imgUrl, onErrorUrls(img.attr("onerror")));
         		Path imgPath = ctx.imagesDir.resolve(imgUrl.fileName());
-        		ctx.add(imgUrl, imgPath);
+        		ctx.add(imgUrl, new FileResource(imgPath));
         	});
         }
     }
@@ -157,6 +164,5 @@ public class MangaLife implements Cmd {
             .setDirPattern("\\d+(\\.\\d+)?")
             .run();
     }
-
 
 }

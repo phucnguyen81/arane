@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import lou.arane.app.Context;
 import lou.arane.core.Cmd;
+import lou.arane.util.FileResource;
 import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
@@ -29,12 +30,6 @@ public class BlogTruyen implements Cmd {
 
 	private final Context ctx;
 
-    /**
-     * Create a downloader to download a story to a directory
-     *
-     * @param story = name of the story, e.g. "vo-than"
-     * @param baseDir = dir to download to, e.g. "/mangas/Vo Than"
-     */
     public BlogTruyen(Context context) {
     	this.ctx = context;
     }
@@ -42,6 +37,7 @@ public class BlogTruyen implements Cmd {
 	@Override
 	public boolean canRun() {
 		//domain must match
+	    //TODO just need to declare domain and check for domain matching
 		String url = ctx.source.externalForm();
 		return url.startsWith(BASE_URL);
 	}
@@ -66,7 +62,7 @@ public class BlogTruyen implements Cmd {
      * </pre>
      */
     private void downloadChapters() {
-        Document rootFile = Util.parseHtml(ctx.chapterList, BASE_URL);
+        Document rootFile = ctx.chapterList.parseHtml(BASE_URL);
         Elements chapterAddresses = rootFile.select("a[href]");
         for (Element chapterAddr : chapterAddresses) {
             String href = chapterAddr.absUrl("href");
@@ -79,7 +75,7 @@ public class BlogTruyen implements Cmd {
 	            		chapterName += ".html";
 	            	}
 	            	Path chapterPath = ctx.chaptersDir.resolve(chapterName);
-	            	ctx.add(chapterUri.get(), chapterPath);
+	            	ctx.add(chapterUri.get(), new FileResource(chapterPath));
 	            }
             }
         }
@@ -106,7 +102,7 @@ public class BlogTruyen implements Cmd {
             		String imageName = imageUri.fileName().toString();
             		Path imagePath = Paths.get(imageDir, imageName);
             		imagePath = ctx.imagesDir.resolve(imagePath);
-            		ctx.add(imageUri, imagePath);
+            		ctx.add(imageUri, new FileResource(imagePath));
             	});
             }
             ctx.download();

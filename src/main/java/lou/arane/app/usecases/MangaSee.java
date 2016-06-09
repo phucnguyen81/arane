@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import lou.arane.app.Context;
 import lou.arane.core.Cmd;
 import lou.arane.scripts.CopyFiles;
+import lou.arane.util.FileResource;
 import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
@@ -50,15 +51,14 @@ public class MangaSee implements Cmd {
 	}
 
     private void downloadChapters() {
-        Path indexPath = ctx.chapterList;
-        Document indexDoc = Util.parseHtml(indexPath);
-        indexDoc.setBaseUri(baseUri);
+        FileResource indexPath = ctx.chapterList;
+        Document indexDoc = indexPath.parseHtml(baseUri);
         for (Element chapterAddr : indexDoc.getElementsByClass("chapter_link")) {
             String chapterName = chapterAddr.text().trim();
             String href = chapterAddr.absUrl("href");
             URLResource.of(href).ifPresent(chapterUrl -> {
             	Path chapterPath = ctx.chaptersDir.resolve(chapterName + ".html");
-            	ctx.add(chapterUrl, chapterPath);
+            	ctx.add(chapterUrl, new FileResource(chapterPath));
             });
         }
         ctx.download();
@@ -89,7 +89,7 @@ public class MangaSee implements Cmd {
 	                    String.format("c%s_p%s.html",
 	                    Util.padStart(chapterIdx, 3, '0'),
 	                    Util.padStart(pageIdx, 3, '0')));
-	                ctx.add(pageUrl.get(), pagePath);
+	                ctx.add(pageUrl.get(), new FileResource(pagePath));
                 }
             }
         }
@@ -122,7 +122,7 @@ public class MangaSee implements Cmd {
         .forEach(imageUrl -> {
         	String pageName = imageUrl.fileName();
         	Path imagePath = ctx.imagesDir.resolve(pageName);
-        	ctx.add(imageUrl, imagePath);
+        	ctx.add(imageUrl, new FileResource(imagePath));
         });
 	}
 
