@@ -17,7 +17,7 @@ public class ToString {
      * Create instance given the class that needs to implement toString.
      */
     public static ToString of(Class<?> c) {
-        return ToString.of(c);
+        return new ToString(c);
     }
 
     private final Class<?> clazz;
