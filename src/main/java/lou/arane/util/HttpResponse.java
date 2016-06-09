@@ -58,7 +58,7 @@ public class HttpResponse implements Closeable {
 
     @Override
     public String toString() {
-        return new ToString(HttpResponse.class).join("conn", conn).join("status", status).render();
+        return ToString.of(HttpResponse.class).join("conn", conn).join("status", status).render();
     }
 
 }

@@ -49,6 +49,6 @@ public class CmdWrap<C extends Cmd> implements Cmd {
 
     @Override
     public String toString() {
-        return new ToString(CmdWrap.class).join(origin).render();
+        return ToString.of(CmdWrap.class).join(origin).render();
     }
 }

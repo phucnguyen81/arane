@@ -13,19 +13,18 @@ import static java.util.stream.Collectors.joining;
  */
 public class ToString {
 
+    /**
+     * Create instance given the class that needs to implement toString.
+     */
     public static ToString of(Class<?> c) {
-        return new ToString(c);
+        return ToString.of(c);
     }
 
     private final Class<?> clazz;
 
     private final Map<Object, Object> parts;
 
-    /**
-     * TODO make this private.
-     * Instantiate with the class that needs to implement toString.
-     */
-    public ToString(Class<?> c) {
+    private ToString(Class<?> c) {
         this.clazz = c;
         parts = new LinkedHashMap<>();
     }

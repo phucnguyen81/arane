@@ -27,7 +27,7 @@ public class CmdLog extends CmdWrap<Cmd> {
 
     @Override
     public String toString() {
-        return new ToString(CmdLog.class).join(super.toString()).render();
+        return ToString.of(CmdLog.class).join(super.toString()).render();
     }
 
 }

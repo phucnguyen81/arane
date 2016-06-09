@@ -57,6 +57,6 @@ public class Downloads extends CmdAllSuccess<Cmd> {
 
     @Override
     public String toString() {
-        return new ToString(Downloads.class).line(super.toString()).render();
+        return ToString.of(Downloads.class).line(super.toString()).render();
     }
 }
