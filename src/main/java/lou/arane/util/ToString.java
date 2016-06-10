@@ -1,13 +1,14 @@
 package lou.arane.util;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import static java.util.stream.Collectors.joining;
 
+import java.util.List;
+
+import lou.arane.core.Cmd;
+
 /**
- * Help generate output for implementing toString method.
- * NOTE: call {@link #render()} to generate output, not {@link #toString()}.
+ * Help generate output for implementing toString method. NOTE: call
+ * {@link #render()} to generate output, not {@link #toString()}.
  *
  * @author Phuc
  */
@@ -22,33 +23,36 @@ public class ToString {
 
     private final Class<?> clazz;
 
-    private final Map<Object, Object> parts;
+    private final List<Object> parts;
 
     private ToString(Class<?> c) {
         this.clazz = c;
-        parts = new LinkedHashMap<>();
+        parts = New.list();
     }
 
     /**
-     * Show string representation. NOTE: use {@link #render()} to get the output.
+     * Show string representation. NOTE: use {@link #render()} to get the
+     * output.
      */
     @Override
     public String toString() {
-        return String.format("%s(%s, %s)", ToString.class.getSimpleName(), clazz.getSimpleName(), parts);
+        return String.format("%s(%s, %s)",
+                ToString.class.getSimpleName(),
+                clazz.getSimpleName(),
+                parts);
     }
 
     /**
      * Get the output of the parts added so far.
      */
     public String render() {
-        return clazz.getSimpleName() + parts.entrySet().stream().map(e -> {
-            if (e.getKey().equals("")) {
-                return String.valueOf(e.getValue());
-            }
-            else {
-                return e.getKey() + " = " + e.getValue();
-            }
-        }).collect(joining(", ", "(", ")"));
+        String attrs = parts.stream().map(Object::toString).collect(joining(", ", "(", ")"));
+        return clazz.getSimpleName() + attrs;
+    }
+
+    public ToString lines(Iterable<Cmd> lines) {
+        lines.forEach(this::line);
+        return this;
     }
 
     public ToString line(Object part) {
@@ -56,7 +60,7 @@ public class ToString {
     }
 
     public ToString line(Object name, Object part) {
-        return join(name, System.lineSeparator() + part);
+        return join(System.lineSeparator() + name, part);
     }
 
     public ToString join(Object part) {
@@ -64,7 +68,12 @@ public class ToString {
     }
 
     public ToString join(Object name, Object part) {
-        parts.put(name, part);
+        if (name.equals("")) {
+            parts.add(part);
+        }
+        else {
+            parts.add(name + " = " + part);
+        }
         return this;
     }
 

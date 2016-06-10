@@ -3,6 +3,7 @@ package lou.arane.app;
 import lou.arane.core.Cmd;
 import lou.arane.util.FileResource;
 import lou.arane.util.HttpResponse;
+import lou.arane.util.ToString;
 import lou.arane.util.URLResource;
 
 /**
@@ -18,6 +19,14 @@ public class DownloadUnit implements Cmd {
     public DownloadUnit(URLResource source, FileResource target) {
         this.source = source;
         this.target = target;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.of(DownloadUnit.class)
+                .line("source", source)
+                .line("target", target)
+                .render();
     }
 
     /**

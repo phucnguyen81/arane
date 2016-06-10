@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lou.arane.core.Cmd;
+import lou.arane.util.ToString;
 
 /**
  * Run each command until the first one succeeds.
@@ -18,6 +19,11 @@ public class CmdFirstSuccess implements Cmd {
     public CmdFirstSuccess(Iterable<? extends Cmd> coll) {
         this.cmds = new ArrayList<>();
         coll.forEach(this.cmds::add);
+    }
+
+    @Override
+    public String toString() {
+        return ToString.of(CmdFirstSuccess.class).lines(cmds).render();
     }
 
     @Override

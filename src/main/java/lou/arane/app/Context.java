@@ -57,7 +57,7 @@ public class Context {
         chaptersDir = baseDir.resolve("chapters");
         pagesDir = baseDir.resolve("pages");
         imagesDir = baseDir.resolve("images");
-        outputDir = baseDir.resolve("output").resolve(baseDir.getFileName());
+        outputDir = baseDir.resolve("output");
     }
 
     @Override
