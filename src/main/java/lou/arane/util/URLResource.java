@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -85,6 +86,13 @@ public class URLResource {
     	return alternatives;
     }
 
+    public List<URLResource> plusAlternatives() {
+        List<URLResource> urls = New.list();
+        urls.add(this);
+        urls.addAll(alternatives());
+        return urls;
+    }
+
     public String externalForm() {
     	return url.toExternalForm();
     }
@@ -134,4 +142,5 @@ public class URLResource {
     		, url, Util.joinLines(alternatives)
     	);
     }
+
 }

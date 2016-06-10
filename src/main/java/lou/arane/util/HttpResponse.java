@@ -8,7 +8,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 
-/** Results from making http connection */
+/**
+ * Results from making http connection
+ */
 public class HttpResponse implements Closeable {
 
     private final HttpURLConnection conn;

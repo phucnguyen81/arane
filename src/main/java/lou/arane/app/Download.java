@@ -1,15 +1,10 @@
 package lou.arane.app;
 
-import static java.util.stream.Collectors.toList;
+import java.util.stream.Collectors;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-
-import lou.arane.core.Cmd;
 import lou.arane.core.cmds.CmdFirstSuccess;
-import lou.arane.core.cmds.CmdWrap;
 import lou.arane.util.FileResource;
+import lou.arane.util.ToString;
 import lou.arane.util.URLResource;
 
 /**
@@ -17,41 +12,17 @@ import lou.arane.util.URLResource;
  *
  * @author Phuc
  */
-public class Download extends CmdWrap<Cmd> {
+public class Download extends CmdFirstSuccess {
 
-	private final URLResource source;
-	private final FileResource target;
+    /** Instantiate given source and target download */
+    public Download(URLResource source, FileResource target) {
+        super(source.plusAlternatives().stream()
+                .map(url -> new DownloadUnit(url, target))
+                .collect(Collectors.toList()));
+    }
 
-	/** Instantiate given download item */
-	public Download(Entry<URLResource, FileResource> item) {
-		this(item.getKey(), item.getValue());
-	}
-
-	/** Instantiate given source and target download */
-	private Download(URLResource source, FileResource target) {
-		super(
-			new CmdFirstSuccess(
-				sourceAndAlternatives(source)
-				.stream()
-				.map(url -> new DownloadUnit(url, target))
-				.collect(toList())
-			)
-		);
-		this.source = source;
-		this.target = target;
-	}
-
-	private static List<URLResource> sourceAndAlternatives(URLResource source) {
-		List<URLResource> urls = new ArrayList<>();
-		urls.add(source);
-		urls.addAll(source.alternatives());
-		return urls;
-	}
-
-	@Override
-	public String toString() {
-		return String.format("%s:%n  source:%s%n  target:%s"
-			, Download.class.getSimpleName(), source, target
-		);
-	}
+    @Override
+    public String toString() {
+        return ToString.of(Download.class).join(super.toString()).render();
+    }
 }

@@ -1,12 +1,11 @@
 package lou.arane.core.cmds;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 
 import lou.arane.core.Cmd;
+import lou.arane.util.New;
 
 /**
  * Keep running command(s) until no command raises exception
@@ -18,8 +17,8 @@ public class CmdAllSuccess<C extends Cmd> implements Cmd {
 
 	private final List<C> cmds;
 
-	public CmdAllSuccess(Collection<C> cmds) {
-		this.cmds = new ArrayList<>(cmds);
+	public CmdAllSuccess(Iterable<C> iter) {
+	    this.cmds = New.list(iter);
 	}
 
 	/**
@@ -27,7 +26,7 @@ public class CmdAllSuccess<C extends Cmd> implements Cmd {
 	 */
 	@Override
 	public final boolean canRun() {
-		return cmds.stream().anyMatch(Cmd::canRun);
+	    return cmds.stream().anyMatch(Cmd::canRun);
 	}
 
 	/**
@@ -37,12 +36,12 @@ public class CmdAllSuccess<C extends Cmd> implements Cmd {
 	 */
 	@Override
 	public final void doRun() {
-    	Deque<C> queue = new ArrayDeque<>();
-    	onFilter(cmds).iterator().forEachRemaining(queue::addLast);
+	    List<C> filtered = New.list(onFilter(cmds));
+    	Deque<C> queue = new ArrayDeque<>(filtered);
         while (!queue.isEmpty()) {
             C c = queue.removeFirst();
-            if (c.canRun()) try {
-        		c.doRun();
+            try {
+        		c.run();
         	}
         	catch (Exception e) {
         		onException(c, e);
@@ -55,7 +54,7 @@ public class CmdAllSuccess<C extends Cmd> implements Cmd {
 	}
 
 	/**
-	 * Template Method for select commands that will get run
+	 * Template Method for selecting commands that will get run
 	 */
 	protected Iterable<C> onFilter(Iterable<C> cmds) {
 	    return cmds;

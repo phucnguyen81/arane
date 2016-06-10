@@ -3,18 +3,19 @@ package lou.arane.app;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lou.arane.util.Check;
 import lou.arane.util.FileResource;
-import lou.arane.util.New;
+import lou.arane.util.ToString;
 import lou.arane.util.URLResource;
 
 /**
- * Common knowledge of all usecases. There are no static elements, everything
- * can be found/replaced on the instance.
+ * Encapsulated Context?, or trying to be one.
+ * <p>
+ * TODO this is mutable, which is troublesome for being a Context.
+ * Maybe it can be a common internal part of the usecases?
  *
  * @author Phuc
  */
@@ -37,15 +38,15 @@ public class Context {
     public final Path outputDir;
 
     /** Re-try limit if a download fails */
-    public int maxDownloadAttempts = 3;
+    private final int maxDownloadAttempts = 3;
 
     /**
      * Pattern for extracting urls from text such as: src=
      * "mangas/Feng Shen Ji/Chapter 001/Feng_Shen_Ji_ch01_p00.jpg"
      */
-    public Pattern srcPattern = Pattern.compile("src=['\"]([^'\"]+)['\"]");
+    private final Pattern srcPattern = Pattern.compile("src=['\"]([^'\"]+)['\"]");
 
-    private final List<Entry<URLResource, FileResource>> items = new ArrayList<>();
+    private final List<Download> items = new ArrayList<>();
 
     public Context(String sourceName, URLResource source, Path baseDir) {
         this.source = source;
@@ -61,7 +62,7 @@ public class Context {
 
     @Override
     public String toString() {
-        return String.format("%s: %s -> %s", Context.class.getSimpleName(), source, target);
+        return ToString.of(Context.class).line("source", source).line("target", target).render();
     }
 
     /**
@@ -77,23 +78,6 @@ public class Context {
                 "Failed to download chapter listing to " + chapterList);
     }
 
-    /** Add a pair of source-target to download later */
-    public void add(URLResource fromUri, FileResource toFile) {
-        items.add(New.entry(fromUri, toFile));
-    }
-
-    /**
-     * Download items added so far. All items are cleared after this returns.
-     */
-    public void download() {
-        try {
-            new Downloads(items, maxDownloadAttempts).run();
-        }
-        finally {
-            items.clear();
-        }
-    }
-
     /**
      * Find urls enclosed in text pattern "src='url'". This is needed because if
      * the url is embedded in javascript elemements then we cannot search for it
@@ -106,6 +90,22 @@ public class Context {
             urls.add(matcher.group(1));
         }
         return urls;
+    }
+
+    /**
+     * Add a pair of source-target to download later
+     */
+    public void add(URLResource src, FileResource dst) {
+        items.add(new Download(src, dst));
+    }
+
+    /**
+     * Download items added so far. All items are cleared after this returns.
+     */
+    public void download() {
+        Downloads d = new Downloads(items, maxDownloadAttempts);
+        items.clear();
+        d.run();
     }
 
 }
