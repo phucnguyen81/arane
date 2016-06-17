@@ -39,8 +39,7 @@ public class CmdLimitedRetry implements Cmd {
 
     @Override
     public String toString() {
-        return ToString.of(CmdLimitedRetry.class).join("limit", limit)
-                .line(origin)
-                .render();
+        return ToString.of(CmdLimitedRetry.class).add("limit=", limit).nln()
+                .add(origin).str();
     }
 }

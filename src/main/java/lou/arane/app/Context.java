@@ -14,8 +14,8 @@ import lou.arane.util.URLResource;
 /**
  * Encapsulated Context?, or trying to be one.
  * <p>
- * TODO this is mutable, which is troublesome for being a Context.
- * Maybe it can be a common internal part of the usecases?
+ * TODO this is mutable, which is troublesome for being a Context. Maybe it can
+ * be a common internal part of the usecases?
  *
  * @author Phuc
  */
@@ -62,7 +62,7 @@ public class Context {
 
     @Override
     public String toString() {
-        return ToString.of(Context.class).line("source", source).line("target", target).render();
+        return ToString.of(Context.class).add("source=", source).add("target=", target).str();
     }
 
     /**

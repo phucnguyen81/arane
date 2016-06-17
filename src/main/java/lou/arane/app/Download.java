@@ -23,6 +23,6 @@ public class Download extends CmdFirstSuccess {
 
     @Override
     public String toString() {
-        return ToString.of(Download.class).join(super.toString()).render();
+        return ToString.of(Download.class).add(super.toString()).str();
     }
 }

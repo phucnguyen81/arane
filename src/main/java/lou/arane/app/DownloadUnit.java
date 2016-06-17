@@ -23,10 +23,8 @@ public class DownloadUnit implements Cmd {
 
     @Override
     public String toString() {
-        return ToString.of(DownloadUnit.class)
-                .line("source", source)
-                .line("target", target)
-                .render();
+        return ToString.of(DownloadUnit.class).add("source=", source, ", ", "target=", target)
+                .str();
     }
 
     /**

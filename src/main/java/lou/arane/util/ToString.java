@@ -3,12 +3,11 @@ package lou.arane.util;
 import static java.util.stream.Collectors.joining;
 
 import java.util.List;
-
-import lou.arane.core.Cmd;
+import java.util.Optional;
 
 /**
  * Help generate output for implementing toString method. NOTE: call
- * {@link #render()} to generate output, not {@link #toString()}.
+ * {@link #str()} to generate output, not {@link #toString()}.
  *
  * @author Phuc
  */
@@ -18,63 +17,66 @@ public class ToString {
      * Create instance given the class that needs to implement toString.
      */
     public static ToString of(Class<?> c) {
-        return new ToString(c);
+        return new ToString(Optional.of(c.getSimpleName()));
     }
 
-    private final Class<?> clazz;
+    public static ToString of() {
+        return new ToString(Optional.empty());
+    }
 
-    private final List<Object> parts;
+    private final Optional<String> clazz;
 
-    private ToString(Class<?> c) {
+    private final List<String> args;
+
+    private ToString(Optional<String> c) {
         this.clazz = c;
-        parts = New.list();
+        args = New.list();
     }
 
     /**
-     * Show string representation. NOTE: use {@link #render()} to get the
+     * Show string representation. NOTE: use {@link #str()} to get the
      * output.
      */
     @Override
     public String toString() {
-        return String.format("%s(%s, %s)",
-                ToString.class.getSimpleName(),
-                clazz.getSimpleName(),
-                parts);
+        String thisClass = ToString.class.getSimpleName();
+        if (clazz.isPresent()) {
+            return String.format("%s(%s, %s)", thisClass, clazz.get(), args);
+        }
+        else {
+            return String.format("%s(%s)", thisClass, args);
+        }
     }
 
     /**
-     * Get the output of the parts added so far.
+     * Append the arguments to the ends of this
      */
-    public String render() {
-        String attrs = parts.stream().map(Object::toString).collect(joining(", ", "(", ")"));
-        return clazz.getSimpleName() + attrs;
-    }
-
-    public ToString lines(Iterable<Cmd> lines) {
-        lines.forEach(this::line);
+    public ToString add(Object first, Object... rest) {
+        args.add(first.toString());
+        for (Object r : rest) {
+            args.add(r.toString());
+        }
         return this;
     }
 
-    public ToString line(Object part) {
-        return line("", part);
+    /**
+     * Append a system line-separator to the end of this
+     */
+    public ToString nln() {
+        args.add(System.lineSeparator());
+        return this;
     }
 
-    public ToString line(Object name, Object part) {
-        return join(System.lineSeparator() + name, part);
-    }
-
-    public ToString join(Object part) {
-        return join("", part);
-    }
-
-    public ToString join(Object name, Object part) {
-        if (name.equals("")) {
-            parts.add(part);
+    /**
+     * Get the output of the arguments added so far.
+     */
+    public String str() {
+        if (clazz.isPresent()) {
+            return args.stream().collect(joining("", clazz.get() + "(", ")"));
         }
         else {
-            parts.add(name + " = " + part);
+            return args.stream().collect(joining());
         }
-        return this;
     }
 
 }

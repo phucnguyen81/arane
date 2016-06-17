@@ -17,10 +17,14 @@ public class AraneTest {
 		if (off) testMangaSee();
 	}
 
+	/**
+	 * DenpaKyoushi, MahouTsukaiNoYome, DEADTube,
+	 * AkaAkatoretachiNoMonogatari,
+	 */
 	static void testMangaLife() {
 		Arane.main(new String[] {
-			"Guarding"
-			, "http://manga.life/read-online/Guarding"
+			"MagikaNoKenshiToShoukanMaou"
+			, "http://manga.life/read-online/MagikaNoKenshiToShoukanMaou"
 		});
 	}
 

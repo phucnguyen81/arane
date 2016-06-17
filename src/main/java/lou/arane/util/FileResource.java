@@ -24,7 +24,7 @@ public class FileResource {
 
     @Override
     public String toString() {
-        return ToString.of(FileResource.class).join(file).render();
+        return ToString.of(FileResource.class).add(file).str();
     }
 
     public OutputStream outputStream() {

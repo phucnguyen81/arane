@@ -23,7 +23,7 @@ public class CmdFirstSuccess implements Cmd {
 
     @Override
     public String toString() {
-        return ToString.of(CmdFirstSuccess.class).lines(cmds).render();
+        return ToString.of(CmdFirstSuccess.class).add(cmds).str();
     }
 
     @Override

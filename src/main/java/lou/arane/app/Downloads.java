@@ -38,7 +38,7 @@ public class Downloads extends CmdAllSuccess<Cmd> {
 
     @Override
     public String toString() {
-        return ToString.of(Downloads.class).join(super.toString()).render();
+        return ToString.of(Downloads.class).add(super.toString()).str();
     }
 
     /**
