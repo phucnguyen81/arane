@@ -26,7 +26,7 @@ import lou.arane.util.Util;
 public class MangaLife implements Cmd {
 
     /** base location of all mangas for this site */
-    private static final String BASE_URI = "http://manga.life/";
+    private static final String BASE_URI = "http://manga.life";
 
     private final Context ctx;
 

@@ -36,8 +36,8 @@ public class CmdAllSuccess<C extends Cmd> implements Cmd {
 	 */
 	@Override
 	public final void doRun() {
-	    List<C> filtered = New.list(onFilter(cmds));
-    	Deque<C> queue = new ArrayDeque<>(filtered);
+    	Deque<C> queue = new ArrayDeque<>();
+    	onFilter(cmds).forEach(queue::add);
         while (!queue.isEmpty()) {
             C c = queue.removeFirst();
             try {

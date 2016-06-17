@@ -18,13 +18,13 @@ public class AraneTest {
 	}
 
 	/**
-	 * DenpaKyoushi, MahouTsukaiNoYome, DEADTube,
+	 * , MahouTsukaiNoYome, DEADTube,
 	 * AkaAkatoretachiNoMonogatari,
 	 */
 	static void testMangaLife() {
 		Arane.main(new String[] {
-			"MagikaNoKenshiToShoukanMaou"
-			, "http://manga.life/read-online/MagikaNoKenshiToShoukanMaou"
+			"DenpaKyoushi"
+			, "http://manga.life/read-online/DenpaKyoushi"
 		});
 	}
 

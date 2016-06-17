@@ -45,8 +45,7 @@ public class New {
     }
 
     public static <T> Stream<T> stream(Iterator<T> iter) {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, Spliterator.ORDERED),
-                false);
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, Spliterator.ORDERED), false);
     }
 
     public static BufferedReader reader(InputStream stream) {
