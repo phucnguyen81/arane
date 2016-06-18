@@ -18,13 +18,13 @@ public class AraneTest {
 	}
 
 	/**
-	 * MahouTsukaiNoYome, DEADTube,
+	 * DEADTube,
 	 * AkaAkatoretachiNoMonogatari,
 	 */
 	static void testMangaLife() {
 		Arane.main(new String[] {
-			"DenpaKyoushi"
-			, "http://manga.life/read-online/DenpaKyoushi"
+			"MahouTsukaiNoYome"
+			, "http://manga.life/read-online/MahouTsukaiNoYome"
 		});
 	}
 

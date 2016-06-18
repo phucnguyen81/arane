@@ -95,7 +95,7 @@ public class GenerateImageViewer {
 		try {
         	IO.write(story, indexFile);
         } catch (Exception e) {
-        	Log.error("Failed to copy to " + indexFile);
+        	Log.warning("Failed to copy to " + indexFile);
         	throw new AssertionError(e);
 		}
 	}

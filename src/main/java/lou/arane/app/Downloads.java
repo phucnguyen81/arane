@@ -61,7 +61,7 @@ public class Downloads extends CmdAllSuccess<Cmd> {
 
     @Override
     protected final void onException(Cmd c, Exception e) {
-        Log.error(e);
+        Log.warning(e);
     }
 
 }

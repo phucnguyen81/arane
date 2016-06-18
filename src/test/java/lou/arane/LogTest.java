@@ -7,8 +7,14 @@ import lou.arane.util.Log;
 public class LogTest {
 
     @Test
-    public void logs() {
-        Log.info("This is an info");
+    public void info() {
+        Log.info("This is info");
     }
+
+    @Test
+    public void warn() {
+        Log.warning("This is warning");
+    }
+
 
 }
