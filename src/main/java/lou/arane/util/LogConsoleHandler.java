@@ -10,6 +10,7 @@ import java.util.logging.StreamHandler;
  * Log to either System.err or System.out depending on log level.
  * <p>
  * NOTE: This handler does not read config from LogManager like ConsoleHandler.
+ * The rest of the code is similar to ConsoleHandler though.
  *
  * @author Phuc
  */
