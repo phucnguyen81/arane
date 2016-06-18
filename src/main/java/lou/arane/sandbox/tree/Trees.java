@@ -16,36 +16,34 @@ public class Trees {
      * visitor.
      * <p>
      * NOTE walking using recursion is much simpler but can blow the stack for
-     * deep trees.
+     * deep trees. Here the stack is simulated with explicit use of {@link Stack}.
      */
-    public static <T> void walk(T t, Function<T, Iterable<T>> getChildren, TreeVisitor<T> v) {
-        Stack<T> parents = new Stack<>();
-        Stack<Iterator<T>> children = new Stack<>();
-        visit(t, getChildren, v, children, parents);
-        while (!children.isEmpty()) {
-            Iterator<T> run = children.peek();
-            if (run.hasNext()) {
-                T n = run.next();
-                visit(n, getChildren, v, children, parents);
+    public static <T> void walk(final T base, Function<T, Iterable<T>> getChildren, TreeVisitor<T> v) {
+        v.enter(base);
+        Stack<T> toLeave = new Stack<>();
+        toLeave.push(base);
+        Stack<Iterator<T>> toEnter = new Stack<>();
+        toEnter.push(getChildren.apply(base).iterator());
+        do {
+            Iterator<T> siblings = toEnter.peek();
+            if (siblings.hasNext()) {
+                T t = siblings.next();
+                v.enter(t);
+                Iterator<T> children = getChildren.apply(t).iterator();
+                if (children.hasNext()) {
+                    toEnter.push(children);
+                    toLeave.push(t);
+                }
+                else {
+                    v.leave(t);
+                }
             }
             else {
-                children.pop();
-                v.leave(parents.pop());
+                toEnter.pop();
+                v.leave(toLeave.pop());
             }
         }
-    }
-
-    private static <T> void visit(T t, Function<T, Iterable<T>> getChildren, TreeVisitor<T> v,
-            Stack<Iterator<T>> runs, Stack<T> parents) {
-        v.enter(t);
-        Iterator<T> children = getChildren.apply(t).iterator();
-        if (children.hasNext()) {
-            runs.push(children);
-            parents.push(t);
-        }
-        else {
-            v.leave(t);
-        }
+        while (!toEnter.isEmpty());
     }
 
     /**

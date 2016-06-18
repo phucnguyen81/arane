@@ -9,6 +9,7 @@ import lou.arane.util.Util;
 
 public class TreeBuilderTest {
 
+    /** TODO proper test */
 	@Test
 	public void build() {
 		SimpleTreeBuilder b = new SimpleTreeBuilder();
