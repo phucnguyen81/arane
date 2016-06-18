@@ -18,7 +18,7 @@ public class AraneTest {
 	}
 
 	/**
-	 * , MahouTsukaiNoYome, DEADTube,
+	 * MahouTsukaiNoYome, DEADTube,
 	 * AkaAkatoretachiNoMonogatari,
 	 */
 	static void testMangaLife() {

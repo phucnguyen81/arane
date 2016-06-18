@@ -1,39 +1,32 @@
 package lou.arane.util;
 
-import org.pmw.tinylog.Level;
-import org.pmw.tinylog.LogEntryForwarder;
-import org.pmw.tinylog.Logger;
-import org.pmw.tinylog.writers.FileWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Just enough code to hide the logging library, which in this case is tinylog.
+ * Just enough code to hide the logging implementation.
  *
  * @author LOU
  */
 public class Log {
 
-    /** Add a target for writing logs */
-    public static void addOutFile(String filepath) {
-        Logger
-        .getConfiguration()
-        .addWriter(new FileWriter(filepath))
-        .activate();
-    }
-
+    /** Log with root logger */
     public static void info(Object msg) {
-        LogEntryForwarder.forward(1, Level.INFO, msg);
+        rootLogger().info(msg.toString());
     }
 
-    public static void info(Throwable err, String msg) {
-        LogEntryForwarder.forward(1, Level.INFO, err, msg);
-    }
-
+    /** Log with root logger */
     public static void error(Throwable err) {
-        LogEntryForwarder.forward(1, Level.ERROR, err);
+        rootLogger().log(Level.WARNING, "", err);
     }
 
+    /** Log with root logger */
     public static void error(Object msg) {
-        LogEntryForwarder.forward(1, Level.ERROR, msg);
+        rootLogger().log(Level.WARNING, "");
+    }
+
+    private static Logger rootLogger() {
+        return Logger.getLogger("");
     }
 
 }

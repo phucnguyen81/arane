@@ -66,16 +66,17 @@ public class MangaLife implements Cmd {
      * </pre>
      */
     private void downloadChapters() {
-        ctx.chapterList.parseHtml(BASE_URI)
-                .select("a[href]")
-                .stream()
-                .map(a -> a.absUrl("href"))
-                .filter(href -> href.contains(ctx.sourceName))
-                .forEach(href -> URLResource.of(href).ifPresent(chapterUrl -> {
-                    String chapterPath = Util.join(Paths.get(chapterUrl.filePath()), "_");
-                    ctx.add(chapterUrl,
-                            new FileResource(ctx.chaptersDir.resolve(chapterPath + ".html")));
-                }));
+        ctx.chapterList
+            .parseHtml(BASE_URI)
+            .select("a[href]")
+            .stream()
+            .map(a -> a.absUrl("href"))
+            .filter(href -> href.contains(ctx.sourceName))
+            .forEach(href -> URLResource.of(href).ifPresent(chapterUrl -> {
+                String chapterPath = Util.join(Paths.get(chapterUrl.filePath()), "_");
+                Path chapterFile = ctx.chaptersDir.resolve(chapterPath + ".html");
+                ctx.add(chapterUrl, new FileResource(chapterFile));
+            }));
         ctx.download();
     }
 
