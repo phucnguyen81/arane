@@ -5,11 +5,30 @@ import java.util.Stack;
 import java.util.function.Function;
 
 /**
- * Base algorithms for working with trees.
+ * Generic tree algorithms.
  *
  * @author Phuc
  */
-public class Trees {
+public class Tree<T> {
+
+    private final T root;
+    private final Function<T, Iterable<T>> getChildren;
+
+    /** A tree, the the core, is anything that can yield children */
+    public Tree(T root, Function<T, Iterable<T>> getChildren) {
+        this.root = root;
+        this.getChildren = getChildren;
+    }
+
+    /** Call {@link #walk(Object, Function, TreeVisitor)} */
+    public final void walk(TreeVisitor<T> v) {
+        walk(root, getChildren, v);
+    }
+
+    /** Call {@link #render(Object, Function, Function)} */
+    public final String render(Function<T, String> toString) {
+        return render(root, getChildren, toString);
+    }
 
     /**
      * Perform a depth-first walk. Nodes visited along the way are reported to a
