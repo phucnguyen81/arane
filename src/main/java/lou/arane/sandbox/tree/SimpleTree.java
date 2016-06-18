@@ -18,12 +18,20 @@ public class SimpleTree {
 
     private final List<SimpleTree> children = new ArrayList<>();
 
-    public void addAttr(Object attr) {
+    public final boolean hasAttr(Object attr) {
+        return attrs.contains(attr);
+    }
+
+    public final void addAttr(Object attr) {
         attrs.add(attr);
     }
 
-    public void addChild(SimpleTree child) {
+    public final void addChild(SimpleTree child) {
         children.add(child);
+    }
+
+    public final Iterable<SimpleTree> children() {
+        return children;
     }
 
     @Override

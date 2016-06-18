@@ -13,7 +13,7 @@ import lou.arane.util.Check;
  *
  * @author Phuc
  */
-public final class SimpleTreeBuilder {
+public abstract class SimpleTreeBuilder {
 
 	/** Represent indentation/depth */
     public static final Object __ = new Object();
@@ -34,21 +34,28 @@ public final class SimpleTreeBuilder {
     public SimpleTreeBuilder(SimpleTree root) {
         trees = new TreeMap<>();
         reset(root);
+        build();
     }
 
+    /**
+     * Called from constructor {@link #SimpleTreeBuilder(SimpleTree)} to build the tree.
+     */
+    protected abstract void build();
+
     /** Reset the builder to build another tree given the new root */
-    public void reset(SimpleTree root) {
+    public final void reset(SimpleTree root) {
         trees.clear();
         registerNode(root, 0);
     }
 
     /** Reset the builder to build another tree with empty root */
-    public void reset() {
+    public final void reset() {
         reset(new SimpleTree());
     }
 
-    /** Get the first child of root, which represents the tree being built */
-    public Optional<SimpleTree> getTree() {
+    /** Get the first child of root, which represents the tree being built.
+     * Return empty if no children have been built or the builder was reset. */
+    public final Optional<SimpleTree> getTree() {
         Integer treeKey = trees.higherKey(0);
         if (trees.containsKey(treeKey)) {
         	return Optional.of(trees.get(treeKey).peekFirst());
@@ -57,7 +64,7 @@ public final class SimpleTreeBuilder {
     }
 
     /** Add the nodes taking identation as node depth */
-    public void add(Object... args) {
+    public final void add(Object... args) {
         int depth = getDepth(args);
         for (SimpleTree node : parseArguments(args)) {
             registerNode(node, depth);
