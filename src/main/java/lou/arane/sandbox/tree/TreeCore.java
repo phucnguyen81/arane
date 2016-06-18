@@ -8,15 +8,15 @@ import java.util.List;
  * information about the tree. Children are internal parts of the tree.
  * <p>
  * This tree is meant to be a temporary structure. It can be built with
- * {@link SimpleTreeBuilder} then converted to other tree types.
+ * {@link TreeCoreBuilder} then converted to other tree types.
  *
  * @author Phuc
  */
-public class SimpleTree {
+public class TreeCore {
 
     private final List<Object> attrs = new ArrayList<>();
 
-    private final List<SimpleTree> children = new ArrayList<>();
+    private final List<TreeCore> children = new ArrayList<>();
 
     public final boolean hasAttr(Object attr) {
         return attrs.contains(attr);
@@ -26,11 +26,11 @@ public class SimpleTree {
         attrs.add(attr);
     }
 
-    public final void addChild(SimpleTree child) {
+    public final void addChild(TreeCore child) {
         children.add(child);
     }
 
-    public final Iterable<SimpleTree> children() {
+    public final Iterable<TreeCore> children() {
         return children;
     }
 

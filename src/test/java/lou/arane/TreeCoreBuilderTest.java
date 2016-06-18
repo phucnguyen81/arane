@@ -3,15 +3,15 @@ package lou.arane;
 import org.junit.Assert;
 import org.junit.Test;
 
-import lou.arane.sandbox.tree.SimpleTree;
-import lou.arane.sandbox.tree.SimpleTreeBuilder;
+import lou.arane.sandbox.tree.TreeCore;
+import lou.arane.sandbox.tree.TreeCoreBuilder;
 import lou.arane.util.Util;
 
-public class SimpleTreeBuilderTest extends Assert {
+public class TreeCoreBuilderTest extends Assert {
 
     @Test
     public void thatBuildTreeWorks() {
-        SimpleTreeBuilder b = new SimpleTreeBuilder() {
+        TreeCoreBuilder b = new TreeCoreBuilder() {
             @Override
             protected void build() {
                 add("html");
@@ -21,16 +21,16 @@ public class SimpleTreeBuilderTest extends Assert {
             }
         };
 
-        SimpleTree html = b.getTree().get();
+        TreeCore html = b.getTree().get();
         Util.println(html);
 
         assertTrue(html.hasAttr("html"));
-        for (SimpleTree c : html.children()) {
+        for (TreeCore c : html.children()) {
             if (c.hasAttr("header")) {
                 continue;
             }
             else if (c.hasAttr("body")) {
-                SimpleTree div = c.children().iterator().next();
+                TreeCore div = c.children().iterator().next();
                 assertTrue(div.hasAttr("div"));
             }
             else {
