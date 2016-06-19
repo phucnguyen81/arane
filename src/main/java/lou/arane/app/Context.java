@@ -108,4 +108,9 @@ public class Context {
         d.run();
     }
 
+    public void download(Iterable<Download> ds) {
+        Downloads d = new Downloads(ds, maxDownloadAttempts);
+        d.run();
+    }
+
 }

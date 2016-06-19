@@ -31,11 +31,15 @@ public class Log {
         return base;
     }
 
-    /** Log with base logger */
-    public static void info(Object msg) {
-        BASE.info(msg.toString());
+    /** Log with base logger.
+     * The args are separated by a space */
+    public static void info(Object first, Object... rest) {
+        StringBuilder s = new StringBuilder(first.toString());
+        for (Object r : rest) {
+            s.append(" ").append(r);
+        }
+        BASE.info(s.toString());
     }
-
 
     /** Log with base logger */
     public static void warning(Throwable err) {

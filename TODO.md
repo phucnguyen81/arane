@@ -1,17 +1,27 @@
 # Make File/Dir Resource
 Move operations on File/Path into FileResource
 
-# Replace tinylog with java logging
-## Move all logging to app level
-## Brush up on java logging
-## Do the replacement
+# Find in html similar to BeautifulSoup
 
-# Make IO abstraction
-Core operations are reading and writing.
-Can have two abtractions: InputSource and OutputSource.
-Additional concerns (read/write texts, buffering, filtering, parsing, ect.) can be achieved with Decorators.
+# Turn Context into Encapsulated Context Pattern
+- move state out of Context 
+- move log factory into Context
+- pass Context to method, not to constructor
 
-# Add generic to Cmd implementations
+# Create common usecase
+The common usecase has:
+- download initial file
+- parse initial file
+- download chapter files
+- parse chapter files
+- download page files
+- parse page files
+- zip chapters
+
+What left for specific usecase:
+- get chapter links from initial file
+- get page links from page files
+- get image links from page files or chapter files
 
 # Remove all checked-exceptions
 Don't want to both checked and unchecked exceptions.
@@ -20,23 +30,25 @@ One has to go and it cannot be the unchecked one.
 Don't know for sure if this is a good idea but have to try anyway.
 Also, Closure/Python seems to work ok without checked exceptions.
 
-# Find in html similar to BeautifulSoup
-
 # Hand-built html parser
-Just need to produce a nested map for html.
-Use JSoup for references.
+Produce an Html document for this app only.
 
-# Make general TreeBuilder
-Having TreeBuilder as base to build arbitrary structures is too complex.
-Let's just build a general trees then we can convert them to anything else.
+Specifically, need to find elements with nicer syntax:
+html.find(
+    select attr(class, changePage) as(select)
+        option oneOrMore(attr(value)) as(options)
+).forEach(e ->
+    e.get("options").map(List::cast).forEach(opt ->
+        link = html.absUrl(opt.text)
+        ...
+    )
+)
 
-General tree:
-    tree = root context?
-    root = node
-    context = node
-    node = name (node)*
-    name = immutable-value
+Hmm, for shallow tree this looks for complex than it should.
+Just need to do the simpler thing for shallow tree:
 
-=> can use Entry for node-type, entry-key can be name and entry-value can be child-nodes.
-    Entry = Key Value
-    Value = Name | Iterable<Entry>
+for select in html.findAll(select, attr(class, changePage)):
+    for option in select.findAt(option, attr(value)):
+        ... have both select and option
+    
+
