@@ -34,17 +34,14 @@ public class ToString {
     }
 
     /**
-     * Show string representation. NOTE: use {@link #str()} to get the
-     * output.
+     * Get the output of the arguments added so far.
      */
-    @Override
-    public String toString() {
-        String thisClass = ToString.class.getSimpleName();
+    public String str() {
         if (clazz.isPresent()) {
-            return String.format("%s(%s, %s)", thisClass, clazz.get(), args);
+            return args.stream().collect(joining("", clazz.get() + "(", ")"));
         }
         else {
-            return String.format("%s(%s)", thisClass, args);
+            return args.stream().collect(joining());
         }
     }
 
@@ -63,19 +60,21 @@ public class ToString {
      * Append a system line-separator to the end of this
      */
     public ToString nln() {
-        args.add(System.lineSeparator());
-        return this;
+        return add(System.lineSeparator());
     }
 
     /**
-     * Get the output of the arguments added so far.
+     * Show string representation. NOTE: use {@link #str()} to get the
+     * output.
      */
-    public String str() {
+    @Override
+    public String toString() {
+        String thisClass = ToString.class.getSimpleName();
         if (clazz.isPresent()) {
-            return args.stream().collect(joining("", clazz.get() + "(", ")"));
+            return String.format("%s(%s, %s)", thisClass, clazz.get(), args);
         }
         else {
-            return args.stream().collect(joining());
+            return String.format("%s(%s)", thisClass, args);
         }
     }
 

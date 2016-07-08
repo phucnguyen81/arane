@@ -17,14 +17,10 @@ public class AraneTest {
 		if (off) testMangaSee();
 	}
 
-	/**
-	 * DEADTube,
-	 * AkaAkatoretachiNoMonogatari,
-	 */
 	static void testMangaLife() {
 		Arane.main(new String[] {
-			"MahouTsukaiNoYome"
-			, "http://manga.life/read-online/MahouTsukaiNoYome"
+			"TerraForMars"
+			, "http://manga.life/read-online/TerraForMars"
 		});
 	}
 

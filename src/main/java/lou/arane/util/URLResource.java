@@ -25,42 +25,43 @@ public class URLResource {
 
     /** Make instance or empty if url is malformed */
     public static Optional<URLResource> of(String url) {
-    	try {
-			return Optional.of(new URLResource(new URL(url)));
-		} catch (MalformedURLException e) {
-			return Optional.empty();
-		}
+        try {
+            return Optional.of(new URLResource(new URL(url)));
+        }
+        catch (MalformedURLException e) {
+            return Optional.empty();
+        }
     }
 
-	/** A url needs to be encoded if it constains
-	 * illegal source characters (e.g. spaces) */
-	public static String encode(String url) {
-		return url.codePoints()
-			.mapToObj(Character::toChars)
-			.map(String::new)
-			.map(c ->
-				(  c.equals(":")
-				|| c.equals("/")
-				|| c.equals("?")
-				|| c.equals("#")
-				|| c.equals("&")
-				)
-				? c
-				: encodeWithEncoder(c)
-			)
-			.collect(Collectors.joining());
-	}
+    /**
+     * A url needs to be encoded if it constains illegal source characters (e.g.
+     * spaces)
+     */
+    public static String encode(String url) {
+        return url.codePoints()
+                .mapToObj(Character::toChars)
+                .map(String::new)
+                .map(c -> (c.equals(":")
+                        || c.equals("/")
+                        || c.equals("?")
+                        || c.equals("#")
+                        || c.equals("&"))
+                                ? c
+                                : encodeWithEncoder(c))
+                .collect(Collectors.joining());
+    }
 
-	/** Encode url using default encoding and unchecked exception */
-	private static String encodeWithEncoder(String url) {
-		try {
-			return URLEncoder.encode(url, IO.encoding());
-		} catch (UnsupportedEncodingException e) {
-			throw new AssertionError(IO.encoding() + " should be supported!", e);
-		}
-	}
+    /** Encode url using default encoding and unchecked exception */
+    private static String encodeWithEncoder(String url) {
+        try {
+            return URLEncoder.encode(url, IO.encoding());
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new AssertionError(IO.encoding() + " should be supported!", e);
+        }
+    }
 
-    /** Alternate urls meant to locate the same resource as this url*/
+    /** Alternate urls meant to locate the same resource as this url */
     private final Collection<URLResource> alternatives;
 
     private final URL url;
@@ -70,22 +71,24 @@ public class URLResource {
     }
 
     public URLResource(URLResource url, Collection<URLResource> alternatives) {
-    	this(url.url, alternatives);
+        this(url.url, alternatives);
     }
 
     public URLResource(URL url, Collection<URLResource> alternatives) {
         try {
-			this.url = new URL(url.toExternalForm());
-		} catch (MalformedURLException e) {
-			throw New.unchecked(e);
-		}
+            this.url = new URL(url.toExternalForm());
+        }
+        catch (MalformedURLException e) {
+            throw New.unchecked(e);
+        }
         this.alternatives = Collections.unmodifiableCollection(alternatives);
     }
 
     public Collection<URLResource> alternatives() {
-    	return alternatives;
+        return alternatives;
     }
 
+    /** Return a new list containing this and its alternatives */
     public List<URLResource> plusAlternatives() {
         List<URLResource> urls = New.list();
         urls.add(this);
@@ -94,7 +97,7 @@ public class URLResource {
     }
 
     public String externalForm() {
-    	return url.toExternalForm();
+        return url.toExternalForm();
     }
 
     /** Return the query part of empty string */
@@ -104,7 +107,7 @@ public class URLResource {
     }
 
     public String fileExtension() {
-    	String fileName = fileName();
+        String fileName = fileName();
         return Util.getFileExtension(fileName);
     }
 
@@ -114,33 +117,32 @@ public class URLResource {
     }
 
     public String filePath() {
-    	String p = url.getPath();
-    	return p == null ? "" : p;
+        String p = url.getPath();
+        return p == null ? "" : p;
     }
 
     /**
      * Make GET request assuming the protocol is http.
      */
     public HttpResponse httpGET() {
-    	try {
-			HttpURLConnection conn;
-			conn = IO.httpGET(url, UTF_8, Duration.of(1, MINUTES));
+        try {
+            HttpURLConnection conn;
+            conn = IO.httpGET(url, UTF_8, Duration.of(1, MINUTES));
             return new HttpResponse(conn);
-		} catch (Exception e) {
-			throw New.unchecked(e);
-		}
+        }
+        catch (Exception e) {
+            throw New.unchecked(e);
+        }
     }
 
-	@Override
+    @Override
     public boolean equals(Object other) {
-    	return url.equals(((URLResource) other).url);
+        return url.equals(((URLResource) other).url);
     }
 
     @Override
     public String toString() {
-    	return String.format("%s%n  alternatives:%s"
-    		, url, Util.joinLines(alternatives)
-    	);
+        return String.format("%s%n  alternatives:%s", url, Util.joinLines(alternatives));
     }
 
 }
