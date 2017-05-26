@@ -123,7 +123,7 @@ public abstract class TreeBuilder<N> {
 
     @Override
     public String toString() {
-    	return String.format("%s:%n  %s", TreeBuilder.class.getSimpleName(), nodes);
+    	return nodes.toString();
     }
 
 }
