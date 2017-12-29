@@ -15,7 +15,7 @@ import lou.arane.util.URLResource;
 import lou.arane.util.Util;
 
 /**
- * Download mangas from manga.life site
+ * Download mangas from egscans site
  *
  * @author Phuc
  */

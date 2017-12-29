@@ -9,15 +9,24 @@ public class AraneTest {
 
 	public static void main(String[] args) {
 		boolean on = true, off = false;
-		if (on) testMangaLife();
+        if (off) testMangakakalot();
+        if (off) testEgScans();
+        if (off) testMangaLife();
 		if (off) testIzTruyenTranh();
 		if (off) testMangaGo();
 		if (off) testKissManga();
-		if (off) testBlogTruyen();
+        if (on) testBlogTruyen();
 		if (off) testMangaSee();
 	}
 
-	static void testMangaLife() {
+    static void testMangakakalot() {
+        Arane.main(new String[] {
+            "Reincarnation as a Slime"
+            , "http://mangakakalot.com/manga/tensei_shitara_slime_datta_ken"
+        });
+    }
+
+    static void testMangaLife() {
 		Arane.main(new String[] {
 			"TerraForMars"
 			, "http://manga.life/read-online/TerraForMars"
@@ -26,8 +35,8 @@ public class AraneTest {
 
 	static void testBlogTruyen() {
 		Arane.main(new String[] {
-			"saiki-kusuo-no-sainan"
-			, "http://blogtruyen.com/truyen/saiki-kusuo-no-sainan"
+            "Psyren"
+            , "http://blogtruyen.com/186/psyren"
 		});
 	}
 
@@ -54,8 +63,8 @@ public class AraneTest {
 
 	static void testEgScans() {
 		Arane.main(new String[] {
-			"Paladin"
-			, "http://read.egscans.com/Paladin"
+            "Heroes_of_the_Spring_and_Autumn"
+            , "http://read.egscans.com/Heroes_of_the_Spring_and_Autumn"
 		});
 	}
 

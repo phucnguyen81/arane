@@ -14,6 +14,7 @@ import lou.arane.app.usecases.KissManga;
 import lou.arane.app.usecases.MangaGo;
 import lou.arane.app.usecases.MangaLife;
 import lou.arane.app.usecases.MangaSee;
+import lou.arane.app.usecases.Mangakakalot;
 import lou.arane.core.Cmd;
 import lou.arane.core.cmds.CmdLog;
 import lou.arane.util.Log;
@@ -54,7 +55,8 @@ public class Arane {
 		System.err.println("e.g. arane WorldTrigger http://manga.life/read-online/WorldTrigger");
 		System.err.println("------------------------------------------");
 		System.err.println("Current supported sites are:");
-		System.err.println("blogtruyen, egscans, iztruyentranh, kissmanga, mangago, manga.life, mangasee");
+        System.err.println("blogtruyen, egscans, iztruyentranh, kissmanga,");
+        System.err.println("mangago, manga.life, mangasee, mangakakalot");
 		System.err.println("------------------------------------------");
 	}
 
@@ -86,6 +88,8 @@ public class Arane {
 		cmds.add(new MangaGo(new Context(name, url, mangaDir("mangago", name))));
 		cmds.add(new MangaLife(new Context(name, url, mangaDir("manga.life", name))));
 		cmds.add(new MangaSee(new Context(name, url, mangaDir("mangasee", name))));
+        cmds.add(new Mangakakalot(
+            new Context(name, url, mangaDir("mangakakalot", name))));
 		return cmds;
 	}
 

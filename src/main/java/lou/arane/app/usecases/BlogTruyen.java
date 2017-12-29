@@ -4,19 +4,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import lou.arane.app.Context;
 import lou.arane.core.Cmd;
 import lou.arane.util.FileResource;
 import lou.arane.util.URLResource;
 import lou.arane.util.Util;
-
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-/** FIXME
- * results seem broken, see example of downloading 'paladin'
- */
 
 /**
  * Download comics from blogtruyen site
@@ -25,100 +21,68 @@ import org.jsoup.select.Elements;
  */
 public class BlogTruyen implements Cmd {
 
-    /** Scheme of this site */
     private static final String BASE_URL = "http://blogtruyen.com/";
 
-	private final Context ctx;
+    private final Context ctx;
 
     public BlogTruyen(Context context) {
-    	this.ctx = context;
+        this.ctx = context;
     }
 
-	@Override
-	public boolean canRun() {
-		//domain must match
-	    //TODO just need to declare domain and check for domain matching
-		String url = ctx.source.externalForm();
-		return url.startsWith(BASE_URL);
-	}
+    @Override
+    public boolean canRun() {
+        String url = ctx.source.externalForm();
+        return url.startsWith(BASE_URL);
+    }
 
-	@Override
-	public void doRun() {
-		ctx.downloadChapterList();
-		downloadChapters();
-		downloadImages();
-		copyImagesToOutputDir();
-	}
+    @Override
+    public void doRun() {
+        ctx.downloadChapterList();
+        downloadChapters();
+        downloadImages();
+    }
 
     /**
      * Download chapter pages by extracting their urls from the master html
-     * file. The page urls are taken from the chapter listing:
-     *
-     * <pre>
-     *  <div class="list-wrap" id="list-chapters">
-     *      <a href="/truyen/hiep-khach-giang-ho/chap-473" >
-     *      <a href="https://www.mediafire.com/?i4fd23z6a8r25i8" rel="nofollow">
-     * ...
-     * </pre>
+     * file.
      */
     private void downloadChapters() {
-        Document rootFile = ctx.chapterList.parseHtml(BASE_URL);
-        Elements chapterAddresses = rootFile.select("a[href]");
-        for (Element chapterAddr : chapterAddresses) {
-            String href = chapterAddr.absUrl("href");
-			Optional<URLResource> chapterUri = URLResource.of(href);
-            if (chapterUri.isPresent()) {
-	            String path = chapterUri.get().filePath();
-	            if (path.contains(ctx.sourceName)) {
-	            	String chapterName = chapterUri.get().fileName().toString();
-	            	if (!chapterName.endsWith(".html")) {
-	            		chapterName += ".html";
-	            	}
-	            	Path chapterPath = ctx.chaptersDir.resolve(chapterName);
-	            	ctx.add(chapterUri.get(), new FileResource(chapterPath));
-	            }
-            }
+        Document root = ctx.chapterList.parseHtml(BASE_URL);
+        Elements chapters = root.select("div[id=list-chapters] a[href]");
+        for (Element chapter : chapters) {
+            String href = chapter.absUrl("href");
+            URLResource.of(href).ifPresent(chapterUri -> {
+                String name = chapterUri.fileName().toString();
+                if (!name.endsWith(".html")) name += ".html";
+                Path path = ctx.chaptersDir.resolve(name);
+                ctx.add(chapterUri, new FileResource(path));
+            });
         }
         ctx.download();
     }
 
     /**
-     * Download the actual images for each chapter. The images can be found in:
-     *
-     * <pre>
-     *   <article id="content">
-     *       <img src="http://4.bp.blogspot.com/.../Vol8-Chap48-P00.jpg?imgmax=3000" />
-     *       ...
-     *   </article>
-     * </pre>
+     * Download the actual images for each chapter.
      */
     private void downloadImages() {
-        for (Path chapterHtml : Util.findHtmlFiles(ctx.chaptersDir)) {
-            String imageDir = Util.removeFileExtension(chapterHtml.getFileName().toString());
-            Document page = Util.parseHtml(chapterHtml);
-            Elements images = page.select("article[id=content] img[src]");
-            for (Element image : images) {
-            	URLResource.of(image.absUrl("src")).ifPresent(imageUri -> {
-            		String imageName = imageUri.fileName().toString();
-            		Path imagePath = Paths.get(imageDir, imageName);
-            		imagePath = ctx.imagesDir.resolve(imagePath);
-            		ctx.add(imageUri, new FileResource(imagePath));
-            	});
-            }
+        for (Path chapter : Util.findHtmlFiles(ctx.chaptersDir)) {
+            String chapterName = chapter.getFileName().toString();
+            String imageDir = Util.removeFileExtension(chapterName);
+            Document page = Util.parseHtml(chapter);
+            page.select("article[id=content] img[src]")
+                .stream()
+                .map(image -> image.absUrl("src"))
+                .map(URLResource::of)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(imageUri -> {
+                    String imageName = imageUri.fileName().toString();
+                    Path imagePath = Paths.get(imageDir, imageName);
+                    imagePath = ctx.imagesDir.resolve(imagePath);
+                    ctx.add(imageUri, new FileResource(imagePath));
+                });
             ctx.download();
         }
-    }
-
-    /** Make output chapters from downloaded images */
-    private void copyImagesToOutputDir() {
-        Util
-        .list(ctx.imagesDir)
-        .filter(Util::isNotEmpty)
-        .forEach(src -> {
-            Path rel = ctx.imagesDir.relativize(src);
-            Path dst = ctx.outputDir.resolve(rel);
-            Util.copy(src, dst);
-        });
     }
 
 }
