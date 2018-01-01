@@ -5,24 +5,31 @@ package lou.arane;
  *
  * @author Phuc
  */
-public class AraneTest {
+public class AraneMain {
 
 	public static void main(String[] args) {
 		boolean on = true, off = false;
         if (off) testMangakakalot();
+        if (on) testManganelo();
         if (off) testEgScans();
         if (off) testMangaLife();
 		if (off) testIzTruyenTranh();
 		if (off) testMangaGo();
 		if (off) testKissManga();
-        if (on) testBlogTruyen();
+        if (off) testBlogTruyen();
 		if (off) testMangaSee();
 	}
 
+    static void testManganelo() {
+        Arane.main(new String[] {
+            "unOrdinary", "http://manganelo.com/manga/unordinary"
+        });
+    }
+
     static void testMangakakalot() {
         Arane.main(new String[] {
-            "Reincarnation as a Slime"
-            , "http://mangakakalot.com/manga/tensei_shitara_slime_datta_ken"
+            "Samurai Deeper Kyo"
+            , "http://mangakakalot.com/manga/samurai_deeper_kyo"
         });
     }
 
